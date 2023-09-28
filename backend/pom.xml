@@ -67,7 +67,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>1.4.0</version>
+				<version>3.0.1</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
@@ -75,7 +75,7 @@
 						<Bundle-Name>Persons Registry Services</Bundle-Name>
 						<Bundle-Vendor>Perun.Tech</Bundle-Vendor>
 						<Bundle-Description>
-							A bundle that provides rerson registry
+							A bundle that provides person registry
 							services
 						</Bundle-Description>
 						<Bundle-Activator>
