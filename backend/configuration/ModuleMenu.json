@@ -1,0 +1,124 @@
+{
+	"perun.persons_registry.module_menu.navigation": {
+		"persons_registry.module_menu.items": [
+			{
+				"labelCode": "perun.persons_registry.mi.physical",
+				"id": "PHYSICAL",
+				"menuItemLevel": 1,
+				"readOnly": true,
+				"order": 1,
+				"permissionCode": "yes",
+				"contextMenuLabelCode": null,
+				"sub-menu": [
+					{
+						"labelCode": "perun.persons_registry.mi.search_physical",
+						"id": "SEARCH_PHYSICAL",
+						"menuItemLevel": 2,
+						"readOnly": true,
+						"order": 1,
+						"permissionCode": "yes",
+						"contextMenuLabelCode": null,
+						"type": "search",
+						"optionsUrl": {
+						"type": "GET",
+						"url": "/SvPersonRegistry/getOptions/%session/PHYSICAL_ENTITY"
+						},
+						"configuration": {
+							"type": "GET",
+							"gridConf": "/ReactElements/getTableFieldList/%session/PHYSICAL_ENTITY"
+						},
+						"data": {
+							"type": "GET",
+							"gridData": "/ReactElements/getTableWithFilter/%session/PHYSICAL_ENTITY/%fieldNAme/%fieldValue/100000"
+						}
+					},
+					{
+						"labelCode": "perun.persons_registry.mi.add_physical",
+						"id": "ADD_PHYSICAL",
+						"menuItemLevel": 2,
+						"readOnly": true,
+						"order": 2,
+						"permissionCode": "yes",
+						"contextMenuLabelCode": null,
+						"type": "form",
+						"configuration": {
+							"type": "GET",
+							"fromConf": "/ReactElements/getTableJSONSchema/%session/PHYSICAL_ENTITY"
+						},
+						"uischema": {
+							"type": "GET",
+							"formUi": "/ReactElements/getTableUISchema/%session/PHYSICAL_ENTITY"
+						},
+						"data": {
+							"type": "GET",
+							"formData": "/ReactElements/getTableFormData/%session/0/PHYSICAL_ENTITY"
+						},
+						"save": {
+							"type": "POST",
+							"formData": "/ReactElements/createTableRecordFormData/%session/PHYSICAL_ENTITY/0"
+						}
+					}
+				]
+			},
+			{
+				"labelCode": "perun.persons_registry.mi.legal",
+				"id": "LEGAL",
+				"menuItemLevel": 1,
+				"readOnly": true,
+				"order": 2,
+				"permissionCode": "yes",
+				"contextMenuLabelCode": null,
+				"sub-menu": [
+					{
+						"labelCode": "perun.persons_registry.mi.search_legal",
+						"id": "SEARCH_LEGAL",
+						"menuItemLevel": 2,
+						"readOnly": true,
+						"order": 1,
+						"permissionCode": "yes",
+						"contextMenuLabelCode": null,
+						"type": "search",
+						"optionsUrl": {
+						"type": "GET",
+						"url": "/SvPersonRegistry/getOptions/%session/LEGAL_ENTITY"
+						},
+						"configuration": {
+							"type": "GET",
+							"gridConf": "/ReactElements/getTableFieldList/%session/LEGAL_ENTITY"
+						},
+						"data": {
+							"type": "GET",
+							"gridData": "/ReactElements/getTableWithFilter/%session/LEGAL_ENTITY/%fieldNAme/%fieldValue/100000"
+						}
+					},
+					{
+						"labelCode": "perun.persons_registry.mi.add_legal",
+						"id": "ADD_LEGAL",
+						"menuItemLevel": 2,
+						"readOnly": true,
+						"order": 2,
+						"permissionCode": "yes",
+						"contextMenuLabelCode": null,
+						"type": "form",
+						"configuration": {
+							"type": "GET",
+							"fromConf": "/ReactElements/getTableJSONSchema/%session/LEGAL_ENTITY"
+						},
+						"uischema": {
+							"type": "GET",
+							"formUi": "/ReactElements/getTableUISchema/%session/LEGAL_ENTITY"
+						},
+						"data": {
+							"type": "GET",
+							"formData": "/ReactElements/getTableFormData/%session/0/LEGAL_ENTITY"
+						},
+						"save": {
+							"type": "POST",
+							"formData": "/ReactElements/createTableRecordFormData/%session/LEGAL_ENTITY/0"
+						}
+					}
+				]
+			}
+		]
+	}
+}

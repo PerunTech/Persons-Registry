@@ -1,0 +1,122 @@
+stages:
+  - 1_linter
+  - 2_build_and_install
+  - 3_mvn_install
+  - 4_sonarqube
+
+before_script:
+  - pwd
+  - echo $K9S_SECRET_GITLABCI_TOKEN
+  - echo $CI_BUILD_REF_NAME
+  - git remote -v
+  - git reset --hard HEAD
+  - git stash
+  - git pull origin $CI_BUILD_REF_NAME
+
+after_script:
+  - git reset --hard HEAD
+  - git stash
+  - git pull origin $CI_BUILD_REF_NAME
+
+1_npm_install_test_build:
+  stage: 1_linter
+  script:
+    - pwd
+    - git reset --hard HEAD
+    - rm -rf node_modules
+    - pnpm install
+    - pnpm run build
+
+1_build_test_java:
+  stage: 2_build_and_install
+  script:
+    - cd backend
+    - mvn clean
+    - mvn test
+    
+1_perun-registry-dev-install:
+  stage: 3_mvn_install
+  script:  
+    - pwd
+    - cd $CI_PROJECT_DIR/
+    - git reset --hard HEAD
+    - rm -rf node_modules
+    - pnpm install
+    - rm -rf backend/www/*.js
+    - pnpm run build
+    - cd backend
+    - ls -al www/
+    - pwd
+    - mvn clean compile deploy -DskipTests
+  only:
+    - dev
+
+2_perun-registry-stable-install:
+  stage: 3_mvn_install
+  script:  
+    - pwd
+    - cd $CI_PROJECT_DIR/
+    - git reset --hard HEAD
+    - rm -rf node_modules
+    - pnpm install
+    - rm -rf backend/www/*.js
+    - pnpm run build
+    - cd backend
+    - ls -al www/
+    - pwd
+    - mvn clean compile deploy -DskipTests
+  only:
+    - master
+    - staging
+    
+3_person-registry-stable-generate-js:
+  stage: 3_mvn_install
+  script:  
+    - pwd
+    - echo $GITLAB_TOKEN_FR
+    - echo $CI_BUILD_TOKEN
+    - echo $CI_JOB_TOKEN
+    - cd $CI_PROJECT_DIR/
+    - git reset --hard HEAD
+    - rm -rf node_modules
+    - pnpm install
+    - rm -rf backend/www/*.js
+    - pnpm run build
+    - url_host=`git remote get-url origin | sed -e "s/https:\/\/gitlab-ci-token:.*@//g"`
+    - git remote set-url origin "https://gitlab-ci-token:${GITLAB_TOKEN_FR}@${url_host}"
+    - git remote -v
+    - git add backend/www/*.js
+    - git commit -m "Auto commit of person-registry library for npm" || exit 0
+    - git push origin HEAD:$CI_COMMIT_REF_NAME    
+  only:
+    - dev
+    - staging
+  when: manual
+
+1_perun-sonarqube_backend:
+  stage: 4_sonarqube
+  script:
+    - cd $CI_PROJECT_DIR/
+    - cd backend
+    - mvn sonar:sonar -Dsonar.analysis.mode=preview -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
+2_perun-sonarqube_backend_publish:
+  stage: 4_sonarqube
+  script:
+    - cd $CI_PROJECT_DIR/
+    - cd backend
+    - mvn sonar:sonar -Dsonar.analysis.mode=publish -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Donar.gitlab.user_token access=a18878c7b5beb401ce2f847537c296b46a3902b8 
+  environment:
+    name: $CI_COMMIT_REF_NAME
+  only:
+    - staging
+    - dev  
+  when: manual
+
+3_sonarqube_frontend:
+  stage: 4_sonarqube
+  script:
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.analysis.mode=preview -Dsonar.login=a02003f1f8f90382d7570b57a85c00c38132f85f -Dsonar.branch=$CI_BUILD_REF_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.analysis.mode=publish -Dsonar.login=a02003f1f8f90382d7570b57a85c00c38132f85f -Dsonar.branch=$CI_BUILD_REF_NAME -Dsonar.projectName=$CI_PROJECT_NAME
+
+

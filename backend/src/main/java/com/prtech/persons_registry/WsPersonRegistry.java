@@ -1,0 +1,765 @@
+package com.prtech.persons_registry;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
+import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.prtech.perun_core.ws.Rc;
+import com.prtech.perun_core.ws.WsReactElements;
+import com.prtech.svarog.I18n;
+import com.prtech.svarog.SvConf;
+import com.prtech.svarog.SvCore;
+import com.prtech.svarog.SvException;
+import com.prtech.svarog.SvLink;
+import com.prtech.svarog.SvLock;
+import com.prtech.svarog.SvReader;
+import com.prtech.svarog.SvWorkflow;
+import com.prtech.svarog.SvWriter;
+import com.prtech.svarog.svCONST;
+import com.prtech.svarog_common.DbDataArray;
+import com.prtech.svarog_common.DbDataObject;
+import com.prtech.svarog_common.DbSearchCriterion;
+import com.prtech.svarog_common.ResponseHandler;
+import com.prtech.svarog_common.DbSearchCriterion.DbCompareOperand;
+import com.prtech.svarog_common.DbSearchExpression;
+import com.prtech.svarog_common.ResponseHandler.MessageType;
+
+@Path("/SvPersonRegistry")
+public class WsPersonRegistry {
+
+	static final Logger log4j = SvConf.getLogger(WsPersonRegistry.class);
+
+	@Path("/getOptions/{token}/{tableName}")
+	@GET
+	@Produces("application/json")
+	public Response getOptions(@PathParam("token") String token, @PathParam("tableName") String tableName) {
+
+		ResponseHandler jrh = new ResponseHandler();
+		try (SvReader svr = new SvReader(token)) {
+
+			JsonArray jArray = new JsonArray();
+			JsonObject jObj;
+
+			jObj = new JsonObject();
+			jObj.addProperty("text", I18n.getText("options.choose"));
+			jObj.addProperty(PRC.VALUE, 0);
+			jObj.addProperty("selected", true);
+			jObj.addProperty("disabled", true);
+			jArray.add(jObj);
+
+			DbDataArray fields = SvReader.getFields(SvReader.getTypeIdByName(tableName));
+
+			for (DbDataObject field : fields.getItems()) {
+				if (field.getVal("INDEX_NAME") != null) {
+					jObj = new JsonObject();
+					jObj.addProperty("text", I18n.getText(field.getVal("LABEL_CODE").toString()));
+					jObj.addProperty(PRC.VALUE, field.getVal("FIELD_NAME").toString());
+					jArray.add(jObj);
+				}
+			}
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS), I18n.getText(PRC.SUCCESS_GET_OPTIONS),
+					jArray);
+
+		} catch (Exception e) {
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
+						I18n.getText(ex.getLabelCode()), new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
+						I18n.getText("person_registry.error.get_options"), new JsonObject());
+				return Response.status(500).entity(jrh.getAll()).build();
+			}
+
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+
+	@Path("/getTableJSONSchemaPerson/{sessionId}/{table_name}/{personType}")
+	@GET
+	@Produces("application/json")
+	public Response getTableJSONSchemaPerson(@PathParam("sessionId") String sessionId,
+			@PathParam("table_name") String tableName, @PathParam("personType") String personType,
+			@Context HttpServletRequest httpRequest) {
+
+		ResponseHandler jrh = new ResponseHandler();
+		JsonObject jObj2 = null;
+		try {
+
+			Response response = (new WsReactElements()).getTableJSONSchema(sessionId, tableName, httpRequest);
+			if (response.getStatus() == 200) {
+
+				JsonObject jObj = (new Gson()).fromJson((String) response.getEntity(), JsonObject.class);
+				JsonArray jARequired = new JsonArray();
+				// if (jObj.has(Rc.REQUIRED)) {
+				ArrayList<String> listRequired = new ArrayList<>();
+				if (personType.equalsIgnoreCase("p")) {
+					listRequired.add(PRC.ID_NO);
+					listRequired.add("ADDRESS");
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("COUNTRY_CODE");
+					listRequired.add("MUNICIPALITY");
+					listRequired.add("CITY_VILLAGE");
+					listRequired.add("CITY");
+
+					response = (new WsReactElements()).getTableJSONSchema(sessionId, PRC.PHYSICAL_ENTITY, httpRequest);
+
+					if (response.getStatus() == 200) {
+						jObj2 = (new Gson()).fromJson((String) response.getEntity(), JsonObject.class);
+						if (jObj2.has(Rc.REQUIRED)) {
+							jARequired = jObj2.get(Rc.REQUIRED).getAsJsonArray();
+
+						}
+					}
+
+				} else if (personType.equalsIgnoreCase("g")) {
+					listRequired.add(PRC.ID_NO);
+					listRequired.add(PRC.TAX_NO);
+					listRequired.add("NAME");
+					listRequired.add("ADDRESS");
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("COUNTRY_CODE");
+					listRequired.add("MUNICIPALITY");
+					listRequired.add("CITY_VILLAGE");
+					listRequired.add("CITY");
+
+					response = (new WsReactElements()).getTableJSONSchema(sessionId, PRC.LEGAL_ENTITY, httpRequest);
+
+					if (response.getStatus() == 200) {
+						jObj2 = (new Gson()).fromJson((String) response.getEntity(), JsonObject.class);
+
+						if (jObj2.has(Rc.REQUIRED)) {
+							jARequired = jObj2.get(Rc.REQUIRED).getAsJsonArray();
+
+						}
+					}
+
+				}
+				JsonElement element = (new Gson()).toJsonTree(listRequired, new TypeToken<List<String>>() {
+				}.getType());
+
+				if (jObj2 != null) {
+					jObj.addProperty(Rc.TITLE, jObj2.get(Rc.TITLE).getAsString());
+					JsonObject properties = jObj.get(Rc.PROPERTIES).getAsJsonObject();
+					if (personType.equalsIgnoreCase("p")) {
+						properties.remove("NAME");
+						properties.remove(PRC.TAX_NO);
+					}
+					if (personType.equalsIgnoreCase("g")) {
+						if (properties.has(PRC.ID_NO)) {
+							JsonObject jIdNo = properties.get(PRC.ID_NO).getAsJsonObject();
+							jIdNo.addProperty("minLength", 7);
+							jIdNo.addProperty("maxLength", 7);
+							properties.add(PRC.ID_NO, jIdNo);
+
+						}
+					}
+					for (Map.Entry<String, JsonElement> entry : jObj2.entrySet()) {
+
+						if (entry.getKey().equals(Rc.PROPERTIES))
+							for (Map.Entry<String, JsonElement> entry1 : entry.getValue().getAsJsonObject()
+									.entrySet()) {
+								if (!entry1.getKey().equalsIgnoreCase("DT_DEATH")
+										&& !entry1.getKey().equalsIgnoreCase("PLACE_OF_BIRTH")
+										&& !entry1.getKey().equalsIgnoreCase("STATE_OF_BIRTH")) {
+									properties.add(entry1.getKey(), entry1.getValue());
+								}
+							}
+
+					}
+					jObj.add(Rc.PROPERTIES, properties);
+				}
+
+				if (element.isJsonArray()) {
+					jARequired.addAll(element.getAsJsonArray());
+					jObj.add(Rc.REQUIRED, jARequired);
+				}
+				// }
+				jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
+						I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), jObj);
+			} else {
+				jrh.create(MessageType.ERROR, I18n.getText("error.perun.get.data"),
+						I18n.getText("error.perun.get.data"), new JsonObject());
+			}
+
+		} catch (Exception e) {
+
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
+						new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+					return Response.status(401).entity(jrh.getAll().toString()).build();
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll().toString()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
+						new JsonObject());
+				return Response.status(500).entity(jrh.getAll().toString()).build();
+			}
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+
+	}
+
+	@Path("/getTableUISchemaPerson/{sessionId}/{table_name}/{personType}")
+	@GET
+	@Produces("application/json")
+	public Response getTableUISchemaPerson(@PathParam("sessionId") String sessionId,
+			@PathParam("table_name") String tableName, @PathParam("personType") String personType,
+			@Context HttpServletRequest httpRequest) {
+		JsonObject jsonData = new JsonObject();
+		Gson gson = new Gson();
+		try {
+			DbDataArray typetoGet = SvCore.getFields(SvCore.getTypeIdByName(tableName));
+
+			for (int i = 0; i < typetoGet.getItems().size(); i++) {
+				JsonObject jsonreactGUI = null;
+				JsonObject jsonObj = null;
+				JsonObject jsonUISchema = null;
+				DbDataObject tempDboField = typetoGet.getItems().get(i);
+				String tmpField = tempDboField.getVal(Rc.FIELD_NAME).toString();
+				if (!tmpField.equalsIgnoreCase("pkid")) {
+					if (tempDboField.getVal(Rc.GUI_METADATA) != null)
+						jsonObj = gson.fromJson(tempDboField.getVal(Rc.GUI_METADATA).toString(), JsonObject.class);
+					if (jsonObj != null && jsonObj.has(Rc.REACT))
+						jsonreactGUI = (JsonObject) jsonObj.get(Rc.REACT);
+					if (jsonreactGUI != null && jsonreactGUI.has(Rc.UISCHEMA))
+						jsonUISchema = (JsonObject) jsonreactGUI.get(Rc.UISCHEMA);
+					// if this is first object in group create the group obect,
+					// if not, retreve it, add it to exising and put it back
+					if (jsonUISchema != null) {
+						String groupPath = null;
+						if (jsonreactGUI != null && jsonreactGUI.has(Rc.GROUPPATH)) { // grouppath
+																						// found
+							groupPath = jsonreactGUI.get(Rc.GROUPPATH).getAsString();
+							JsonObject groupValues = null;
+							if (jsonData.has(groupPath))
+								groupValues = (JsonObject) jsonData.get(groupPath);
+							if (groupValues == null)
+								groupValues = new JsonObject();
+							groupValues.add(tmpField, jsonUISchema);
+							jsonData.add(groupPath, groupValues);
+						} else // no grouppath found
+						{
+							if (personType.equalsIgnoreCase("p") && tmpField.equalsIgnoreCase(PRC.TAX_NO)) {
+								jsonUISchema.addProperty("ui:widget", "hidden");
+							}
+							jsonData.add(tmpField, jsonUISchema);
+						}
+
+					} else {
+						if (personType.equalsIgnoreCase("p") && tmpField.equalsIgnoreCase(PRC.TAX_NO)) {
+							jsonUISchema = new JsonObject();
+							jsonUISchema.addProperty("ui:widget", "hidden");
+							jsonData.add(tmpField, jsonUISchema);
+						}
+					}
+				}
+
+			}
+		} catch (SvException e) {
+			log4j.error(e.getFormattedMessage(), e);
+			return Response.status(401).entity(e.getFormattedMessage()).build();
+		}
+		return Response.status(200).entity(jsonData.toString()).build();
+	}
+
+	@Path("/savePerson/{session_id}")
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces("application/json")
+	public Response savePerson(@PathParam("session_id") String sessionId, MultivaluedMap<String, String> formVals,
+			@Context HttpServletRequest httpRequest) {
+		ResponseHandler jrh = new ResponseHandler();
+		String jsonObjString = "{}";
+		if (formVals != null)
+			for (Entry<String, List<String>> entry : formVals.entrySet()) {
+				if (entry.getKey() != null && !entry.getKey().isEmpty()) {
+					String key = entry.getKey();
+					jsonObjString = key;
+				}
+			}
+
+		DbDataObject vdataObject = null;
+		WsReactElements re = new WsReactElements();
+		JsonObject jsonData = null;
+		Gson gson = new Gson();
+		Long parentId = 0L;
+		String tableName = PRC.PERSON;
+		try (SvReader svr = new SvReader(sessionId); SvWriter svw = new SvWriter(svr);) {
+
+			jsonData = gson.fromJson(jsonObjString, JsonObject.class);
+
+			if (jsonData.has("PERSON_TYPE")) {
+				jsonData.addProperty("tableName", tableName);
+				vdataObject = re.prepareObjectToSave(jsonData, parentId, svr);
+
+				tableName = jsonData.get("PERSON_TYPE").getAsString().equalsIgnoreCase("g") ? PRC.LEGAL_ENTITY
+						: PRC.PHYSICAL_ENTITY;
+				if (tableName.equals(PRC.PHYSICAL_ENTITY)) {
+					vdataObject.setVal("NAME",
+							jsonData.get("FIRST_NAME").getAsString() + " " + jsonData.get("LAST_NAME").getAsString());
+				}
+				svw.saveObject(vdataObject, false);
+				parentId = vdataObject.getObjectId();
+				jsonData.addProperty("tableName", tableName);
+				if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
+						&& jsonData.has(tableName + "." + Rc.PKID)) {
+					jsonData.addProperty(Rc.OBJECT_TYPE, jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
+					jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
+					jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
+
+				}
+				vdataObject = re.prepareObjectToSave(jsonData, parentId, svr);
+
+				svw.saveObject(vdataObject, false);
+
+				svw.dbCommit();
+
+				jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
+						I18n.getText("perrun.success.save"), vdataObject.toSimpleJson());
+			} else {
+				jrh.create(MessageType.WARNING, I18n.getText("perrun.bad_data.save"),
+						I18n.getText("perrun.bad_data.save"), new JsonObject());
+			}
+		} catch (SvException e) {
+
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
+						new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+					return Response.status(401).entity(jrh.getAll().toString()).build();
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll().toString()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
+						new JsonObject());
+				return Response.status(500).entity(jrh.getAll().toString()).build();
+			}
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+
+	@Path("/getPerson/{sessionId}/{objectId}/{personType}")
+	@GET
+	@Produces("text/html;charset=utf-8")
+	public Response getPerson(@PathParam("sessionId") String sessionId, @PathParam("objectId") Long objectId,
+			@PathParam("personType") String personType, @Context HttpServletRequest httpRequest) throws SvException {
+		JsonObject responseJson = new JsonObject();
+		ResponseHandler jrh = new ResponseHandler();
+		WsReactElements wre = new WsReactElements();
+		try (SvReader svr = new SvReader(sessionId);) {
+			String tableName = personType.equalsIgnoreCase("g") ? PRC.LEGAL_ENTITY : PRC.PHYSICAL_ENTITY;
+
+			Response response = wre.getTableFormData(sessionId, objectId, PRC.PERSON, httpRequest);
+
+			if (!objectId.equals(0L) && response.getStatus() == 200) {
+				String personDataStr = response.getEntity().toString();
+				responseJson = (new Gson()).fromJson(personDataStr, JsonObject.class);
+				if (responseJson.has(Rc.OBJECT_ID)) {
+					DbDataArray arrPersonDetail = svr.getObjectsByParentId(objectId, SvCore.getTypeIdByName(tableName),
+							null);
+					if (!arrPersonDetail.isEmpty()) {
+						DbDataObject personDetail = arrPersonDetail.get(0);
+						DbDataArray vFields = svr.getObjectsByParentId(SvCore.getTypeIdByName(tableName),
+								svCONST.OBJECT_TYPE_FIELD, null, 0, 0, Rc.SORT_ORDER);
+						String fieldType = "";
+						for (int j = 0; j < vFields.getItems().size(); j++) {
+
+							String tmpFieldname = vFields.getItems().get(j).getVal(Rc.FIELD_NAME).toString();
+							fieldType = vFields.getItems().get(j).getVal(Rc.FIELD_TYPE).toString();
+							if (tmpFieldname.equalsIgnoreCase(Rc.PKID)) {
+								tmpFieldname = tableName + "." + tmpFieldname;
+								responseJson.addProperty(tmpFieldname, personDetail.getPkid());
+							} else {
+								if (personDetail.getVal(tmpFieldname) != null) {
+									switch (fieldType) {
+									case Rc.NUMERIC:
+										responseJson.addProperty(tmpFieldname,
+												(Long) personDetail.getVal(tmpFieldname));
+										break;
+									case Rc.NVARCHAR:
+									case "TEXT":
+										responseJson.addProperty(tmpFieldname,
+												(String) personDetail.getVal(tmpFieldname));
+										break;
+									case Rc.BOOLEAN:
+										responseJson.addProperty(tmpFieldname,
+												(Boolean) personDetail.getVal(tmpFieldname));
+										break;
+									case Rc.DATE:
+										DateTime tmpDsh = new DateTime(personDetail.getVal(tmpFieldname));
+
+										if (tmpDsh != null) {
+											int monthInt = tmpDsh.monthOfYear().get();
+											int dayInt = tmpDsh.dayOfMonth().get();
+											String monthStr = ((monthInt < 10) ? "0" : "") + String.valueOf(monthInt);
+											String dayStr = ((dayInt < 10) ? "0" : "") + String.valueOf(dayInt);
+											responseJson.addProperty(tmpFieldname,
+													tmpDsh.year().get() + "-" + monthStr + "-" + dayStr);
+										}
+										break;
+									case Rc.TIMESTAMP:
+									case Rc.DATETIME:
+										DateTime tmpDl = (DateTime) personDetail.getVal(tmpFieldname);
+										if (tmpDl != null)
+											responseJson.addProperty(tmpFieldname, tmpDl.toString());
+										break;
+									default:
+										break;
+									}
+								}
+							}
+						}
+
+						responseJson.addProperty(tableName + "." + Rc.OBJECT_ID, personDetail.getObjectId());
+						responseJson.addProperty(tableName + "." + Rc.OBJECT_TYPE, personDetail.getObjectType());
+					}
+					jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
+							I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), responseJson);
+				}
+
+			}
+
+		} catch (SvException e) {
+
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
+						new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+					return Response.status(401).entity(jrh.getAll().toString()).build();
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll().toString()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
+						new JsonObject());
+				return Response.status(500).entity(jrh.getAll().toString()).build();
+			}
+		}
+		return Response.status(200).entity(responseJson.toString()).build();
+	}
+
+	@Path("/getLinkTypeOptions/{token}")
+	@GET
+	@Produces("application/json")
+	public Response getLinkTypeOptions(@PathParam("token") String token) {
+
+		ResponseHandler jrh = new ResponseHandler();
+		try (SvReader svr = new SvReader(token)) {
+			JsonArray jArray = new JsonArray();
+			JsonObject jObj;
+
+			jObj = new JsonObject();
+			jObj.addProperty("text", I18n.getText("options.choose"));
+			jObj.addProperty(PRC.VALUE, 0);
+			jObj.addProperty("selected", true);
+			jObj.addProperty("disabled", true);
+			jArray.add(jObj);
+
+			DbSearchCriterion crit = new DbSearchCriterion(Rc.LINK_OBJECT_TYPE1, DbCompareOperand.EQUAL,
+					SvCore.getTypeIdByName(PRC.PERSON));
+			DbSearchCriterion crit2 = new DbSearchCriterion(Rc.LINK_OBJECT_TYPE2, DbCompareOperand.EQUAL,
+					SvCore.getTypeIdByName(PRC.PERSON));
+			DbSearchExpression exp = new DbSearchExpression().addDbSearchItem(crit).addDbSearchItem(crit2);
+
+			DbDataArray linkTypes = svr.getObjects(exp, SvReader.getTypeIdByName(Rc.LINK_TYPE), null, 0, 0);
+
+			for (DbDataObject linkType : linkTypes.getItems()) {
+
+				jObj = new JsonObject();
+				jObj.addProperty("text", I18n.getText(linkType.getVal(PRC.LINK_TYPE_DESCRIPTION).toString()));
+				jObj.addProperty(PRC.VALUE, linkType.getVal(Rc.LINK_TYPE).toString());
+				jArray.add(jObj);
+			}
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS), I18n.getText(PRC.SUCCESS_GET_OPTIONS),
+					jArray);
+
+		} catch (Exception e) {
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
+						I18n.getText(ex.getLabelCode()), new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
+						I18n.getText("person_registry.error.get_options"), new JsonObject());
+				return Response.status(500).entity(jrh.getAll()).build();
+			}
+
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+
+	@Path("/linkTwoPersons/{session_id}")
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces("application/json")
+	public Response linkTwoPersons(@PathParam("session_id") String sessionId, MultivaluedMap<String, String> formVals,
+			@Context HttpServletRequest httpRequest) {
+		ResponseHandler jrh = new ResponseHandler();
+
+		Long objectId1 = null;
+		Long objectId2 = null;
+		String linkName = "";
+		String jsonObjString = "";
+		ReentrantLock lock = null;
+		JsonObject jObj = new JsonObject();
+		String lockKey = "";
+		try (SvReader svr = new SvReader(sessionId); SvLink svl = new SvLink(svr);) {
+			if (formVals != null)
+				for (Entry<String, List<String>> entry : formVals.entrySet()) {
+					if (entry.getKey() != null && !entry.getKey().isEmpty()) {
+						String key = entry.getKey();
+						jsonObjString = key;
+					}
+				}
+
+			JsonObject jsonData = null;
+			Gson gson = new Gson();
+			jsonData = gson.fromJson(jsonObjString, JsonObject.class);
+
+			if (jsonData.has("objId1") && jsonData.has("objId2") && jsonData.has("linkName")) {
+				objectId1 = jsonData.get("objId1").getAsLong();
+
+				objectId2 = jsonData.get("objId2").getAsLong();
+
+				linkName = jsonData.get("linkName").getAsString();
+				lockKey = linkName + "-" + objectId1 + "-" + objectId2;
+
+				lock = SvLock.getLock(lockKey, false, 0);
+				if (lock != null) {
+					svl.linkObjects(objectId1, objectId2, SvLink
+							.getLinkType(linkName, SvCore.getTypeIdByName(PRC.PERSON), SvCore.getTypeIdByName(PRC.PERSON))
+							.getObjectId(), "", true, true);
+
+					jrh.create(MessageType.SUCCESS, I18n.getText("success.object_is_linked"),
+							I18n.getText("success.object_is_linked"), jObj);
+				} else {
+					jrh.create(MessageType.WARNING, I18n.getText("warning.object_is_locked"),
+							I18n.getText("warning.object_is_locked"), jObj);
+				}
+			} else {
+				jrh.create(MessageType.ERROR, I18n.getText("error.bad_json_date"), I18n.getText("error.bad_json_date"),
+						new JsonObject());
+			}
+		} catch (Exception e) {
+			if (e instanceof SvException) {
+				SvException ex = (SvException) e;
+
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
+						new JsonObject());
+				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+							new JsonObject());
+					log4j.error(ex.getFormattedMessage());
+					return Response.status(401).entity(jrh.getAll().toString()).build();
+				} else {
+					log4j.error(ex.getLabelCode(), ex);
+					if (ex.getLabelCode().startsWith("sys")) {
+						return Response.status(500).entity(jrh.getAll().toString()).build();
+					}
+				}
+
+			} else {
+				log4j.error(e.getMessage(), e);
+				jrh.create(MessageType.ERROR, I18n.getText("error.create_link"), I18n.getText("error.create_link"),
+						new JsonObject());
+				return Response.status(500).entity(jrh.getAll().toString()).build();
+			}
+
+		} finally {
+			if (lock != null) {
+				SvLock.releaseLock(lockKey, lock);
+			}
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+
+	@Path("BankAcc/changeStatus/sId/{sId}/oId/{oId}/nextStatus/{nextStatus}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response changeBankAccStatus(@PathParam("sId") String sId, @PathParam("oId") Long oId,
+			@PathParam("nextStatus") String nextStatus) {
+		ResponseHandler jrh = new ResponseHandler();
+		try (SvReader svr = new SvReader(sId); SvWorkflow sww = new SvWorkflow(svr)) {
+			if (oId != null && nextStatus != null && !nextStatus.equalsIgnoreCase(PRC.EMPTY_STRING)
+					&& (nextStatus.equalsIgnoreCase(PRC.ACTIVE) || nextStatus.equalsIgnoreCase(PRC.INACTIVE))) {
+				DbDataObject bankAcc = svr.getObjectById(oId, SvReader.getTypeIdByName(PRC.BANKACC), null);
+				sww.moveObject(bankAcc, nextStatus);
+				switch (nextStatus) {
+				case PRC.ACTIVE:
+					jrh.create(MessageType.SUCCESS, I18n.getText("success.perun.changedActiveStatus"),
+							I18n.getText("success.perun.changedActiveStatus"));
+					break;
+				case PRC.INACTIVE:
+					jrh.create(MessageType.SUCCESS, I18n.getText("success.perun.changedInactiveStatus"),
+							I18n.getText("success.perun.changedInactiveStatus"));
+					break;
+				default:
+					break;
+				}
+			} else {
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.ERROR_PERUN_CHANGED_STATUS),
+						I18n.getText(PRC.ERROR_PERUN_CHANGED_STATUS));
+			}
+		} catch (Exception e) {
+			return handleException(e, jrh, PRC.ERROR_PERUN_CHANGED_STATUS);
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+	
+	@Path("/get/dependency-dropdown/location/sid/{sid}")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLocationDependencyDropdown(@PathParam("sid") String sessionId,
+			MultivaluedMap<String, String> postData, @Context HttpServletRequest httpRequest) {
+		JsonObject jResult = new JsonObject();
+		try (SvReader svr = new SvReader(sessionId); SvWriter svw = new SvWriter(svr);) {
+			JsonObject jObject = new JsonObject();
+			if (postData != null) {
+				for (Entry<String, List<String>> entry : postData.entrySet()) {
+					List<String> value = entry.getValue();
+					jObject = (new Gson()).fromJson(value.get(0), JsonObject.class);
+				}
+			}
+			
+			Reader perunCoreRdr = new Reader();
+			String tableName = "REGION";
+			JsonObject jModifiedFormData = new JsonObject();
+			if (!jObject.has("FIELD_NAME")) {
+				throw new SvException("error.ipard_spa.missing_field_name", svr.getInstanceUser());
+			}
+			if (!jObject.has("FIELD_VALUE")) {
+				throw new SvException("error.ipard_spa.missing_field_value", svr.getInstanceUser());
+			}
+			String fieldName = jObject.get("FIELD_NAME").getAsString();
+			String fieldValue = jObject.get("FIELD_VALUE").getAsString();
+			jModifiedFormData.addProperty("FIELD_VALUE", fieldValue);
+			switch (fieldName) {
+			case "COUNTRY_CODE":
+				jModifiedFormData.addProperty("PARENT_CODE_VALUE", "REGIONS");
+				jModifiedFormData.addProperty("DEPENDENT_PARENT_CODE_VALUE", "MUNICIPALITY");
+				break;
+			case "MUNIC_CODE":
+				jModifiedFormData.addProperty("PARENT_CODE_VALUE", "MUNICIPALITY");
+				jModifiedFormData.addProperty("DEPENDENT_PARENT_CODE_VALUE", "POPULATED_AREAS");
+				break;
+			default:
+				break;
+			}
+			jResult = perunCoreRdr.getDependentElements(jModifiedFormData, tableName, svr);
+			
+		} catch (Exception e) {
+			ResponseHandler jrh = new ResponseHandler();
+			log4j.error(e.getMessage(), e);
+			jrh.create(MessageType.ERROR, I18n.getText("ERROR_DEFAULT_TITLE"), I18n.getText("ERROR_DEFAULT_TITLE"), new JsonObject());
+		}
+		return Response.status(200).entity(jResult.toString()).build();
+	}
+
+	private Response handleException(Exception e, ResponseHandler jrh, String message) {
+		if (e instanceof SvException) {
+			SvException sve = (SvException) e;
+			log4j.error(sve.getFormattedMessage(), sve);
+			if (sve.getLabelCode().equals("error_invalid_session")) {
+				jrh.create(MessageType.ERROR, I18n.getText("error_invalid_session"),
+						I18n.getText("error_invalid_session"), new JsonObject());
+				return Response.status(401).entity(jrh.getAll().toString()).build();
+			} else if (sve.getLabelCode().equals(PRC.ERROR_USER_NOT_AUTHORIZED)) {
+				jrh.create(MessageType.ERROR, I18n.getText(PRC.ERROR_USER_NOT_AUTHORIZED),
+						I18n.getText(PRC.ERROR_USER_NOT_AUTHORIZED), new JsonObject());
+				return Response.status(403).entity(jrh.getAll().toString()).build();
+			}
+		} else {
+			log4j.error(e.getMessage(), e);
+			jrh.create(MessageType.ERROR, I18n.getText(message), I18n.getText(message), new JsonObject());
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+}
