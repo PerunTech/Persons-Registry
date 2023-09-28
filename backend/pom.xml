@@ -126,7 +126,7 @@
 		<dependency>
 			<groupId>svarog</groupId>
 			<artifactId>svarog</artifactId>
-			<version>[3.0.6,3.2.99)</version>
+			<version>[4.0.0-SNAPSHOT,5.0.0)</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -150,4 +150,17 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>Oracle</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc8</artifactId>
+					<version>12.2.0.1.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+	
 </project>
