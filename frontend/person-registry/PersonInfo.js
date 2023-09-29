@@ -199,6 +199,41 @@ class PersonInfo extends React.Component {
           this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
           break;
         }
+        case 'idData': {
+          let gridId = 'IDENTITY_DATA'
+          let obj = [
+            {
+              "name": `${labelsManager.importLabel('edit', p_r, this.context)}`,
+              "action": () => this.manageSave('edit', gridId),
+              "id": "editBtnContact"
+            }, {
+              "name": `${labelsManager.importLabel('delete', p_r, this.context)}`,
+              "action": () => this.deleteIdData(`${gridId}${objectId}`),
+              "id": "deleteIdData"
+            }
+          ]
+          let grid = <GenericGrid
+            gridType={'READ_URL'}
+            key={gridId + objectId}
+            id={gridId + objectId}
+            configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
+            dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000/PKID'}
+            onRowClickFunct={this.rowClickFunction}
+            heightRatio={0.60}
+            toggleCustomButton={true}
+            customButton={() => this.manageSave('add', gridId)}
+            customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
+            buttonsArray={obj}
+            refreshData={true}
+          />
+          ComponentManager.setStateForComponent(gridId + objectId, null, {
+            onRowClickFunct: this.rowClickFunction,
+            customButton: () => this.manageSave('add', gridId),
+            buttonsArray: obj
+          })
+          this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
+          break;
+        }
         case 'pureRender': {
           this.setState({ additionalInfoRender: this.state.pureRender, renderForm: false })
           break;
@@ -625,6 +660,8 @@ class PersonInfo extends React.Component {
       this.setState({ bankObjId: row['BANKACC.OBJECT_ID'], status: row['BANKACC.STATUS'] })
     } else if (removeNumber === 'SVAROG_CONTACT_DATA') {
       this.setState({ contactObjId: row['SVAROG_CONTACT_DATA.OBJECT_ID'], objTypeId: row['SVAROG_CONTACT_DATA.OBJECT_TYPE'], bankStatus: row['SVAROG_CONTACT_DATA.STATUS'] })
+    } else if (removeNumber === 'IDENTITY_DATA') {
+      this.setState({ idDataId: row['IDENTITY_DATA.OBJECT_ID'], idDataType: row['IDENTITY_DATA.OBJECT_TYPE'] })
     }
   }
 
@@ -664,7 +701,7 @@ class PersonInfo extends React.Component {
   }
   //reusable button function used to define button label and  button action based on the saveType
   manageSave = (saveType, gridId) => {
-    const { bankObjId, contactObjId, status } = this.state
+    const { bankObjId, contactObjId, status, idDataId } = this.state
     let tableFormDataMethod
     let customSaveButtonName
     let modalTitle
@@ -676,8 +713,10 @@ class PersonInfo extends React.Component {
         customSaveButtonName = labelsManager.importLabel('add', p_r, this.context)
         if (gridId === 'BANKACC') {
           modalTitle = labelsManager.importLabel('add_bank_acc', p_r, this.context)
-        } else {
+        } else if (gridId === 'SVAROG_CONTACT_DAT') {
           modalTitle = labelsManager.importLabel('contact', p_r, this.context)
+        } else if (gridId === 'IDENTITY_DATA') {
+          modalTitle = labelsManager.importLabel('id_data', p_r, this.context)
         }
         break;
       }
@@ -702,6 +741,19 @@ class PersonInfo extends React.Component {
               modalTitle = labelsManager.importLabel('edit_contact_data', p_r, this.context)
               hideBtns = 'closeAndDelete'
             } else {
+              generateModal = false
+              this.alertInfo()
+            }
+          }
+            break;
+          case 'IDENTITY_DATA': {
+            if (idDataId) {
+              tableFormDataMethod = '/ReactElements/getTableFormData/%session/' + idDataId + '/' + gridId
+              customSaveButtonName = labelsManager.importLabel('edit', p_r, this.context)
+              modalTitle = labelsManager.importLabel('edit_id_data', p_r, this.context)
+              hideBtns = 'closeAndDelete'
+            }
+            else {
               generateModal = false
               this.alertInfo()
             }
@@ -877,7 +929,10 @@ class PersonInfo extends React.Component {
       }
     } else if (gridId === 'SVAROG_CONTACT_DATA') {
       canMakeAxios = true
-    } else {
+    } else if (gridId === 'IDENTITY_DATA') {
+      canMakeAxios = true
+    }
+    else {
       alertUser(true, 'error', 'Настана грешка', 'Ве молиме контактирајте го администраторот')
     }
     if (canMakeAxios === true) {
@@ -918,6 +973,42 @@ class PersonInfo extends React.Component {
     this.hashHistory.push(href)
   }
 
+  deleteIdData = (gridid) => {
+    let { svSession } = this.props
+    let { idDataId, idDataType } = this.state
+    if (idDataId && idDataType) {
+      alertUser(true, 'info',
+        labelsManager.importLabel('delete_id_data', p_r, this.context),
+        labelsManager.importLabel('confirm_delete_id_data', p_r, this.context),
+        () => {
+          let restUrl = window.server + '/ReactElements/deleteObject/' + svSession + '/false/false'
+          let data = { 'OBJECT_ID': idDataId, 'OBJECT_TYPE': idDataType }
+          axios({
+            method: 'post',
+            data,
+            url: restUrl,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          }).then((response) => {
+
+
+            this.setState({ objTypeId: '', contactObjId: '', bankStatus: '', idDataId: '', idDataType: '' })
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => GridManager.reloadGridData(gridid))
+
+          }).catch((err) => {
+            if (err.data) {
+              this.setState({ objTypeId: '', contactObjId: '', bankStatus: '', idDataId: '', idDataType: '' })
+              alertUser(true, err.data.type.toLowerCase(), err.data.title, err.data.message)
+            }
+          })
+        }, null, true,
+        labelsManager.importLabel('delete', p_r, this.context),
+        labelsManager.importLabel('cancel', p_r, this.context)
+      )
+    } else {
+      alertUser(true, 'info', labelsManager.importLabel('no_selection', p_r, this.context), labelsManager.importLabel('choose_selection', p_r, this.context))
+    }
+  }
+
   render() {
     const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, namePhysical, activeTab } = this.state;
     return (
@@ -943,14 +1034,20 @@ class PersonInfo extends React.Component {
                   this.setState({ activeTab: 'contact' })
                   this.additionalInfo('contact')
                 }} className={`pr-btn-reg-info pr-contact  ${activeTab === 'contact' && 'pr-active-tab'}`}>{iconManager.getIcon('contact')} {labelsManager.importLabel('contact', p_r, this.context)} </button>
-                {selectedPersonType === 'P' && <button id='authP' onClick={() => {
+                {/* {selectedPersonType === 'P' && <button id='authP' onClick={() => {
                   this.setState({ activeTab: 'authP' })
                   this.additionalInfo('showAuthC')
                 }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {this.context.intl.formatMessage({ id: 'perun.persons_registry.legal_connection', defaultMessage: 'perun.persons_registry.legal_connection' })} </button>}
                 {selectedPersonType === 'G' && <button id='authP' onClick={() => {
                   this.setState({ activeTab: 'authP' })
                   this.additionalInfo('authorizedPerson')
-                }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>}
+                }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>} */}
+
+                {selectedPersonType === 'P' && <button id='idData' onClick={() => {
+                  this.setState({ activeTab: 'idData' })
+                  this.additionalInfo('idData')
+                }} className={`pr-btn-reg-info pr-idData ${activeTab === 'idData' && 'pr-active-tab'}`}>{iconManager.getIcon('idData')} {labelsManager.importLabel('add_identity_data', p_r, this.context)} </button>}
+
                 {selectedPersonType === 'G' && <button id='authPlist' onClick={() => {
                   this.setState({ activeTab: 'authPlist' })
                   this.additionalInfo('showAuthP')
