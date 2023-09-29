@@ -618,7 +618,7 @@ public class DbInit implements IDbInit {
 		dbf4.setDbFieldSize(10);
 		dbf4.setIsNull(true);
 		dbf4.setLabel_code("identity_data.issued_by");
-		dbf4.setCode_list_user_code("identity_data.document_authority");
+		dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
 		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
 		DbDataField[] dbTableFields = new DbDataField[4];
