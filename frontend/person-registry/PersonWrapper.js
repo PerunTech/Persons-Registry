@@ -181,12 +181,12 @@ class PersonWrapper extends React.Component {
         if (selectedPersonType === 'P') {
           finalUiSchema['ui:order'] = [
             'ID_NO', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'FIRST_NAME', 'LAST_NAME', 'GENDER', 'PERSON_TYPE'
+            'DT_BIRTH_REG', 'FIRST_NAME', 'LAST_NAME', 'GENDER', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
           ]
         } else if (selectedPersonType === 'G') {
           finalUiSchema['ui:order'] = [
             'ID_NO', 'TAX_NO', 'NAME', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'SHORT_NAME', 'BUSINESS_STATUS', 'OWNERSHIP_TYPE', 'SUBJECT_SIZE', 'ORGANIZATIONAL_TYPE', 'PERSON_TYPE'
+            'DT_BIRTH_REG', 'SHORT_NAME', 'BUSINESS_STATUS', 'OWNERSHIP_TYPE', 'SUBJECT_SIZE', 'ORGANIZATIONAL_TYPE', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
           ]
         }
         this.setState({ jsonSchema: finalSchema, uiSchema: finalUiSchema, formData: newFormData })
@@ -316,7 +316,7 @@ class PersonWrapper extends React.Component {
 
   generatePerson = (_personType, modalTitle, personTypeShort) => {
     if (personTypeShort) {
-      let uiSchema = {}, jsonSchema = {}, formData = { COUNTRY_CODE: 'MKD' }
+      let uiSchema = {}, jsonSchema = {}, formData = {}
       switch (personTypeShort) {
         case 'P': {
           uiSchema = {

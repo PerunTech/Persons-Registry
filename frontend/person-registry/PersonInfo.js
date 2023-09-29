@@ -2,7 +2,6 @@ import { React, axios, connect, ComponentManager, GenericGrid, GridManager, Gene
 const { alertUser, Dropdown } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
-import { axiosCall } from './components/AxiosCalls'
 import { searchRender, searchComponent, searchResult } from './components/SearchComponent'
 import { logOut } from './components/LogOut'
 
@@ -19,6 +18,7 @@ class PersonInfo extends React.Component {
       jsonSchema: {},
       uiSchema: {},
       formData: {},
+      activeTab: '',
     }
     this.hashHistory = createHashHistory()
   }
@@ -100,7 +100,7 @@ class PersonInfo extends React.Component {
             configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
             dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000'}
             onRowClickFunct={this.rowClickFunction}
-            minHeight={0}
+            heightRatio={0.60}
             toggleCustomButton={true}
             customButton={() => this.manageSave('add', gridId)}
             customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
@@ -140,7 +140,7 @@ class PersonInfo extends React.Component {
             configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
             dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000/PKID'}
             onRowClickFunct={this.rowClickFunction}
-            minHeight={0}
+            heightRatio={0.60}
             toggleCustomButton={true}
             customButton={() => this.manageSave('add', gridId)}
             customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
@@ -167,7 +167,7 @@ class PersonInfo extends React.Component {
             configTableName={'/WsIpardSpa/getTableFieldListForResponsiblePersons/%session'}
             dataTableName={'/WsIpardSpa/getResponsiblePersons/%session/' + objectId + '/' + false}
             onRowClickFunct={this.getRespPersonOnRowClick}
-            minHeight={0}
+            heightRatio={0.60}
             toggleCustomButton={true}
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
@@ -187,7 +187,7 @@ class PersonInfo extends React.Component {
             configTableName={'/WsIpardSpa/getTableFieldListForResponsiblePersons/%session'}
             dataTableName={'/WsIpardSpa/getResponsiblePersons/%session/' + objectId + '/' + true}
             onRowClickFunct={this.getRespPersonOnRowClick}
-            minHeight={0}
+            heightRatio={0.60}
             toggleCustomButton={true}
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
@@ -329,9 +329,17 @@ class PersonInfo extends React.Component {
     if (this.state.objectId && this.state.setAuthPerson) {
       const { objectId, objectIdF, setAuthPerson } = this.state
       let params = { 'objId1': objectIdF, 'objId2': objectId, 'linkName': setAuthPerson }
-      let url = []
-      url.push(window.server + '/SvPersonRegistry/linkTwoPersons/' + svSession)
-      axiosCall(url, svSession, this.responseAuth, 'post', params)
+      const url = window.server + '/SvPersonRegistry/linkTwoPersons/' + svSession
+      axios({
+        method: 'post',
+        url: url,
+        data: params,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      })
+        .then(this.responseAuth)
+        .catch(function (error) {
+          console.error("Error: ", error)
+        })
     } else {
       alertUser(true, 'info', labelsManager.importLabel('missing_dd_value', p_r, this.context), labelsManager.importLabel('please_choose_dd', p_r, this.context))
     }
@@ -357,10 +365,16 @@ class PersonInfo extends React.Component {
     let selectedPersonTypeP = row['PERSON.PERSON_TYPE']
     if (selectedPersonTypeP === 'P') {
       th1s.setState({ objectIdF, nameAuth }, () => {
-        let url = []
-        url.push(window.server + '/SvPersonRegistry/getLinkTypeOptions/' + svSession)
-        axiosCall(url, svSession, th1s.responseAxios, 'get')
-      })
+        const url = window.server + '/SvPersonRegistry/getLinkTypeOptions/' + svSession
+        axios({
+          method: 'get',
+          url: url,
+        })
+          .then(th1s.responseAxios)
+          .chatch(function (error) {
+            console.error('Error: ', error)
+          });
+      });
     } else {
       th1s.setState({ objectIdF: '', nameAuth: '' })
       alertUser(true, 'info', labelsManager.importLabel('legal_selected', p_r, this.context), labelsManager.importLabel('please_choose_physical', p_r, this.context))
@@ -557,12 +571,12 @@ class PersonInfo extends React.Component {
         if (selectedPersonType === 'P') {
           finalUiSchema['ui:order'] = [
             'ID_NO', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'FIRST_NAME', 'LAST_NAME', 'GENDER', 'PERSON_TYPE'
+            'DT_BIRTH_REG', 'FIRST_NAME', 'LAST_NAME', 'GENDER', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
           ]
         } else if (selectedPersonType === 'G') {
           finalUiSchema['ui:order'] = [
             'ID_NO', 'TAX_NO', 'NAME', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'SHORT_NAME', 'BUSINESS_STATUS', 'OWNERSHIP_TYPE', 'SUBJECT_SIZE', 'ORGANIZATIONAL_TYPE', 'PERSON_TYPE'
+            'DT_BIRTH_REG', 'SHORT_NAME', 'BUSINESS_STATUS', 'OWNERSHIP_TYPE', 'SUBJECT_SIZE', 'ORGANIZATIONAL_TYPE', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
           ]
         }
         this.setState({ jsonSchema: finalSchema, uiSchema: finalUiSchema, formData: newFormData, isLoading: false, renderForm: true })
@@ -623,8 +637,19 @@ class PersonInfo extends React.Component {
       form_params.FIRST_NAME = form_params.FIRST_NAME?.toUpperCase()
       form_params.LAST_NAME = form_params.LAST_NAME?.toUpperCase()
     }
-    let urlArr = [window.server + '/SvPersonRegistry/savePerson/' + this.props.svSession]
-    axiosCall(urlArr, this.props.svSession, this.responseCallback, 'post', form_params)
+    const url = window.server + '/SvPersonRegistry/savePerson/' + this.props.svSession;
+    axios({
+      method: 'post',
+      url: url,
+      data: form_params,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+      .then(res => {
+        this.responseCallback(res.data)
+      })
+      .catch(function (error) {
+        console.error('Error: ', error)
+      })
   }
 
   responseCallback = (data) => {
@@ -691,9 +716,19 @@ class PersonInfo extends React.Component {
         const { svSession } = this.props
         if (this.state.linkTypeObjId && this.state.linkType && this.state.respPersonName) {
           let params = { 'objectId1': linkTypeObjId, 'objectType1': 'PERSON', 'objectId2': objectId, 'objectType2': 'PERSON', 'linkType': linkType }
-          let urlArr = []
-          urlArr.push(window.server + '/ReactElements/deleteLinkObject/' + svSession)
-          alertUser(true, 'info', `${labelsManager.importLabel('your_selection', p_r, this.context)} ${respPersonName}`, labelsManager.importLabel('delete_connect', p_r, this.context), () => axiosCall(urlArr, svSession, this.deleteConnCallback, 'post', params), null, true, labelsManager.importLabel('delete', p_r, this.context), labelsManager.importLabel('cancel', p_r, this.context))
+          const url = window.server + '/ReactElements/deleteLinkObject/' + svSession;
+          alertUser(true, 'info', `${labelsManager.importLabel('your_selection', p_r, this.context)} ${respPersonName}`, labelsManager.importLabel('delete_connect', p_r, this.context), () => {
+            axios({
+              method: 'post',
+              url: url,
+              data: params,
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            })
+              .then(this.deleteConnCallback)
+              .cathc(function (error) {
+                console.error('Error: ', error)
+              })
+          }, null, true, labelsManager.importLabel('delete', p_r, this.context), labelsManager.importLabel('cancel', p_r, this.context))
         } else {
           alertUser(true, 'info', labelsManager.importLabel('no_selection', p_r, this.context), labelsManager.importLabel('choose_selection', p_r, this.context))
         }
@@ -764,10 +799,12 @@ class PersonInfo extends React.Component {
         nextStatus = 'INACTIVE'
         break;
     }
-    let url = [
-      window.server + `/SvPersonRegistry/BankAcc/changeStatus/sId/${svSession}/oId/${bankObjId}/nextStatus/${nextStatus}`
-    ]
-    axiosCall(url, svSession, this.responseStatus, 'get')
+    const url = window.server + `/SvPersonRegistry/BankAcc/changeStatus/sId/${svSession}/oId/${bankObjId}/nextStatus/${nextStatus}`;
+    axios.get(url)
+      .then(this.responseStatus)
+      .catch(function (error) {
+        console.error('Error: ', error)
+      })
   }
 
   responseStatus = (data) => {
@@ -882,28 +919,50 @@ class PersonInfo extends React.Component {
   }
 
   render() {
-    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, namePhysical } = this.state;
+    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, namePhysical, activeTab } = this.state;
     return (
       <React.Fragment>
-        <div className='pr-holder'>
+        <div className='pr-holder-info'>
           {isLoading}
           {showModal}
-          <div id='alt-btn_holder' className='pr-btn-holder'>
-            {showRenderBtns && <React.Fragment>
+          <div className='pr-main-btn-holder'>
+            <div className='pr-info-btn-holder'> <button id='back' onClick={this.redirectBack} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', p_r, this.context)} </button>
               {namePhysical && <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', p_r, this.context)} : <b>{namePhysical}</b></p></div>}
-              <button id='back' onClick={this.redirectBack} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', p_r, this.context)} </button>
-              <button id='editPerson' onClick={() => this.additionalInfo('editPerson')} className='pr-btn-reg'>{iconManager.getIcon('editUser')} {labelsManager.importLabel('edit_person', p_r, this.context)} </button>
-              <button id='bankAcc' onClick={() => this.additionalInfo('bankAcc')} className='pr-btn-reg'>{iconManager.getIcon('bankAcc')} {labelsManager.importLabel('bank_acc', p_r, this.context)} </button>
-              <button id='contact' onClick={() => this.additionalInfo('contact')} className='pr-btn-reg'>{iconManager.getIcon('contact')} {labelsManager.importLabel('contact', p_r, this.context)} </button>
-              {selectedPersonType === 'P' && <button id='authP' onClick={() => this.additionalInfo('showAuthC')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {this.context.intl.formatMessage({ id: 'perun.persons_registry.legal_connection', defaultMessage: 'perun.persons_registry.legal_connection' })} </button>}
-              {selectedPersonType === 'G' && <button id='authP' onClick={() => this.additionalInfo('authorizedPerson')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>}
-              {selectedPersonType === 'G' && <button id='authPlist' onClick={() => this.additionalInfo('showAuthP')} className='pr-btn-reg'>{iconManager.getIcon('preview')} {labelsManager.importLabel('show_auth_person', p_r, this.context)} </button>}
-            </React.Fragment>
-            }
+            </div>
+            <div id='alt-btn_holder' className='pr-btn-holder-info'>
+              <div className='pr-btn-container'>
+                <button id='editPerson' onClick={() => {
+                  this.setState({ activeTab: 'editPerson' })
+                  this.additionalInfo('editPerson')
+                }} className={`pr-btn-reg-info  pr-editPerson ${activeTab === 'editPerson' && 'pr-active-tab'}`}>{iconManager.getIcon('editUser')} {labelsManager.importLabel('edit_person', p_r, this.context)} </button>
+                <button id='bankAcc' onClick={() => {
+                  this.setState({ activeTab: 'bankAcc' })
+                  this.additionalInfo('bankAcc')
+                }} className={`pr-btn-reg-info pr-bankAcc  ${activeTab === 'bankAcc' && 'pr-active-tab'}`}>{iconManager.getIcon('bankAcc')} {labelsManager.importLabel('bank_acc', p_r, this.context)} </button>
+                <button id='contact' onClick={() => {
+                  this.setState({ activeTab: 'contact' })
+                  this.additionalInfo('contact')
+                }} className={`pr-btn-reg-info pr-contact  ${activeTab === 'contact' && 'pr-active-tab'}`}>{iconManager.getIcon('contact')} {labelsManager.importLabel('contact', p_r, this.context)} </button>
+                {selectedPersonType === 'P' && <button id='authP' onClick={() => {
+                  this.setState({ activeTab: 'authP' })
+                  this.additionalInfo('showAuthC')
+                }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {this.context.intl.formatMessage({ id: 'perun.persons_registry.legal_connection', defaultMessage: 'perun.persons_registry.legal_connection' })} </button>}
+                {selectedPersonType === 'G' && <button id='authP' onClick={() => {
+                  this.setState({ activeTab: 'authP' })
+                  this.additionalInfo('authorizedPerson')
+                }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>}
+                {selectedPersonType === 'G' && <button id='authPlist' onClick={() => {
+                  this.setState({ activeTab: 'authPlist' })
+                  this.additionalInfo('showAuthP')
+                }} className={`pr-btn-reg-info pr-authPlist  ${activeTab === 'authPlist' && 'pr-active-tab'}`}>{iconManager.getIcon('preview')} {labelsManager.importLabel('show_auth_person', p_r, this.context)} </button>}
+              </div>
+            </div>
           </div>
-          <div id='alt-content' className='pr-content'>
-            {additionalInfoRender}
-            {renderForm && this.generateForm()}
+          <div id='alt-content' className='pr-content-info'>
+            <div className='pr-content-inner'>
+              {additionalInfoRender}
+              {renderForm && this.generateForm()}
+            </div>
           </div>
         </div>
       </React.Fragment>
