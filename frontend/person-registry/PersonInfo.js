@@ -853,7 +853,9 @@ class PersonInfo extends React.Component {
     }
     const url = window.server + `/SvPersonRegistry/BankAcc/changeStatus/sId/${svSession}/oId/${bankObjId}/nextStatus/${nextStatus}`;
     axios.get(url)
-      .then(this.responseStatus)
+      .then(res => {
+        this.responseStatus(res.data)
+      })
       .catch(function (error) {
         console.error('Error: ', error)
       })
@@ -865,6 +867,7 @@ class PersonInfo extends React.Component {
       alertUser(true, data.type.toLowerCase(), data.title, data.message)
       this.setState({ status: '', bankObjId: '' })
       GridManager.reloadGridData('BANKACC' + objectId)
+      ComponentManager.setStateForComponent('BANKACC' + objectId, null, { rowClicked: undefined })
     }
   }
 
