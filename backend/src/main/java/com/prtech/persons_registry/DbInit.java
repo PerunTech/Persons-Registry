@@ -564,8 +564,8 @@ public class DbInit implements IDbInit {
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
 		dbTableFields[2] = dbf3;
-		dbTableFields[3] = dbf7;
-		dbTableFields[4] = dbf4;
+		dbTableFields[3] = dbf4;
+		dbTableFields[4] = dbf7;
 		// dbTableFields[3] = dbf4;
 		// dbTableFields[4] = dbf5;
 		// dbTableFields[3] = dbf6;
