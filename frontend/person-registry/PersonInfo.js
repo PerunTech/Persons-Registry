@@ -1048,11 +1048,11 @@ class PersonInfo extends React.Component {
                   this.additionalInfo('idData')
                 }} className={`pr-btn-reg-info pr-idData ${activeTab === 'idData' && 'pr-active-tab'}`}>{iconManager.getIcon('idData')} {labelsManager.importLabel('add_identity_data', p_r, this.context)} </button>}
 
-                {selectedPersonType === 'G' && <button id='authPlist' onClick={() => {
+                {/* {selectedPersonType === 'G' && <button id='authPlist' onClick={() => {
                   this.setState({ activeTab: 'authPlist' })
                   this.additionalInfo('showAuthP')
                 }} className={`pr-btn-reg-info pr-authPlist  ${activeTab === 'authPlist' && 'pr-active-tab'}`}>{iconManager.getIcon('preview')} {labelsManager.importLabel('show_auth_person', p_r, this.context)} </button>}
-              </div>
+             */} </div>
             </div>
           </div>
           <div id='alt-content' className='pr-content-info'>

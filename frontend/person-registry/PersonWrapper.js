@@ -375,6 +375,10 @@ class PersonWrapper extends React.Component {
       form_params.FIRST_NAME = form_params.FIRST_NAME?.toUpperCase()
       form_params.LAST_NAME = form_params.LAST_NAME?.toUpperCase()
     }
+    if (form_params.NAME) {
+      form_params.NAME = form_params.NAME?.toUpperCase()
+    }
+
     let restUrl = window.server + '/SvPersonRegistry/savePerson/' + this.props.svSession
     let th1s = this
     axios({
