@@ -390,9 +390,9 @@ class PersonWrapper extends React.Component {
         } else {
           th1s.setState({ selectedPersonType: '', objectId: '' })
           th1s.closeModalFn()
-          if (response.data.data.parent_id) {
-            th1s.saveCallBackGridFunc(response.data.data.parent_id)
-          }
+          // if (response.data.data.parent_id) {
+          //   th1s.saveCallBackGridFunc(response.data.data.parent_id)
+          // }
           alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message)
         }
       }
