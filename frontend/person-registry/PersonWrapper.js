@@ -403,7 +403,6 @@ class PersonWrapper extends React.Component {
     }).catch(function (error) {
       if (error) {
         if (error.response.data) {
-          th1s.setState({ selectedPersonType: '', objectId: '' })
           alertUser(true, 'error', error.response.data.title, error.response.data.message)
         }
       }
