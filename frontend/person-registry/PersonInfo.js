@@ -4,6 +4,7 @@ import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
 import { searchRender, searchComponent, searchResult } from './components/SearchComponent'
 import { logOut } from './components/LogOut'
+import InitialEditForm from './InitialEditForm'
 
 const p_r = 'persons_registry'
 class PersonInfo extends React.Component {
@@ -11,68 +12,38 @@ class PersonInfo extends React.Component {
     super(props)
     this.state = {
       isLoading: false,
-      renderForm: false,
       dataToRender: [],
       jsonSchemaP: {},
       jsonSchemaG: {},
       jsonSchema: {},
       uiSchema: {},
       formData: {},
-      activeTab: '',
+      activeTab: 'editPerson',
+      initial: true
     }
     this.hashHistory = createHashHistory()
   }
-
   componentDidMount() {
     if (this.props.match) {
       if (this.props.match.params) {
-        const { objId, personType, name } = this.props.match.params
-        this.setState({ namePhysical: name })
-        this.getCustomFormJson(objId, personType)
+        const { objId, personType } = this.props.match.params
+        this.setState({ selectedPersonType: personType, objectId: objId })
       }
     }
   }
-  /*
+
+  setPersonName = (fullname, first, last) => {
+    let name
+    if (first && last) {
+      name = first + " " + last
+    } else {
+      name = fullname
+    }
+    this.setState({ entityName: name })
+  }
+  /*  
   Used to save  custom jsonSchemas for further usage
   */
-  getCustomFormJson = (objId, personType) => {
-    this.setState({ isLoading: <Loading /> })
-    const { svSession } = this.props
-    let personTypeP = window.server + '/SvPersonRegistry/getTableJSONSchemaPerson/' + svSession + '/PERSON/P'
-    let personTypeG = window.server + '/SvPersonRegistry/getTableJSONSchemaPerson/' + svSession + '/PERSON/G'
-    axios.all([
-      axios.get(personTypeP),
-      axios.get(personTypeG)
-    ]).then(
-      axios.spread((...responses) => {
-        if (responses.length > 0) {
-          this.setState({ isLoading: false, objectId: objId, selectedPersonType: personType, showRenderBtns: true })
-          const responseP = responses[0]
-          const responseG = responses[1]
-          if ((responseP.data.type === 'ERROR' && responseP.data.title === 'Невалидна сесија') && (responseG.data.type === 'ERROR' && responseG.data.title === 'Невалидна сесија')) {
-            alertUser(true, responses.data.type.toLowerCase(), responses.data.title, responses.data.message)
-            logOut()
-          } else {
-            if (responseP.data.data) {
-              this.setState({ jsonSchemaP: responseP.data.data })
-            }
-            if (responseG.data.data) {
-              this.setState({ jsonSchemaG: responseG.data.data })
-            }
-            this.setState({ showButtons: true })
-          }
-        }
-      })
-    ).catch(error => {
-      if (error) {
-        if (error.data) {
-          this.setState({ showButtons: false, isLoading: false })
-          alertUser(true, error.data.toLowerCase(), error.data.message, error.data.message)
-        }
-      }
-    });
-  }
-
   /*
  Used as a button function located in the side menu used to generate diffrent <GenericGrid/> components based on current case
    */
@@ -112,7 +83,7 @@ class PersonInfo extends React.Component {
             customButton: () => this.manageSave('add', gridId),
             buttonsArray: obj
           })
-          this.setState({ additionalInfoRender: grid, renderForm: false, contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, initial: false, contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'authorizedPerson': {
@@ -151,12 +122,7 @@ class PersonInfo extends React.Component {
             customButton: () => this.manageSave('add', gridId),
             buttonsArray: obj
           })
-          this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
-          break;
-        }
-        case 'editPerson': {
-          this.setState({ additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
-          this.getFormData()
+          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
           break;
         }
         case 'showAuthC': {
@@ -176,7 +142,7 @@ class PersonInfo extends React.Component {
             onRowClickFunct: this.getRespPersonOnRowClick,
             customButton: () => this.manageSave('delete'),
           })
-          this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'showAuthP': {
@@ -196,7 +162,7 @@ class PersonInfo extends React.Component {
             onRowClickFunct: this.getRespPersonOnRowClick,
             customButton: () => this.manageSave('delete'),
           })
-          this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'idData': {
@@ -231,7 +197,7 @@ class PersonInfo extends React.Component {
             customButton: () => this.manageSave('add', gridId),
             buttonsArray: obj
           })
-          this.setState({ additionalInfoRender: grid, renderForm: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
+          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
           break;
         }
         case 'pureRender': {
@@ -314,7 +280,7 @@ class PersonInfo extends React.Component {
     let title = <div>{labelsManager.importLabel('please_search_person', p_r, this.context)}</div>
     let form = searchRender(this.searchComponentParent, this.context)
     showAddAuthPerson.push(title, form)
-    this.setState({ additionalInfoRender: showAddAuthPerson, renderForm: false, pureRender: showAddAuthPerson })
+    this.setState({ additionalInfoRender: showAddAuthPerson, initial: false, pureRender: showAddAuthPerson })
   }
 
   searchComponentParent = (formData, form) => {
@@ -384,7 +350,7 @@ class PersonInfo extends React.Component {
     const { objectId } = this.state
     if (data.type) {
       GridManager.reloadGridData('RESPONSIBLE_PERSON' + objectId)
-      this.setState({ additionalInfoRender: '', renderForm: false, objectIdF: '', nameAuth: '', setAuthPerson: '', showModal: '' }, () => this.additionalInfo('pureRender'))
+      this.setState({ additionalInfoRender: '', initial: false, objectIdF: '', nameAuth: '', setAuthPerson: '', showModal: '' }, () => this.additionalInfo('pureRender'))
       alertUser(true, data.type.toLowerCase(), data.title, data.message)
     } else {
       alertUser(true, 'error', labelsManager.importLabel('error', p_r, this.context), labelsManager.importLabel('try_again_or_contact_admin', p_r, this.context))
@@ -441,218 +407,6 @@ class PersonInfo extends React.Component {
     })
   }
 
-  getFormData = () => {
-    const { objectId, selectedPersonType } = this.state
-    if (objectId && selectedPersonType) {
-      const { svSession } = this.props
-      let url = window.server + '/SvPersonRegistry/getPerson/' + svSession + '/' + objectId + '/' + selectedPersonType
-      axios.get(url).then((response) => {
-        if (response.data) {
-          if (response.data.type === 'ERROR' && response.data.title === 'Невалидна сесија') {
-            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message)
-            logOut()
-          } else {
-            let jsonSchema
-            let uiSchema = {}
-            if (selectedPersonType === 'P') {
-              uiSchema = { "PERSON_TYPE": { "ui:widget": "hidden" } }
-              jsonSchema = this.state.jsonSchemaP
-            }
-            if (selectedPersonType === 'G') {
-              uiSchema = { "PERSON_TYPE": { "ui:widget": "hidden" } }
-              jsonSchema = this.state.jsonSchemaG
-            }
-
-            this.setState({ jsonSchema, uiSchema, formData: response.data }, () => this.getMunicipalities('', true))
-          }
-        }
-      }).catch((error) => {
-        if (error.data) {
-          alertUser(true, error.data.type.toLowerCase(), error.data.message, null, null)
-        }
-      })
-    } else {
-      alertUser(true, 'info', labelsManager.importLabel('no_selection', p_r, this.context), labelsManager.importLabel('choose_selection', p_r, this.context))
-    }
-  }
-
-  getSettlements = (municipality, skipFormDataCheck) => {
-    const { svSession } = this.props
-    const { jsonSchema, uiSchema, formData } = this.state
-    // JSON schema stuff
-    const newSchema = JSON.parse(JSON.stringify(jsonSchema))
-    // UI schema stuff
-    const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
-    newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
-    // Form data stuff
-    const newFormData = JSON.parse(JSON.stringify(formData))
-    if (!skipFormDataCheck) {
-      newFormData.CITY_VILLAGE = '/'
-    }
-    // Getting the new dropdown data
-    const dataObj = { FIELD_NAME: 'MUNIC_CODE', FIELD_VALUE: municipality }
-    const data = new URLSearchParams()
-    data.append('params', JSON.stringify(dataObj))
-    const wsPath = `SvPersonRegistry/get/dependency-dropdown/location/sid/${svSession}`
-    const url = `${window.server}/${wsPath}`
-    const reqConfig = { method: 'post', url, data }
-    axios(reqConfig).then(res => {
-      if (res.data && Object.keys(res.data).length > 0) {
-        const finalUiSchema = JSON.parse(JSON.stringify(newUiSchema))
-        finalUiSchema.CITY_VILLAGE.classNames = ''
-
-        const finalSchema = JSON.parse(JSON.stringify(newSchema))
-        finalSchema.properties.CITY_VILLAGE.enum = Object.keys(res.data)
-        finalSchema.properties.CITY_VILLAGE.enumNames = Object.values(res.data)
-        this.setState({ jsonSchema: finalSchema, uiSchema: finalUiSchema, formData: newFormData, isLoading: false, renderForm: true })
-      } else {
-        this.setState({ jsonSchema: newSchema, uiSchema: newUiSchema, formData: newFormData })
-      }
-    }).catch(err => {
-      console.error(err)
-      alertUser(true, 'error', err)
-      this.setState({ isLoading: false })
-    })
-  }
-
-  // Used to build the dependecyDropDown element for municipalities
-  getMunicipalities = (country, skipFormDataCheck) => {
-    const { svSession } = this.props
-    const { jsonSchema, uiSchema, formData, selectedPersonType } = this.state
-    if (!country) {
-      this.setState({ isLoading: <Loading /> })
-    }
-    // JSON schema stuff
-    const newSchema = JSON.parse(JSON.stringify(jsonSchema))
-    // UI schema stuff
-    const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
-    if (!newUiSchema.MUNICIPALITY) {
-      newUiSchema.MUNICIPALITY = {}
-    }
-    newUiSchema.MUNICIPALITY.classNames = 'hidden-field'
-    if (!newUiSchema.CITY_VILLAGE) {
-      newUiSchema.CITY_VILLAGE = {}
-    }
-    newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
-    if (!newUiSchema.CITY) {
-      newUiSchema.CITY = {}
-    }
-    newUiSchema.CITY.classNames = 'hidden-field'
-    // Form data stuff
-    const newFormData = JSON.parse(JSON.stringify(formData))
-    if (!skipFormDataCheck) {
-      newFormData.MUNICIPALITY = '/'
-      newFormData.CITY_VILLAGE = '/'
-    }
-    // Getting the new dropdown data
-    const dataObj = { FIELD_NAME: 'COUNTRY_CODE', FIELD_VALUE: country || formData.COUNTRY_CODE }
-    const data = new URLSearchParams()
-    data.append('params', JSON.stringify(dataObj))
-    const wsPath = `SvPersonRegistry/get/dependency-dropdown/location/sid/${svSession}`
-    const url = `${window.server}/${wsPath}`
-    const reqConfig = { method: 'post', url, data }
-    axios(reqConfig).then(res => {
-      if (res.data && Object.keys(res.data).length > 0) {
-        newFormData.CITY = undefined
-        const finalUiSchema = JSON.parse(JSON.stringify(newUiSchema))
-        finalUiSchema.MUNICIPALITY.classNames = ''
-        if (!finalUiSchema.CITY) {
-          finalUiSchema.CITY = {}
-        }
-        finalUiSchema.CITY.classNames = 'hidden-field'
-
-        const finalSchema = JSON.parse(JSON.stringify(newSchema))
-        finalSchema.properties.MUNICIPALITY.enum = Object.keys(res.data)
-        finalSchema.properties.MUNICIPALITY.enumNames = Object.values(res.data)
-        const cityFieldIndex = finalSchema.required?.indexOf('CITY')
-        if (cityFieldIndex > -1) {
-          finalSchema.required.splice(cityFieldIndex, 1)
-        }
-        if (!skipFormDataCheck) {
-          finalSchema.required.push('MUNICIPALITY', 'CITY_VILLAGE')
-        }
-        this.setState({ jsonSchema: finalSchema, uiSchema: finalUiSchema, formData: newFormData })
-        if (!country) {
-          this.getSettlements(formData.MUNICIPALITY, true)
-        }
-      } else {
-        const finalSchema = JSON.parse(JSON.stringify(newSchema))
-        finalSchema.properties.MUNICIPALITY.enum = ['/']
-        finalSchema.properties.MUNICIPALITY.enumNames = ['/']
-        finalSchema.properties.CITY_VILLAGE.enum = ['/']
-        finalSchema.properties.CITY_VILLAGE.enumNames = ['/']
-        const municipalityFieldIndex = finalSchema.required?.indexOf('MUNICIPALITY')
-        if (municipalityFieldIndex > -1) {
-          finalSchema.required.splice(municipalityFieldIndex, 1)
-        }
-        const cityVillageFieldIndex = finalSchema.required?.indexOf('CITY_VILLAGE')
-        if (cityVillageFieldIndex > -1) {
-          finalSchema.required.splice(cityVillageFieldIndex, 1)
-        }
-        const cityFieldIndex = finalSchema.required?.indexOf('CITY')
-        if (cityFieldIndex === -1) {
-          finalSchema.required.push('CITY')
-        }
-        newFormData.MUNICIPALITY = '/'
-        newFormData.CITY_VILLAGE = '/'
-        const finalUiSchema = JSON.parse(JSON.stringify(newUiSchema))
-        if (!finalUiSchema.CITY) {
-          finalUiSchema.CITY = {}
-        }
-        finalUiSchema.CITY.classNames = ''
-        if (!finalUiSchema['ui:order']) {
-          finalUiSchema['ui:order'] = []
-        }
-        if (selectedPersonType === 'P') {
-          finalUiSchema['ui:order'] = [
-            'ID_NO', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'FIRST_NAME', 'LAST_NAME', 'GENDER', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
-          ]
-        } else if (selectedPersonType === 'G') {
-          finalUiSchema['ui:order'] = [
-            'ID_NO', 'TAX_NO', 'NAME', 'COUNTRY_CODE', 'MUNICIPALITY', 'CITY_VILLAGE', 'CITY', 'ADDRESS',
-            'DT_BIRTH_REG', 'SHORT_NAME', 'BUSINESS_STATUS', 'OWNERSHIP_TYPE', 'SUBJECT_SIZE', 'ORGANIZATIONAL_TYPE', 'PERSON_TYPE', 'PHONE_NUMBER', 'EMAIL'
-          ]
-        }
-        this.setState({ jsonSchema: finalSchema, uiSchema: finalUiSchema, formData: newFormData, isLoading: false, renderForm: true })
-      }
-    }).catch(err => {
-      console.error(err)
-      alertUser(true, 'error', err)
-      this.setState({ isLoading: false })
-    })
-  }
-
-  onPersonFormDataChange = ({ formData }) => {
-    const { formData: formDataState } = this.state
-    this.setState({ formData })
-    if (formData.COUNTRY_CODE && formData.COUNTRY_CODE !== formDataState.COUNTRY_CODE) {
-      this.getMunicipalities(formData.COUNTRY_CODE)
-    } else if (formData.MUNICIPALITY && formData.MUNICIPALITY !== formDataState.MUNICIPALITY) {
-      this.getSettlements(formData.MUNICIPALITY)
-    }
-  }
-
-  generateForm = () => {
-    const { jsonSchema, uiSchema, formData } = this.state
-    let form = (
-      <Form
-        schema={jsonSchema}
-        uiSchema={uiSchema}
-        formData={formData}
-        onChange={this.onPersonFormDataChange}
-        onSubmit={this.savePerson}
-        className={`form-test person-registry-forms person-registration-form`}
-      >
-        <div id="btnSeparator" style={{ width: 'auto', float: 'right' }}>
-          <button id='submit_btn' type='submit' className={'btn-success btn_save_form'}> {labelsManager.importLabel('save', p_r, this.context)} </button>
-        </div>
-      </Form>
-    )
-
-    return form
-  }
-
   rowClickFunction = (id, _idx, row) => {
     // fn that matches the letters in the string excluding numbers and join the created array with "_" into single string
     let removeNumber = id.match(/[a-zA-Z]+/g).join('_')
@@ -666,7 +420,9 @@ class PersonInfo extends React.Component {
   }
 
   savePerson = (formData) => {
+    this.setState({ initial: false })
     let form_params = formData.formData
+    this.setPersonName(form_params.NAME, form_params.FIRST_NAME, form_params.LAST_NAME)
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
     }
@@ -682,22 +438,12 @@ class PersonInfo extends React.Component {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
       .then(res => {
-        this.responseCallback(res.data)
+        alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message)
+        this.setState({ additionalInfoRender: '', initial: true })
       })
       .catch(function (error) {
         console.error('Error: ', error)
       })
-  }
-
-  responseCallback = (data) => {
-    if (data.type) {
-      alertUser(true, data.type.toLowerCase(), data.title, data.message)
-      if (data.type.toLowerCase() === 'success') {
-        this.setState({ additionalInfoRender: '', renderForm: false }, () => {
-          this.additionalInfo('editPerson')
-        })
-      }
-    }
   }
   //reusable button function used to define button label and  button action based on the saveType
   manageSave = (saveType, gridId) => {
@@ -1013,7 +759,7 @@ class PersonInfo extends React.Component {
   }
 
   render() {
-    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, namePhysical, activeTab } = this.state;
+    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, entityName, activeTab } = this.state;
     return (
       <React.Fragment>
         <div className='pr-holder-info'>
@@ -1021,13 +767,12 @@ class PersonInfo extends React.Component {
           {showModal}
           <div className='pr-main-btn-holder'>
             <div className='pr-info-btn-holder'> <button id='back' onClick={this.redirectBack} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', p_r, this.context)} </button>
-              {namePhysical && <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', p_r, this.context)} : <b>{namePhysical}</b></p></div>}
+              <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', p_r, this.context)} : <b>{entityName}</b></p></div>
             </div>
             <div id='alt-btn_holder' className='pr-btn-holder-info'>
               <div className='pr-btn-container'>
                 <button id='editPerson' onClick={() => {
-                  this.setState({ activeTab: 'editPerson' })
-                  this.additionalInfo('editPerson')
+                  this.setState({ activeTab: 'editPerson', initial: true, additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
                 }} className={`pr-btn-reg-info  pr-editPerson ${activeTab === 'editPerson' && 'pr-active-tab'}`}>{iconManager.getIcon('editUser')} {labelsManager.importLabel('edit_person', p_r, this.context)} </button>
                 <button id='bankAcc' onClick={() => {
                   this.setState({ activeTab: 'bankAcc' })
@@ -1046,7 +791,7 @@ class PersonInfo extends React.Component {
                   this.additionalInfo('authorizedPerson')
                 }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>} */}
 
-                {selectedPersonType === 'P' && <button id='idData' onClick={() => {
+                {this.props.match.params.personType === 'P' && <button id='idData' onClick={() => {
                   this.setState({ activeTab: 'idData' })
                   this.additionalInfo('idData')
                 }} className={`pr-btn-reg-info pr-idData ${activeTab === 'idData' && 'pr-active-tab'}`}>{iconManager.getIcon('idData')} {labelsManager.importLabel('add_identity_data', p_r, this.context)} </button>}
@@ -1061,7 +806,7 @@ class PersonInfo extends React.Component {
           <div id='alt-content' className='pr-content-info'>
             <div className='pr-content-inner'>
               {additionalInfoRender}
-              {renderForm && this.generateForm()}
+              {this.state.initial && <InitialEditForm setPersonName={this.setPersonName} objId={this.props.match.params.objId} personType={this.props.match.params.personType} savePerson={this.savePerson} />}
             </div>
           </div>
         </div>
