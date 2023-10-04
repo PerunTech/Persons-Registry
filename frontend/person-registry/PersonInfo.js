@@ -12,7 +12,6 @@ class PersonInfo extends React.Component {
     super(props)
     this.state = {
       isLoading: false,
-      initial: false,
       dataToRender: [],
       jsonSchemaP: {},
       jsonSchemaG: {},
@@ -40,7 +39,7 @@ class PersonInfo extends React.Component {
     } else {
       name = fullname
     }
-    this.setState({ namePhysical: name })
+    this.setState({ entityName: name })
   }
   /*  
   Used to save  custom jsonSchemas for further usage
@@ -760,7 +759,7 @@ class PersonInfo extends React.Component {
   }
 
   render() {
-    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, namePhysical, activeTab } = this.state;
+    const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, entityName, activeTab } = this.state;
     return (
       <React.Fragment>
         <div className='pr-holder-info'>
@@ -768,7 +767,7 @@ class PersonInfo extends React.Component {
           {showModal}
           <div className='pr-main-btn-holder'>
             <div className='pr-info-btn-holder'> <button id='back' onClick={this.redirectBack} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', p_r, this.context)} </button>
-              <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', p_r, this.context)} : <b>{namePhysical}</b></p></div>
+              <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', p_r, this.context)} : <b>{entityName}</b></p></div>
             </div>
             <div id='alt-btn_holder' className='pr-btn-holder-info'>
               <div className='pr-btn-container'>

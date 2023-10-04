@@ -40,9 +40,14 @@ const InitialEditForm = (props, context) => {
                 formData = res.data
                 props.setPersonName(formData.NAME, formData.FIRST_NAME, formData.LAST_NAME)
                 renderForm(schema, formData, uiSchema)
+            }).catch(err => {
+                console.error(err)
+                alertUser(true, 'error', err.response.data.title, err.response.data.message)
+                setLoading(false)
             })
         }).catch(err => {
-            alertUser(true, 'error', err.data.title, err.data.message)
+            console.error(err)
+            alertUser(true, 'error', err.response.data.title, err.response.data.message)
             setLoading(false)
         })
     }
