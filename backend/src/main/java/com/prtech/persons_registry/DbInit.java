@@ -544,7 +544,7 @@ public class DbInit implements IDbInit {
 		dbf5.setDbFieldSize(5);
 		dbf5.setIsNull(true);
 		dbf5.setLabel_code("bankacc.bank_code");
-		dbf5.setGui_metadata(CONST_GUI_FIL_HIDE);
+		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
 		DbDataField dbf7 = new DbDataField();
 		dbf7.setDbFieldName("IS_DEFAULT");
