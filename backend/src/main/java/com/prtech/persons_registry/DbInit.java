@@ -530,27 +530,29 @@ public class DbInit implements IDbInit {
 		dbf3.setLabel_code("bankacc.bank_account");
 		dbf3.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"minLength\":15,\"maxLength\":15,\"maximum\":\"\"}}");
 
+		DbDataField dbf4 = new DbDataField();
+		dbf4.setDbFieldName("BRANCH_ADDRESS");
+		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
+		dbf4.setDbFieldSize(100);
+		dbf4.setIsNull(true);
+		dbf4.setLabel_code("bankacc.branch_address");
+		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+
+		DbDataField dbf5 = new DbDataField();
+		dbf5.setDbFieldName("BANK_CODE");
+		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
+		dbf5.setDbFieldSize(5);
+		dbf5.setIsNull(true);
+		dbf5.setLabel_code("bankacc.bank_code");
+		dbf5.setGui_metadata(CONST_GUI_FIL_HIDE);
+
 		DbDataField dbf7 = new DbDataField();
 		dbf7.setDbFieldName("IS_DEFAULT");
 		dbf7.setDbFieldType(DbFieldType.BOOLEAN);
 		dbf7.setLabel_code("bankacc.is_default");
-		//dbf.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true}}");
-	
-		 DbDataField dbf4 = new DbDataField();
-		 dbf4.setDbFieldName("BRANCH_ADDRESS");
-		 dbf4.setDbFieldType(DbFieldType.NVARCHAR);
-		 dbf4.setDbFieldSize(100);
-		 dbf4.setIsNull(true);
-		 dbf4.setLabel_code("bankacc.branch_address");
-		 dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
-
-		// DbDataField dbf5 = new DbDataField();
-		// dbf5.setDbFieldName("DATE_TO");
-		// dbf5.setDbFieldType(DbFieldType.DATE);
-		// dbf5.setDbFieldSize(3);
-		// dbf5.setIsNull(true);
-		// dbf5.setLabel_code("bankacc.date_to");
-		// dbf5.setGui_metadata(CONST_GUI_FIL_HIDE);
+		dbf7.setIsNull(true);
+		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
 
 //		DbDataField dbf6 = new DbDataField();
 //		dbf6.setDbFieldName("person_id");
@@ -560,15 +562,14 @@ public class DbInit implements IDbInit {
 //		dbf6.setLabel_code("bankacc.person_id");
 //		dbf6.setGui_metadata(CONST_GUI_FIL_HIDE);
 
-		DbDataField[] dbTableFields = new DbDataField[5];
+		DbDataField[] dbTableFields = new DbDataField[6];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
 		dbTableFields[2] = dbf3;
 		dbTableFields[3] = dbf4;
-		dbTableFields[4] = dbf7;
-		// dbTableFields[3] = dbf4;
-		// dbTableFields[4] = dbf5;
-		// dbTableFields[3] = dbf6;
+		dbTableFields[4] = dbf5;
+		dbTableFields[5] = dbf7;
+
 		
 
 		dbf.setDbTableFields(dbTableFields);
