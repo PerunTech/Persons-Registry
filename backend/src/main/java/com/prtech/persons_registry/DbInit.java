@@ -540,7 +540,7 @@ public class DbInit implements IDbInit {
 
 		DbDataField dbf5 = new DbDataField();
 		dbf5.setDbFieldName("BANK_CODE");
-		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
+		dbf5.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf5.setDbFieldSize(5);
 		dbf5.setIsNull(true);
 		dbf5.setLabel_code("bankacc.bank_code");
