@@ -325,12 +325,17 @@ class PersonWrapper extends React.Component {
             CITY: { 'classNames': 'hidden-field' }
           }
           jsonSchema = this.state.jsonSchemaP
-          jsonSchema.properties?.MUNICIPALITY?.enum.forEach((v, i) => {
-            if (v === '/' || v === '0') {
-              jsonSchema.properties.MUNICIPALITY.enum.splice(i, 1)
-              jsonSchema.properties.MUNICIPALITY.enumNames.splice(i, 1)
-            }
-          })
+          if (jsonSchema?.properties?.MUNICIPALITY?.enum) {
+            jsonSchema?.properties?.MUNICIPALITY?.enum.forEach((v, i) => {
+              if (v === '/' || v === '0') {
+                jsonSchema.properties.MUNICIPALITY.enum.splice(i, 1)
+                jsonSchema.properties.MUNICIPALITY.enumNames.splice(i, 1)
+              }
+            })
+          } else {
+            jsonSchema.properties.MUNICIPALITY.enum = {}
+            jsonSchema.properties.MUNICIPALITY.enumNames = {}
+          }
           this.setState({ selectedPersonType: personTypeShort, jsonSchema, uiSchema, formData, modalTitle }, () => this.generateForm())
           break;
         }
