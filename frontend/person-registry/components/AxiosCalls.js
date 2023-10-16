@@ -8,18 +8,18 @@
 * @param {object} form_params - form_params for 'post' method
 */
 
-import {axios, elements} from 'perun-core'
-const {alertUser} = elements
+import { axios, elements } from 'perun-core'
+const { alertUser } = elements
 import { logOut } from './LogOut'
 
-export function axiosCall (urlArr, session, hasCallback, methodType, form_params) {
+export function axiosCall(urlArr, session, hasCallback, methodType, form_params) {
   if (urlArr) {
     for (let i = 0; i < urlArr.length; i++) {
       axios({
         method: methodType,
         data: form_params ? form_params : null,
         url: urlArr[i],
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        headers: methodType === 'get' ? null : { 'Content-Type': 'application/x-www-form-urlencoded' }
       }).then(function (response) {
         if (response.data) {
           if (response.data.type === 'ERROR' && response.data.title === 'Невалидна сесија') {
@@ -31,12 +31,12 @@ export function axiosCall (urlArr, session, hasCallback, methodType, form_params
             if (takeLast.length === 1 && takeLast.match(/[a-z]/i)) {
               personType = takeLast
             }
-            hasCallback(response.data, urlArr.length-1, i, personType)
+            hasCallback(response.data, urlArr.length - 1, i, personType)
           }
         }
       }).catch(function (error) {
         if (error.response && error.response.data && error.response.data.type) {
-          hasCallback(error.response.data, urlArr.length-1, i)
+          hasCallback(error.response.data, urlArr.length - 1, i)
         }
       })
     }
