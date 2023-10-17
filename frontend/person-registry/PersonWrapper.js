@@ -324,19 +324,16 @@ class PersonWrapper extends React.Component {
             CITY_VILLAGE: { 'classNames': 'hidden-field' },
             CITY: { 'classNames': 'hidden-field' }
           }
-          jsonSchema = this.state.jsonSchemaP
-          if (jsonSchema?.properties?.MUNICIPALITY?.enum) {
-            jsonSchema?.properties?.MUNICIPALITY?.enum.forEach((v, i) => {
-              if (v === '/' || v === '0') {
-                jsonSchema.properties.MUNICIPALITY.enum.splice(i, 1)
-                jsonSchema.properties.MUNICIPALITY.enumNames.splice(i, 1)
-              }
-            })
+          jsonSchema = this.state.jsonSchemaP;
+
+          if (Array.isArray(jsonSchema?.properties?.MUNICIPALITY?.enum)) {
+            jsonSchema.properties.MUNICIPALITY.enum = jsonSchema.properties.MUNICIPALITY.enum.filter(v => v !== '/' && v !== '0');
           } else {
-            jsonSchema.properties.MUNICIPALITY.enum = {}
-            jsonSchema.properties.MUNICIPALITY.enumNames = {}
+            jsonSchema.properties.MUNICIPALITY.enum = [];
+            jsonSchema.properties.MUNICIPALITY.enumNames = [];
           }
-          this.setState({ selectedPersonType: personTypeShort, jsonSchema, uiSchema, formData, modalTitle }, () => this.generateForm())
+
+          this.setState({ selectedPersonType: personTypeShort, jsonSchema, uiSchema, formData, modalTitle }, () => this.generateForm());
           break;
         }
         case 'G': {
@@ -345,14 +342,16 @@ class PersonWrapper extends React.Component {
             CITY_VILLAGE: { 'classNames': 'hidden-field' },
             CITY: { 'classNames': 'hidden-field' }
           }
-          jsonSchema = this.state.jsonSchemaG
-          jsonSchema.properties?.MUNICIPALITY?.enum?.forEach((v, i) => {
-            if (v === '/' || v === '0') {
-              jsonSchema.properties.MUNICIPALITY.enum.splice(i, 1)
-              jsonSchema.properties.MUNICIPALITY.enumNames.splice(i, 1)
-            }
-          })
-          this.setState({ selectedPersonType: personTypeShort, jsonSchema, uiSchema, formData, modalTitle }, () => this.generateForm())
+          jsonSchema = this.state.jsonSchemaG;
+
+          if (Array.isArray(jsonSchema?.properties?.MUNICIPALITY?.enum)) {
+            jsonSchema.properties.MUNICIPALITY.enum = jsonSchema.properties.MUNICIPALITY.enum.filter(v => v !== '/' && v !== '0');
+          } else {
+            jsonSchema.properties.MUNICIPALITY.enum = [];
+            jsonSchema.properties.MUNICIPALITY.enumNames = [];
+          }
+
+          this.setState({ selectedPersonType: personTypeShort, jsonSchema, uiSchema, formData, modalTitle }, () => this.generateForm());
           break;
         }
         default: {
