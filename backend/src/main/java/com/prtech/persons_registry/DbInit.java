@@ -602,16 +602,8 @@ public class DbInit implements IDbInit {
 		dbf2.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf2.setDbFieldSize(30);
 		dbf2.setIsNull(false);
-		dbf2.setLabel_code("identity_data.bank_name");
+		dbf2.setLabel_code("identity_data.identity_code");
 		dbf2.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
-
-		DbDataField dbf3 = new DbDataField();
-		dbf3.setDbFieldName("DOCUMENT_SERAIL_NO");
-		dbf3.setDbFieldType(DbFieldType.NVARCHAR);
-		dbf3.setDbFieldSize(30);
-		dbf3.setIsNull(false);
-		dbf3.setLabel_code("identity_data.document_serial_no");
-		dbf3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
 		DbDataField dbf4 = new DbDataField();
 		dbf4.setDbFieldName("ISSUED_BY");
@@ -622,11 +614,10 @@ public class DbInit implements IDbInit {
 		dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
 		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
-		DbDataField[] dbTableFields = new DbDataField[4];
+		DbDataField[] dbTableFields = new DbDataField[3];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
-		dbTableFields[2] = dbf3;
-		dbTableFields[3] = dbf4;
+		dbTableFields[2] = dbf4;
 
 		dbf.setDbTableFields(dbTableFields);
 		return dbf;
