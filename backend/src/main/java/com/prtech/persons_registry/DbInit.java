@@ -609,7 +609,7 @@ public class DbInit implements IDbInit {
 		dbf4.setDbFieldName("ISSUED_BY");
 		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf4.setDbFieldSize(10);
-		dbf4.setIsNull(true);
+		dbf4.setIsNull(false);
 		dbf4.setLabel_code("identity_data.issued_by");
 		dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
 		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
@@ -619,7 +619,7 @@ public class DbInit implements IDbInit {
 		dbf5.setDbFieldName("VALID_BEFORE");
 		dbf5.setDbFieldType(DbFieldType.DATE);
 		dbf5.setDbFieldSize(3);
-		dbf5.setIsNull(true);
+		dbf5.setIsNull(false);
 		dbf5.setLabel_code("identity_data.valid_before");
 		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
