@@ -613,11 +613,21 @@ public class DbInit implements IDbInit {
 		dbf4.setLabel_code("identity_data.issued_by");
 		dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
 		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		
+		DbDataField dbf5 = new DbDataField();
+		dbf5.setDbFieldName("VALID_BEFORE");
+		dbf5.setDbFieldType(DbFieldType.DATE);
+		dbf5.setDbFieldSize(3);
+		dbf5.setIsNull(true);
+		dbf5.setLabel_code("identity_data.valid_before");
+		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
-		DbDataField[] dbTableFields = new DbDataField[3];
+		DbDataField[] dbTableFields = new DbDataField[4];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
 		dbTableFields[2] = dbf4;
+		dbTableFields[3] = dbf5;
 
 		dbf.setDbTableFields(dbTableFields);
 		return dbf;
