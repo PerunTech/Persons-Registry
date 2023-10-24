@@ -34,6 +34,7 @@ import com.prtech.svarog.SvCore;
 import com.prtech.svarog.SvException;
 import com.prtech.svarog.SvLink;
 import com.prtech.svarog.SvLock;
+import com.prtech.svarog.SvParameter;
 import com.prtech.svarog.SvReader;
 import com.prtech.svarog.SvWorkflow;
 import com.prtech.svarog.SvWriter;
@@ -124,19 +125,31 @@ public class WsPersonRegistry {
 
 			Response response = (new WsReactElements()).getTableJSONSchema(sessionId, tableName, httpRequest);
 			if (response.getStatus() == 200) {
-
+				String defaultCountry = SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase();
 				JsonObject jObj = (new Gson()).fromJson((String) response.getEntity(), JsonObject.class);
 				JsonArray jARequired = new JsonArray();
 				// if (jObj.has(Rc.REQUIRED)) {
 				ArrayList<String> listRequired = new ArrayList<>();
 				if (personType.equalsIgnoreCase("p")) {
-					listRequired.add(PRC.ID_NO);
-					listRequired.add("ADDRESS");
-					listRequired.add("DT_BIRTH_REG");
-					listRequired.add("COUNTRY_CODE");
-					listRequired.add("MUNICIPALITY");
-					listRequired.add("CITY_VILLAGE");
-					listRequired.add("CITY");
+					switch (defaultCountry) {
+					case "MLD":
+						listRequired.add(PRC.ID_NO);
+						listRequired.add("ADDRESS");
+						listRequired.add("DT_BIRTH_REG");
+						listRequired.add("MUNICIPALITY");
+						listRequired.add("CITY");
+						break;
+					default:
+						listRequired.add(PRC.ID_NO);
+						listRequired.add("ADDRESS");
+						listRequired.add("DT_BIRTH_REG");
+						listRequired.add("COUNTRY_CODE");
+						listRequired.add("MUNICIPALITY");
+						listRequired.add("CITY_VILLAGE");
+						listRequired.add("CITY");
+					}
+					
+
 
 					response = (new WsReactElements()).getTableJSONSchema(sessionId, PRC.PHYSICAL_ENTITY, httpRequest);
 
@@ -149,15 +162,26 @@ public class WsPersonRegistry {
 					}
 
 				} else if (personType.equalsIgnoreCase("g")) {
-					listRequired.add(PRC.ID_NO);
-					listRequired.add(PRC.TAX_NO);
-					listRequired.add("NAME");
-					listRequired.add("ADDRESS");
-					listRequired.add("DT_BIRTH_REG");
-					listRequired.add("COUNTRY_CODE");
-					listRequired.add("MUNICIPALITY");
-					listRequired.add("CITY_VILLAGE");
-					listRequired.add("CITY");
+					switch (defaultCountry) {
+					case "MLD":
+						listRequired.add(PRC.ID_NO);
+						listRequired.add("NAME");
+						listRequired.add("ADDRESS");
+						listRequired.add("DT_BIRTH_REG");
+						listRequired.add("MUNICIPALITY");
+						listRequired.add("CITY");
+						break;
+					default:
+						listRequired.add(PRC.ID_NO);
+						listRequired.add(PRC.TAX_NO);
+						listRequired.add("NAME");
+						listRequired.add("ADDRESS");
+						listRequired.add("DT_BIRTH_REG");
+						listRequired.add("COUNTRY_CODE");
+						listRequired.add("MUNICIPALITY");
+						listRequired.add("CITY_VILLAGE");
+						listRequired.add("CITY");
+					}
 
 					response = (new WsReactElements()).getTableJSONSchema(sessionId, PRC.LEGAL_ENTITY, httpRequest);
 
