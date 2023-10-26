@@ -726,18 +726,18 @@ public class WsPersonRegistry {
 
 		try (SvReader svr = new SvReader(sessionId);) {
 			DbDataObject userDbo = svr.getInstanceUser();
-			DbDataObject linkTypePerson = SvCore.getLinkType("POA", SvCore.getTypeIdByName("USERS" ),
+			DbDataObject linkTypePerson = SvCore.getLinkType("POA", SvCore.getTypeIdByName("USERS"),
 					SvCore.getTypeIdByName(PRC.PERSON));
 			DbDataArray persons = svr.getObjectsByLinkedId(userDbo.getObjectId(), linkTypePerson, null, 0, 0);
 			Boolean isPerson = (persons != null && !persons.getItems().isEmpty()) ? true : false;
 
 			tablesUsedArray[0] = PRC.PERSON;
 			tableShowArray[0] = true;
-			Long personObjTypeIdd = SvCore.getTypeIdByName(PRC.PERSON);
+			Long personObjTypeId = SvCore.getTypeIdByName(PRC.PERSON);
 			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJ_TYPE_1", DbCompareOperand.EQUAL,
-					personObjTypeIdd);
+					personObjTypeId);
 			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJ_TYPE_2", DbCompareOperand.EQUAL,
-					personObjTypeIdd);
+					personObjTypeId);
 			DbSearchExpression exp = new DbSearchExpression().addDbSearchItem(crit).addDbSearchItem(crit2);
 
 			DbDataArray linkTypes = svr.getObjects(exp, SvReader.getTypeIdByName(PRC.LINK_TYPE), null, 0, 0);
@@ -757,7 +757,7 @@ public class WsPersonRegistry {
 					q.addItem(dqoPerson1);
 					linkedPersons = svr.getObjects(q, 0, 0);
 				} else {
-					linkedPersons = svr.getObjectsByLinkedId(objectId, personObjTypeIdd, linkType, personObjTypeIdd,
+					linkedPersons = svr.getObjectsByLinkedId(objectId, personObjTypeId, linkType, personObjTypeId,
 							isReverse, new DateTime(), 0, 0);
 				}
 
