@@ -137,7 +137,7 @@ public class WsPersonRegistry {
 				ArrayList<String> listRequired = new ArrayList<>();
 				if (personType.equalsIgnoreCase("p")) {
 					switch (defaultCountry) {
-					case "MLD":
+					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
@@ -168,7 +168,7 @@ public class WsPersonRegistry {
 
 				} else if (personType.equalsIgnoreCase("g")) {
 					switch (defaultCountry) {
-					case "MLD":
+					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("NAME");
 						listRequired.add("ADDRESS");
