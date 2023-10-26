@@ -734,9 +734,9 @@ public class WsPersonRegistry {
 			tablesUsedArray[0] = PRC.PERSON;
 			tableShowArray[0] = true;
 			Long personObjTypeId = SvCore.getTypeIdByName(PRC.PERSON);
-			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJECT_TYPE1", DbCompareOperand.EQUAL,
+			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJ_TYPE_1", DbCompareOperand.EQUAL,
 					personObjTypeId);
-			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJECT_TYPE2", DbCompareOperand.EQUAL,
+			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJ_TYPE_2", DbCompareOperand.EQUAL,
 					personObjTypeId);
 			DbSearchExpression exp = new DbSearchExpression().addDbSearchItem(crit).addDbSearchItem(crit2);
 
