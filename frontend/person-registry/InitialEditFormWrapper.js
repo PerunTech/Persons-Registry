@@ -20,7 +20,6 @@ const InitialEditFormWrapper = (props, context) => {
             'PERSON_FORM',
             "formTableData"
         );
-        console.log(formData)
         setPersonName(formData.NAME, formData.FIRST_NAME, formData.LAST_NAME)
     }, [])
 
