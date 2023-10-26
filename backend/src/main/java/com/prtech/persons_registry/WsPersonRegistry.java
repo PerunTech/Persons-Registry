@@ -287,7 +287,24 @@ public class WsPersonRegistry {
 		JsonObject jsonData = new JsonObject();
 		Gson gson = new Gson();
 		try {
+			String personTypeTableName = "";
+			switch(personType.toUpperCase()) {
+			case "P":
+				personTypeTableName = "PHYSICAL_ENTITY";
+				break;
+			case "G":
+				personTypeTableName = "LEGAL_ENTITY";
+				break;
+			default:
+				break;
+			}
 			DbDataArray typetoGet = SvCore.getFields(SvCore.getTypeIdByName(tableName));
+			if (personTypeTableName != "") {
+				DbDataArray typetoGet2 = SvCore.getFields(SvCore.getTypeIdByName(personTypeTableName));
+				for (DbDataObject dbo : typetoGet2.getItems()) {
+					typetoGet.addDataItem(dbo);
+				}
+			}
 
 			for (int i = 0; i < typetoGet.getItems().size(); i++) {
 				JsonObject jsonreactGUI = null;
