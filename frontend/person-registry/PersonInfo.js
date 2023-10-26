@@ -6,6 +6,7 @@ import { searchRender, searchComponent, searchResult } from './components/Search
 import { logOut } from './components/LogOut'
 import InitialEditForm from './InitialEditForm'
 
+let arrOfGrids = []
 const p_r = 'persons_registry'
 class PersonInfo extends React.Component {
   constructor(props) {
@@ -31,7 +32,12 @@ class PersonInfo extends React.Component {
       }
     }
   }
-
+  componentWillUnmount() {
+    arrOfGrids.map(el => {
+      ComponentManager.cleanComponentReducerState(el);
+    })
+    arrOfGrids = []
+  }
   setPersonName = (fullname, first, last) => {
     let name
     if (first && last) {
@@ -78,6 +84,7 @@ class PersonInfo extends React.Component {
             buttonsArray={obj}
 
           />
+          arrOfGrids.push(`${gridId}${objectId}`)
           ComponentManager.setStateForComponent(gridId + objectId, null, {
             onRowClickFunct: this.rowClickFunction,
             customButton: () => this.manageSave('add', gridId),
@@ -118,6 +125,7 @@ class PersonInfo extends React.Component {
             customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
             buttonsArray={obj}
           />
+          arrOfGrids.push(`${gridId}${objectId}`)
           ComponentManager.setStateForComponent(gridId + objectId, null, {
             onRowClickFunct: this.rowClickFunction,
             customButton: () => this.manageSave('add', gridId),
@@ -140,6 +148,7 @@ class PersonInfo extends React.Component {
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
           />
+          arrOfGrids.push(`${'RESPONSIBLE_PERSON'}${objectId}`)
           ComponentManager.setStateForComponent('RESPONSIBLE_PERSON' + objectId, null, {
             onRowClickFunct: this.getRespPersonOnRowClick,
             customButton: () => this.manageSave('delete'),
@@ -161,6 +170,7 @@ class PersonInfo extends React.Component {
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
           />
+          arrOfGrids.push(`${'RESPONSIBLE_PERSON'}${objectId}`)
           ComponentManager.setStateForComponent('RESPONSIBLE_PERSON' + objectId, null, {
             onRowClickFunct: this.getRespPersonOnRowClick,
             customButton: () => this.manageSave('delete'),
@@ -196,6 +206,7 @@ class PersonInfo extends React.Component {
             buttonsArray={obj}
             refreshData={true}
           />
+          arrOfGrids.push(`${gridId}${objectId}`)
           ComponentManager.setStateForComponent(gridId + objectId, null, {
             onRowClickFunct: this.rowClickFunction,
             customButton: () => this.manageSave('add', gridId),
@@ -655,12 +666,15 @@ class PersonInfo extends React.Component {
       GridManager.reloadGridData('RESPONSIBLE_PERSON' + objectId)
       alertUser(true, data.data.type.toLowerCase(), data.data.title, data.data.message)
       this.setState({ isLoading: false })
-      ComponentManager.setStateForComponent('RESPONSIBLE_PERSON' + objectId + objectId, null, {
+      ComponentManager.setStateForComponent('RESPONSIBLE_PERSON' + objectId, null, {
         rowClicked: undefined
       })
     } else {
       this.setState({ linkTypeObjId: '', linkType: '', respPersonName: '' })
       alertUser(true, 'error', labelsManager.importLabel('error', p_r, this.context), labelsManager.importLabel('try_again_or_contact_admin', p_r, this.context))
+      ComponentManager.setStateForComponent('RESPONSIBLE_PERSON' + objectId, null, {
+        rowClicked: undefined
+      })
       this.setState({ isLoading: false })
     }
   }
