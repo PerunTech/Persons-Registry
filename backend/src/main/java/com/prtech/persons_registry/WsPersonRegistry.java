@@ -1,6 +1,7 @@
 package com.prtech.persons_registry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,8 +42,12 @@ import com.prtech.svarog.SvWriter;
 import com.prtech.svarog.svCONST;
 import com.prtech.svarog_common.DbDataArray;
 import com.prtech.svarog_common.DbDataObject;
+import com.prtech.svarog_common.DbQueryExpression;
+import com.prtech.svarog_common.DbQueryObject;
 import com.prtech.svarog_common.DbSearchCriterion;
 import com.prtech.svarog_common.ResponseHandler;
+import com.prtech.svarog_common.DbQueryObject.DbJoinType;
+import com.prtech.svarog_common.DbQueryObject.LinkType;
 import com.prtech.svarog_common.DbSearchCriterion.DbCompareOperand;
 import com.prtech.svarog_common.DbSearchExpression;
 import com.prtech.svarog_common.ResponseHandler.MessageType;
@@ -682,6 +687,154 @@ public class WsPersonRegistry {
 				SvLock.releaseLock(lockKey, lock);
 			}
 		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+	
+	/** TAKEN FROM WSIPARDSPA 
+	 * 
+	 * Method to get responsible persons for a given objectId
+	 * 
+	 * @param sessionId String token access
+	 * @param objectId Long OBJECT_ID for the PERSON 
+	 * @param isReverse what is the orientation of the responsibility 
+	 * @param httpRequest
+	 * @return ResponseHandler
+	 * @throws SvException
+	 */
+	@Path("/getResponsiblePersons/{sessionId}/{objectId}/{isReverse}")
+	@GET
+	@Produces("text/html;charset=utf-8")
+	public Response getResponsiblePersons(@PathParam("sessionId") String sessionId,
+			@PathParam("objectId") Long objectId, @PathParam("isReverse") Boolean isReverse,
+			@Context HttpServletRequest httpRequest) throws SvException {
+
+		/**
+		 * for some reson we check POA for USER that is logged in if it has link to
+		 * PERSON , for that group of users we give one type of search , probably what
+		 * legal entities is this natural entity attached to, and for oher group we give
+		 * what are the netural entities attached to this legal entity
+		 * 
+		 */
+		ResponseHandler jrh = new ResponseHandler();
+
+		JsonArray tmpJArray = new JsonArray();
+		JsonObject joPerson = new JsonObject();
+		JsonArray responseJArray = new JsonArray();
+		String[] tablesUsedArray = new String[1];
+		Boolean[] tableShowArray = new Boolean[1];
+		int tablesusedCount = 1;
+
+		try (SvReader svr = new SvReader(sessionId);) {
+			DbDataObject userDbo = svr.getInstanceUser();
+			DbDataObject linkTypePerson = SvCore.getLinkType("POA", SvCore.getTypeIdByName("USERS"),
+					SvCore.getTypeIdByName(PRC.PERSON));
+			DbDataArray persons = svr.getObjectsByLinkedId(userDbo.getObjectId(), linkTypePerson, null, 0, 0);
+			Boolean isPerson = (persons != null && !persons.getItems().isEmpty()) ? true : false;
+
+			tablesUsedArray[0] = PRC.PERSON;
+			tableShowArray[0] = true;
+			Long personObjTypeId = SvCore.getTypeIdByName(PRC.PERSON);
+			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJ_TYPE_1", DbCompareOperand.EQUAL,
+					personObjTypeId);
+			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJ_TYPE_2", DbCompareOperand.EQUAL,
+					personObjTypeId);
+			DbSearchExpression exp = new DbSearchExpression().addDbSearchItem(crit).addDbSearchItem(crit2);
+
+			DbDataArray linkTypes = svr.getObjects(exp, SvReader.getTypeIdByName(PRC.LINK_TYPE), null, 0, 0);
+
+			for (DbDataObject linkType : linkTypes.getItems()) {
+				DbDataArray linkedPersons;
+				if (isPerson) {
+					DbSearchCriterion critPerson = new DbSearchCriterion("OBJECT_ID", DbCompareOperand.EQUAL, objectId);
+					DbQueryObject dqoPerson = new DbQueryObject(SvCore.getDbtByName(PRC.PERSON), critPerson,
+							DbJoinType.INNER, linkType, LinkType.DBLINK_REVERSE, null, null);
+					DbQueryObject dqoPerson1 = new DbQueryObject(SvCore.getDbtByName(PRC.PERSON), null, null, null);
+
+					DbQueryExpression q = new DbQueryExpression();
+					dqoPerson.setIsReturnType(false);
+					dqoPerson1.setIsReturnType(true);
+					q.addItem(dqoPerson);
+					q.addItem(dqoPerson1);
+					linkedPersons = svr.getObjects(q, 0, 0);
+				} else {
+					linkedPersons = svr.getObjectsByLinkedId(objectId, personObjTypeId, linkType, personObjTypeId,
+							isReverse, new DateTime(), 0, 0);
+				}
+
+				tmpJArray = WsReactElements.prapareTableQueryData(linkedPersons, tablesUsedArray, tableShowArray,
+						tablesusedCount, true, svr, false, new HashMap<String, String>());
+				for (int i = 0; i < tmpJArray.size(); i++) {
+					joPerson = tmpJArray.get(i).getAsJsonObject();
+					joPerson.addProperty(PRC.LINK_TYPE + "." + PRC.LINK_TYPE,
+							I18n.getText(linkType.getVal(PRC.LINK_TYPE_DESCRIPTION).toString()));
+					joPerson.addProperty(PRC.LINK_TYPE, linkType.getVal(PRC.LINK_TYPE).toString());
+					responseJArray.add(joPerson);
+				}
+
+			}
+
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
+					I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), responseJArray);
+
+		} catch (SvException ex) {
+
+			jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
+					new JsonObject());
+			if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
+
+				jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
+						new JsonObject());
+				log4j.error(ex.getFormattedMessage());
+				return Response.status(401).entity(jrh.getAll().toString()).build();
+			} else {
+				log4j.error(ex.getLabelCode(), ex);
+				if (ex.getLabelCode().startsWith("sys")) {
+					return Response.status(500).entity(jrh.getAll().toString()).build();
+				}
+			}
+		} catch (Exception e) {
+			log4j.error(e.getMessage(), e);
+			jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
+					new JsonObject());
+			return Response.status(500).entity(jrh.getAll().toString()).build();
+
+		}
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+
+	/** fielt list for method /getResponsiblePersons/
+	 * 
+	 * @param sessionId
+	 * @param httpRequest
+	 * @return ResponseHandler
+	 */
+	@Path("/getTableFieldListForResponsiblePersons/{session_id}")
+	@GET
+	@Produces("application/json")
+	public Response getTableFieldListForResponsiblePersons(@PathParam("session_id") String sessionId,
+			@Context HttpServletRequest httpRequest) {
+		WsReactElements wre = new WsReactElements();
+		ResponseHandler jrh = new ResponseHandler();
+		Response response = wre.getTableFieldList(sessionId, PRC.PERSON, httpRequest);
+		JsonArray jResponse = new JsonArray();
+		jrh.create(MessageType.ERROR, I18n.getText(PRC.ERROR_PERUN_GET_DATA), I18n.getText(PRC.ERROR_PERUN_GET_DATA),
+				jResponse);
+		if (response.getStatus() == 200) {
+			String strResponse = (String) response.getEntity();
+			jResponse = (new Gson()).fromJson(strResponse, JsonArray.class);
+			JsonObject linkType = new JsonObject();
+			linkType.addProperty("key", PRC.LINK_TYPE + "." + PRC.LINK_TYPE);
+			linkType.addProperty(PRC.TABLE_NAME, PRC.LINK_TYPE);
+			linkType.addProperty(PRC.FIELD_NAME, PRC.LINK_TYPE);
+			linkType.addProperty("filterable", true);
+			linkType.addProperty("visible", true);
+			linkType.addProperty("resizable", true);
+			jResponse.add(linkType);
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
+					I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), jResponse);
+
+		}
+
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
 

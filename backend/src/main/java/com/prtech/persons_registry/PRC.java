@@ -52,6 +52,7 @@ public class PRC {
 	public static final String ERROR_INVALID_SESSION = "error.invalid_session";
 	public static final String PR_ERROR_GET_OPTIONS = "person_registry.error.get_options";
 	public static final String SUCCESS_PERUN_GET_DATA = "success.perun.get.data";
+	public static final String ERROR_PERUN_GET_DATA = "error.perun.get.data";
 	public static final String PERUN_ERROR_SAVE = "perrun.error.save";
 	public static final String ERROR_PERUN_CHANGED_STATUS = "error.perun.changedStatus";
 	public static final String ERROR_USER_NOT_AUTHORIZED = "error_user_not_authorized";
