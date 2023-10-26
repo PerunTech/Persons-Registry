@@ -579,7 +579,7 @@ public class DbInit implements IDbInit {
 	private static DbDataTable createIdentityData() {
 
 		DbDataTable dbf = new DbDataTable();
-		dbf.setDbTableName("identity_data");
+		dbf.setDbTableName("IDENTITY_DATA");
 		dbf.setDbRepoName(PRC.MASTER_REPO);
 		dbf.setDbSchema(PRC.DEFAULT_SCHEMA);
 		dbf.setIsSystemTable(true);
@@ -594,6 +594,7 @@ public class DbInit implements IDbInit {
 		dbf1.setDbFieldType(DbFieldType.NUMERIC);
 		dbf1.setDbFieldSize(18);
 		dbf1.setDbFieldScale(0);
+		dbf1.setSort_order(100);
 		dbf1.setIsNull(false);
 		dbf1.setLabel_code("identity_data.table_meta_pkid");
 
@@ -601,6 +602,7 @@ public class DbInit implements IDbInit {
 		dbf2.setDbFieldName("IDENTITY_CODE");
 		dbf2.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf2.setDbFieldSize(30);
+		dbf2.setSort_order(200);
 		dbf2.setIsNull(false);
 		dbf2.setLabel_code("identity_data.identity_code");
 		dbf2.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
@@ -609,25 +611,37 @@ public class DbInit implements IDbInit {
 		dbf4.setDbFieldName("ISSUED_BY");
 		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf4.setDbFieldSize(10);
+		dbf4.setSort_order(300);
 		dbf4.setIsNull(false);
 		dbf4.setLabel_code("identity_data.issued_by");
 		dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
 		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbf6 = new DbDataField();
+		dbf6.setDbFieldName("ISSUED_ON");
+		dbf6.setDbFieldType(DbFieldType.DATE);
+		dbf6.setDbFieldSize(3);
+		dbf6.setSort_order(400);
+		dbf6.setIsNull(false);
+		dbf6.setLabel_code("identity_data.issued_on");
+		dbf6.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
 		
 		DbDataField dbf5 = new DbDataField();
 		dbf5.setDbFieldName("VALID_BEFORE");
 		dbf5.setDbFieldType(DbFieldType.DATE);
 		dbf5.setDbFieldSize(3);
+		dbf5.setSort_order(500);
 		dbf5.setIsNull(false);
 		dbf5.setLabel_code("identity_data.valid_before");
 		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
-		DbDataField[] dbTableFields = new DbDataField[4];
+		DbDataField[] dbTableFields = new DbDataField[5];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
 		dbTableFields[2] = dbf4;
-		dbTableFields[3] = dbf5;
+		dbTableFields[3] = dbf6;		
+		dbTableFields[4] = dbf5;
 
 		dbf.setDbTableFields(dbTableFields);
 		return dbf;

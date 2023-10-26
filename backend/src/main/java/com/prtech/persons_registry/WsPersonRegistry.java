@@ -137,7 +137,7 @@ public class WsPersonRegistry {
 				ArrayList<String> listRequired = new ArrayList<>();
 				if (personType.equalsIgnoreCase("p")) {
 					switch (defaultCountry) {
-					case "MLD":
+					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
@@ -168,7 +168,7 @@ public class WsPersonRegistry {
 
 				} else if (personType.equalsIgnoreCase("g")) {
 					switch (defaultCountry) {
-					case "MLD":
+					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("NAME");
 						listRequired.add("ADDRESS");
@@ -287,7 +287,24 @@ public class WsPersonRegistry {
 		JsonObject jsonData = new JsonObject();
 		Gson gson = new Gson();
 		try {
+			String personTypeTableName = "";
+			switch(personType.toUpperCase()) {
+			case "P":
+				personTypeTableName = "PHYSICAL_ENTITY";
+				break;
+			case "G":
+				personTypeTableName = "LEGAL_ENTITY";
+				break;
+			default:
+				break;
+			}
 			DbDataArray typetoGet = SvCore.getFields(SvCore.getTypeIdByName(tableName));
+			if (personTypeTableName != "") {
+				DbDataArray typetoGet2 = SvCore.getFields(SvCore.getTypeIdByName(personTypeTableName));
+				for (DbDataObject dbo : typetoGet2.getItems()) {
+					typetoGet.addDataItem(dbo);
+				}
+			}
 
 			for (int i = 0; i < typetoGet.getItems().size(); i++) {
 				JsonObject jsonreactGUI = null;
