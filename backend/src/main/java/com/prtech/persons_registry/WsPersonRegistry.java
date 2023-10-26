@@ -288,12 +288,10 @@ public class WsPersonRegistry {
 		Gson gson = new Gson();
 		try {
 			String personTypeTableName = "";
-			switch(personType) {
-			case "p":
+			switch(personType.toLowerCase()) {
 			case "P":
 				personTypeTableName = "PHYSICAL_ENTITY";
 				break;
-			case "g":
 			case "G":
 				personTypeTableName = "LEGAL_ENTITY";
 				break;
