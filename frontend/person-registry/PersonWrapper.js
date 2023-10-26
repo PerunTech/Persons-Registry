@@ -23,6 +23,8 @@ class PersonWrapper extends React.Component {
       jsonSchemaG: {},
       jsonSchema: {},
       uiSchema: {},
+      uiSchemaP: {},
+      uiSchemaG: {},
       formData: {},
     }
     this.hashHistory = createHashHistory()
@@ -44,9 +46,21 @@ class PersonWrapper extends React.Component {
     const { svSession } = this.props
     let personTypeP = window.server + '/SvPersonRegistry/getTableJSONSchemaPerson/' + svSession + '/PERSON/P'
     let personTypeG = window.server + '/SvPersonRegistry/getTableJSONSchemaPerson/' + svSession + '/PERSON/G'
+    let uiSchemaG = window.server + `/SvPersonRegistry/getTableUISchemaPerson/${svSession}/PERSON/G`
+    let uiSchemaP = window.server + `/SvPersonRegistry/getTableUISchemaPerson/${svSession}/PERSON/P`
     let urlArr = []
+    let urlArr2 = []
     urlArr.push(personTypeP, personTypeG)
+    urlArr2.push(uiSchemaP, uiSchemaG)
+    axiosCall(urlArr2, svSession, this.responseAxiosUi, 'get')
     axiosCall(urlArr, svSession, this.responseAxios, 'get')
+
+  }
+
+  responseAxiosUi = (data, _ln, _i, personType) => {
+    if (personType === 'P') {
+      this.setState({ uiSchemaP: data })
+    } else { this.setState({ uiSchemaG: data }) }
   }
   //used in dependency dropdown to get settlements based on municipality
   getSettlements = (municipality) => {
@@ -55,8 +69,10 @@ class PersonWrapper extends React.Component {
     // JSON schema stuff
     const newSchema = JSON.parse(JSON.stringify(jsonSchema))
     // UI schema stuff
-    const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
-    newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
+    if (uiSchema) {
+      const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
+      newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
+    }
     // Form data stuff
     const newFormData = JSON.parse(JSON.stringify(formData))
     newFormData.CITY_VILLAGE = '/'
@@ -103,12 +119,14 @@ class PersonWrapper extends React.Component {
     // JSON schema stuff
     const newSchema = JSON.parse(JSON.stringify(jsonSchema))
     // UI schema stuff
-    const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
-    if (!newUiSchema.MUNICIPALITY) {
-      newUiSchema.MUNICIPALITY = {}
+    if (uiSchema) {
+      const newUiSchema = JSON.parse(JSON.stringify(uiSchema))
+      if (!newUiSchema.MUNICIPALITY) {
+        newUiSchema.MUNICIPALITY = {}
+      }
+      newUiSchema.MUNICIPALITY.classNames = 'hidden-field'
+      newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
     }
-    newUiSchema.MUNICIPALITY.classNames = 'hidden-field'
-    newUiSchema.CITY_VILLAGE.classNames = 'hidden-field'
     // Form data stuff
     const newFormData = JSON.parse(JSON.stringify(formData))
     newFormData.MUNICIPALITY = '/'
@@ -319,11 +337,7 @@ class PersonWrapper extends React.Component {
       let uiSchema = {}, jsonSchema = {}, formData = {}
       switch (personTypeShort) {
         case 'P': {
-          uiSchema = {
-            PERSON_TYPE: { 'ui:widget': 'hidden' },
-            CITY_VILLAGE: { 'classNames': 'hidden-field' },
-            CITY: { 'classNames': 'hidden-field' }
-          }
+          uiSchema = this.state.uiSchemaP
           jsonSchema = this.state.jsonSchemaP;
 
           if (Array.isArray(jsonSchema?.properties?.MUNICIPALITY?.enum)) {
@@ -337,11 +351,7 @@ class PersonWrapper extends React.Component {
           break;
         }
         case 'G': {
-          uiSchema = {
-            PERSON_TYPE: { 'ui:widget': 'hidden' },
-            CITY_VILLAGE: { 'classNames': 'hidden-field' },
-            CITY: { 'classNames': 'hidden-field' }
-          }
+          uiSchema = this.state.uiSchemaG
           jsonSchema = this.state.jsonSchemaG;
 
           if (Array.isArray(jsonSchema?.properties?.MUNICIPALITY?.enum)) {
