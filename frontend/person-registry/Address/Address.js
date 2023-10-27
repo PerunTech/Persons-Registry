@@ -209,14 +209,14 @@ const Address = (props, context) => {
                     toggleCustomButton={true}
                     customButton={() => generateMainForm()}
                     customButtonLabel={labelsManager.importLabel(
-                        "add_address", "person_registry", context
+                        "add_address", "persons_registry", context
                     )}
                 />
                 {show && <Modal className={style["person-registry-modal"]} show={show} onHide={() => setShow(false)}>
                     <Modal.Header className={style["person-registry-modal-header"]} closeButton>
                         <Modal.Title>{labelsManager.importLabel(
                             "add_address",
-                            "person_registry",
+                            "persons_registry",
                             context
                         )}</Modal.Title>
                     </Modal.Header>
@@ -235,8 +235,8 @@ const Address = (props, context) => {
                             <></>
                             <div className={style['person-registry-btn-holder']} >
                                 {deleteBtn && <button onClick={() => alertUser(true, 'warning', labelsManager.importLabel('delete_record_prompt_title', 'main', context), labelsManager.importLabel('delete_record_prompt_message', 'main', context), () => { deleteFunc(formData) }, () => { }, true, labelsManager.importLabel('yes', 'admin_console', context), labelsManager.importLabel('no', 'admin_console', context))
-                                } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel("delete", "person_registry", context)}</button>}
-                                <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel("add_address", "person_registry", context)}</button>
+                                } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel("delete", "persons_registry", context)}</button>}
+                                <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel("add_address", "persons_registry", context)}</button>
                             </div>
                         </Form>}
                     </Modal.Body>
