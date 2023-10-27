@@ -491,6 +491,133 @@ public class DbInit implements IDbInit {
 		dbe.setDbTableFields(dbTableFields);
 		return dbe;
 	}
+	
+	private static DbDataTable address() {
+		DbDataTable dbe = new DbDataTable();
+		dbe.setDbTableName("ADDRESS");
+		dbe.setDbRepoName(CONST_MASTER_REPO);
+		dbe.setDbSchema(CONST_DEFAULT_SCHEMA);
+		dbe.setIsSystemTable(false);
+		dbe.setIsRepoTable(false);
+		dbe.setLabel_code("master_repo.address");
+		dbe.setUse_cache(false);
+
+		DbDataField dbe1 = new DbDataField();
+		dbe1.setDbFieldName("PKID");
+		dbe1.setIsPrimaryKey(true);
+		dbe1.setDbFieldType(DbFieldType.NUMERIC);
+		dbe1.setDbFieldSize(18);
+		dbe1.setDbFieldScale(0);
+		dbe1.setIsNull(false);
+		dbe1.setLabel_code("master_repo.pkid");
+
+		DbDataField dbe2 = new DbDataField();
+		dbe2.setDbFieldName("COUNTRY");
+		dbe2.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe2.setDbFieldSize(5);
+		dbe2.setIsNull(true);
+		dbe2.setCode_list_user_code("COUNTRY_CODE");
+		dbe2.setLabel_code("address.country");
+		dbe2.setGui_metadata(CONST_GUI_FIL_HIDE);
+
+		DbDataField dbe3 = new DbDataField();
+		dbe3.setDbFieldName("LOCALITY1");
+		dbe3.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe3.setDbFieldSize(60);
+		dbe3.setIsNull(true);
+		dbe3.setCode_list_user_code("CUATM0");
+		dbe3.setLabel_code("address.locality1");
+		dbe3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+
+		DbDataField dbe4 = new DbDataField();
+		dbe4.setDbFieldName("LOCALITY2");
+		dbe4.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe4.setDbFieldSize(60);
+		dbe4.setIsNull(true);
+		dbe4.setCode_list_user_code("CUATM_DISPLAY");
+		dbe4.setLabel_code("address.locality2");
+		dbe4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+
+		DbDataField dbe5 = new DbDataField();
+		dbe5.setDbFieldName("LOCALITY3");
+		dbe5.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe5.setDbFieldSize(60);
+		dbe5.setIsNull(true);
+		dbe5.setLabel_code("address.locality3");
+		dbe5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe6 = new DbDataField();
+		dbe6.setDbFieldName("LOCALITY4");
+		dbe6.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe6.setDbFieldSize(60);
+		dbe6.setIsNull(true);
+		dbe6.setLabel_code("address.locality4");
+		dbe6.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe7 = new DbDataField();
+		dbe7.setDbFieldName("STREET");
+		dbe7.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe7.setDbFieldSize(200);
+		dbe7.setIsNull(false);
+		dbe7.setLabel_code("address.street");
+		dbe7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe8 = new DbDataField();
+		dbe8.setDbFieldName("POSTAL_CODE");
+		dbe8.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe8.setDbFieldSize(10);
+		dbe8.setIsNull(true);
+		dbe8.setLabel_code("address.postal_code");
+		dbe8.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe9 = new DbDataField();
+		dbe9.setDbFieldName("PHONE");
+		dbe9.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe9.setDbFieldSize(15);
+		dbe9.setIsNull(true);
+		dbe9.setLabel_code("address.phone");
+		dbe9.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe10 = new DbDataField();
+		dbe10.setDbFieldName("FAX");
+		dbe10.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe10.setDbFieldSize(15);
+		dbe10.setIsNull(true);
+		dbe10.setLabel_code("address.fax");
+		dbe10.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe11 = new DbDataField();
+		dbe11.setDbFieldName("EMAIL");
+		dbe11.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe11.setDbFieldSize(150);
+		dbe11.setIsNull(true);
+		dbe11.setLabel_code("address.email");
+		dbe11.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe17 = new DbDataField();
+		dbe17.setDbFieldName("IS_DEFAULT");
+		dbe17.setDbFieldType(DbFieldType.BOOLEAN);
+		dbe17.setCode_list_user_code("BOOLEAN_TRUE_FALSE");
+		dbe17.setLabel_code("address.is_default");
+		dbe17.setIsNull(true);
+		dbe17.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField[] dbTableFields = new DbDataField[12];
+		dbTableFields[0] = dbe1;
+		dbTableFields[1] = dbe2;
+		dbTableFields[2] = dbe3;
+		dbTableFields[3] = dbe4;
+		dbTableFields[4] = dbe5;
+		dbTableFields[5] = dbe6;
+		dbTableFields[6] = dbe7;
+		dbTableFields[7] = dbe8;
+		dbTableFields[8] = dbe9;
+		dbTableFields[9] = dbe10;
+		dbTableFields[10] = dbe11;
+		dbTableFields[11] = dbe17;
+		dbe.setDbTableFields(dbTableFields);
+		return dbe;
+	}
 
 	private static DbDataTable createBankAcc() {
 
@@ -823,6 +950,8 @@ public class DbInit implements IDbInit {
 		dbtt = legalEntity();
 		dbtList.add(addSortOrder(dbtt));
 		dbtt = mkAddressDict();
+		dbtList.add(addSortOrder(dbtt));
+		dbtt = address();
 		dbtList.add(addSortOrder(dbtt));
 		dbtt = createBankAcc();
 		dbtList.add(addSortOrder(dbtt));
