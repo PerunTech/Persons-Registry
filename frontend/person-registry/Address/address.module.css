@@ -1,0 +1,42 @@
+.person-registry-modal {
+    z-index: 2000;
+    display: flex;
+    padding-right: 7px;
+    justify-content: center;
+    align-items: center;
+}
+
+.person-registry-modal-body {
+    margin-top: 30px
+}
+
+.person-registry-modal-header {
+    background: #304040;
+    height: 8.5%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    width: 100%;
+    border-bottom: 5px solid #e8b763;
+    color: white;
+}
+
+.person-registry-modal-footer {
+    background: #304040;
+    height: 8.5%;
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    padding: 20px;
+    border-top: 5px solid #e8b763;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.person-registry-btn-holder {
+    display: flex;
+    float: right;
+}

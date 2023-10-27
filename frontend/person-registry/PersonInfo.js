@@ -5,7 +5,7 @@ import { labelsManager } from './components/LabelsExport'
 import { searchRender, searchComponent, searchResult } from './components/SearchComponent'
 import { logOut } from './components/LogOut'
 import InitialEditForm from './InitialEditForm'
-
+import Address from './Address/Address'
 let arrOfGrids = []
 const p_r = 'persons_registry'
 class PersonInfo extends React.Component {
@@ -20,7 +20,9 @@ class PersonInfo extends React.Component {
       uiSchema: {},
       formData: {},
       activeTab: 'editPerson',
-      initial: true
+      active: 'initial',
+      defaultCountry: ''
+
     }
     this.hashHistory = createHashHistory()
   }
@@ -31,6 +33,12 @@ class PersonInfo extends React.Component {
         this.setState({ selectedPersonType: personType, objectId: objId })
       }
     }
+    let url = window.server + `/WsConf/params/get/sys/DEFAULT_COUNTRY`
+    axios.get(url).then(res => {
+      if (res.data.VALUE) {
+        this.setState({ defaultCountry: res.data.VALUE })
+      }
+    })
   }
   componentWillUnmount() {
     arrOfGrids.map(el => {
@@ -91,48 +99,12 @@ class PersonInfo extends React.Component {
             buttonsArray: obj,
             rowClicked: undefined
           })
-          this.setState({ additionalInfoRender: grid, initial: false, contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, active: undefined, contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'authorizedPerson': {
           this.setState({ bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
           this.generateSearch()
-          break;
-        }
-        case 'contact': {
-          let gridId = 'SVAROG_CONTACT_DATA'
-          let obj = [
-            {
-              "name": `${labelsManager.importLabel('edit', p_r, this.context)}`,
-              "action": () => this.manageSave('edit', gridId),
-              "id": "editBtnContact"
-            }, {
-              "name": `${labelsManager.importLabel('delete', p_r, this.context)}`,
-              "action": () => this.changeStatusContact(),
-              "id": "changeStatusBtnContact"
-            }
-          ]
-          let grid = <GenericGrid
-            gridType={'READ_URL'}
-            key={gridId + objectId}
-            id={gridId + objectId}
-            configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
-            dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000/PKID'}
-            onRowClickFunct={this.rowClickFunction}
-            heightRatio={0.55}
-            toggleCustomButton={true}
-            customButton={() => this.manageSave('add', gridId)}
-            customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
-            buttonsArray={obj}
-          />
-          arrOfGrids.push(`${gridId}${objectId}`)
-          ComponentManager.setStateForComponent(gridId + objectId, null, {
-            onRowClickFunct: this.rowClickFunction,
-            customButton: () => this.manageSave('add', gridId),
-            buttonsArray: obj,
-            rowClicked: undefined
-          })
-          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
           break;
         }
         case 'showAuthC': {
@@ -154,7 +126,7 @@ class PersonInfo extends React.Component {
             customButton: () => this.manageSave('delete'),
             rowClicked: undefined
           })
-          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, active: undefined, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'showAuthP': {
@@ -176,7 +148,7 @@ class PersonInfo extends React.Component {
             customButton: () => this.manageSave('delete'),
             rowClicked: undefined
           })
-          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
+          this.setState({ additionalInfoRender: grid, active: undefined, bankObjId: '', contactObjId: '', objTypeId: '', bankStatus: '' })
           break;
         }
         case 'idData': {
@@ -213,7 +185,7 @@ class PersonInfo extends React.Component {
             buttonsArray: obj,
             rowClicked: undefined
           })
-          this.setState({ additionalInfoRender: grid, initial: false, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
+          this.setState({ additionalInfoRender: grid, active: undefined, bankObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '' })
           break;
         }
         case 'pureRender': {
@@ -296,7 +268,7 @@ class PersonInfo extends React.Component {
     let title = <div>{labelsManager.importLabel('please_search_person', p_r, this.context)}</div>
     let form = searchRender(this.searchComponentParent, this.context)
     showAddAuthPerson.push(title, form)
-    this.setState({ additionalInfoRender: showAddAuthPerson, initial: false, pureRender: showAddAuthPerson })
+    this.setState({ additionalInfoRender: showAddAuthPerson, active: undefined, pureRender: showAddAuthPerson })
   }
 
   searchComponentParent = (formData, form) => {
@@ -441,7 +413,7 @@ class PersonInfo extends React.Component {
   }
 
   savePerson = (formData) => {
-    this.setState({ initial: false })
+    this.setState({ active: undefined })
     let form_params = formData.formData
     this.setPersonName(form_params.NAME, form_params.FIRST_NAME, form_params.LAST_NAME)
     if (!form_params.PERSON_TYPE) {
@@ -460,7 +432,7 @@ class PersonInfo extends React.Component {
     })
       .then(res => {
         alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message)
-        this.setState({ additionalInfoRender: '', initial: true })
+        this.setState({ additionalInfoRender: '', active: 'initial' })
       })
       .catch(err => {
         console.error(err)
@@ -820,16 +792,20 @@ class PersonInfo extends React.Component {
               <div id='alt-btn_holder' className='pr-btn-holder-info'>
                 <div className='pr-btn-container'>
                   <button id='editPerson' onClick={() => {
-                    this.setState({ activeTab: 'editPerson', initial: true, additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
+                    this.setState({ activeTab: 'editPerson', active: 'initial', additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
                   }} className={`pr-btn-reg-info  pr-editPerson ${activeTab === 'editPerson' && 'pr-active-tab'}`}>{iconManager.getIcon('editUser')} {labelsManager.importLabel('edit_person', p_r, this.context)} </button>
                   <button id='bankAcc' onClick={() => {
                     this.setState({ activeTab: 'bankAcc' })
                     this.additionalInfo('bankAcc')
                   }} className={`pr-btn-reg-info pr-bankAcc  ${activeTab === 'bankAcc' && 'pr-active-tab'}`}>{iconManager.getIcon('bankAcc')} {labelsManager.importLabel('bank_acc', p_r, this.context)} </button>
-                  <button id='contact' onClick={() => {
-                    this.setState({ activeTab: 'contact' })
-                    this.additionalInfo('contact')
-                  }} className={`pr-btn-reg-info pr-contact  ${activeTab === 'contact' && 'pr-active-tab'}`}>{iconManager.getIcon('contact')} {labelsManager.importLabel('contact', p_r, this.context)} </button>
+
+
+                  <button id='address' onClick={() => {
+                    this.setState({ activeTab: 'address', additionalInfoRender: '', bankObjId: '', active: 'address', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
+                    this.additionalInfo('address')
+                  }} className={`pr-btn-reg-info pr-address  ${activeTab === 'address' && 'pr-active-tab'}`}>{iconManager.getIcon('address')} {labelsManager.importLabel('address', p_r, this.context)} </button>
+
+
                   {selectedPersonType === 'P' && <button id='authP' onClick={() => {
                     this.setState({ activeTab: 'authP' })
                     this.additionalInfo('showAuthC')
@@ -854,7 +830,8 @@ class PersonInfo extends React.Component {
             <div id='alt-content' className='pr-content-info'>
               <div className='pr-content-inner'>
                 {additionalInfoRender}
-                {this.state.initial && <InitialEditForm setPersonName={this.setPersonName} objId={this.props.match.params.objId} personType={this.props.match.params.personType} savePerson={this.savePerson} />}
+                {this.state.active === 'initial' && <InitialEditForm setPersonName={this.setPersonName} objId={this.props.match.params.objId} personType={this.props.match.params.personType} savePerson={this.savePerson} />}
+                {this.state.active === 'address' && <Address personObjId={this.state.objectId} defaultCountry={this.state.defaultCountry} />}
               </div>
             </div>
           </div>
