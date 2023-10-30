@@ -93,7 +93,7 @@ const Address = (props, context) => {
             if (data['LOCALITY1']) {
                 tempUi.LOCALITY2 = {}
 
-                if (formData['LOCALITY1'] !== data['LOCALITY1'] || formData['LOCALITY1'] === data['LOCALITY1']) {
+                if (formData['LOCALITY1'] !== data['LOCALITY1']) {
                     setFlagForm(false)
                     let tempSchema = JSON.parse(JSON.stringify(permaSchema))
                     let tempEnum = []
