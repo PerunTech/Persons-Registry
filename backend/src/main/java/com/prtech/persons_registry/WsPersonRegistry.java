@@ -141,8 +141,6 @@ public class WsPersonRegistry {
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
-						listRequired.add("MUNICIPALITY");
-						listRequired.add("CITY");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
@@ -171,10 +169,7 @@ public class WsPersonRegistry {
 					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("NAME");
-						listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
-						listRequired.add("MUNICIPALITY");
-						listRequired.add("CITY");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
