@@ -139,7 +139,6 @@ public class WsPersonRegistry {
 					switch (defaultCountry) {
 					case "MDA":
 						listRequired.add(PRC.ID_NO);
-						listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
 						break;
 					default:
@@ -202,17 +201,39 @@ public class WsPersonRegistry {
 					jObj.addProperty(Rc.TITLE, jObj2.get(Rc.TITLE).getAsString());
 					JsonObject properties = jObj.get(Rc.PROPERTIES).getAsJsonObject();
 					if (personType.equalsIgnoreCase("p")) {
-						properties.remove("NAME");
-						properties.remove(PRC.TAX_NO);
+						
+						switch (defaultCountry) {
+						case "MDA":
+							properties.remove("NAME");
+							properties.remove(PRC.TAX_NO);
+							break;
+						default:
+							properties.remove("NAME");
+							properties.remove(PRC.TAX_NO);
+						}
+						
+						
+						
+
 					}
 					if (personType.equalsIgnoreCase("g")) {
-						if (properties.has(PRC.ID_NO)) {
-							JsonObject jIdNo = properties.get(PRC.ID_NO).getAsJsonObject();
-							jIdNo.addProperty("minLength", 7);
-							jIdNo.addProperty("maxLength", 7);
-							properties.add(PRC.ID_NO, jIdNo);
+						
+						switch (defaultCountry) {
+						case "MDA":
 
+							break;
+						default:
+							if (properties.has(PRC.ID_NO)) {
+								JsonObject jIdNo = properties.get(PRC.ID_NO).getAsJsonObject();
+								jIdNo.addProperty("minLength", 7);
+								jIdNo.addProperty("maxLength", 7);
+								properties.add(PRC.ID_NO, jIdNo);
+
+							}
 						}
+						
+						
+
 					}
 					for (Map.Entry<String, JsonElement> entry : jObj2.entrySet()) {
 
