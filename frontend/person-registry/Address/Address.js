@@ -16,7 +16,7 @@ const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
 import { CustomOnchangeFunction } from './CustomOnchangeFunction';
-let changeField
+let changeField = 'LOCALITY1'
 const Address = (props, context) => {
     const [schema, setSchema] = useState({})
     const [uiSchema, setUiSchema] = useState({})
@@ -160,6 +160,7 @@ const Address = (props, context) => {
 
     const handleRowClick = (_id, _rowIdx, row) => {
         generateMainForm(row)
+        changeField = 'LOCALITY1'
     }
 
     const deleteFunc = (formData) => {
