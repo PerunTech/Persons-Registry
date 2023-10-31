@@ -596,8 +596,9 @@ public class DbInit implements IDbInit {
 		
 		DbDataField dbe17 = new DbDataField();
 		dbe17.setDbFieldName("IS_DEFAULT");
-		dbe17.setDbFieldType(DbFieldType.BOOLEAN);
-		dbe17.setCode_list_user_code("BOOLEAN_TRUE_FALSE");
+		dbe17.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe17.setDbFieldSize(1);
+		dbe17.setCode_list_user_code("NUMERIC_YES_NO_WITHOUT_CHOOSE");
 		dbe17.setLabel_code("address.is_default");
 		dbe17.setIsNull(true);
 		dbe17.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
