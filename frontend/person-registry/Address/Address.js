@@ -88,7 +88,7 @@ const Address = (props, context) => {
 
     };
 
-    const generateNewTest = (data) => {
+    const generateNewDependentForm = (data) => {
         let tempUi = JSON.parse(JSON.stringify(permaUi))
         if (data['COUNTRY'] === props.defaultCountry) {
             if (data['LOCALITY1']) {
