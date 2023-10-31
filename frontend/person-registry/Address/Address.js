@@ -15,7 +15,8 @@ import { labelsManager } from '../components/LabelsExport';
 const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
-
+import { CustomOnchangeFunction } from './CustomOnchangeFunction';
+let changeField
 const Address = (props, context) => {
     const [schema, setSchema] = useState({})
     const [uiSchema, setUiSchema] = useState({})
@@ -92,7 +93,6 @@ const Address = (props, context) => {
         if (data['COUNTRY'] === props.defaultCountry) {
             if (data['LOCALITY1']) {
                 tempUi.LOCALITY2 = {}
-
                 if (formData['LOCALITY1'] !== data['LOCALITY1']) {
                     setFlagForm(false)
                     let tempSchema = JSON.parse(JSON.stringify(permaSchema))
@@ -111,14 +111,12 @@ const Address = (props, context) => {
                     tempSchema.properties['LOCALITY2'].enum = tempEnum
                     tempSchema.properties['LOCALITY2'].enumNames = tempEnumNames
                     setSchema(tempSchema)
-
                     setFlagForm(true)
                 }
             } else {
                 tempUi.LOCALITY2 = { 'ui:widget': 'hidden' }
             }
         }
-
         setUiSchema(tempUi)
     }
 
@@ -189,7 +187,18 @@ const Address = (props, context) => {
 
             });
     };
-
+    const onFieldChange = (name, _formData) => {
+        changeField = name
+    }
+    const formContext = {
+        onFieldChange: onFieldChange
+    };
+    const onChange = (e) => {
+        setFormData(e.formData)
+        if (changeField === 'LOCALITY1' || changeField === 'LOCALITY2') {
+            generateNewDependentForm(e.formData)
+        }
+    }
     return (
         <>{loading && <Loading />}
             <div>
@@ -225,12 +234,11 @@ const Address = (props, context) => {
                             schema={schema}
                             uiSchema={uiSchema}
                             onSubmit={(e) => saveAddress(e)}
+                            fields={{ SchemaField: CustomOnchangeFunction }}
                             className={`person-registry-forms`}
                             formData={formData}
-                            onChange={(e) => {
-                                setFormData(e.formData)
-                                generateNewTest(e.formData)
-                            }}
+                            formContext={formContext}
+                            onChange={(e) => onChange(e)}
                         >
                             <></>
                             <div className={style['person-registry-btn-holder']} >
