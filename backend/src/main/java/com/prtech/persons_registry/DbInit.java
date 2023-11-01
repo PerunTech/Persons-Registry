@@ -656,7 +656,7 @@ public class DbInit implements IDbInit {
 		dbf3.setIsUnique(true);
 		dbf3.setIsNull(false);
 		dbf3.setLabel_code("bankacc.bank_account");
-		dbf3.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"minLength\":15,\"maxLength\":15,\"maximum\":\"\"}}");
+		dbf3.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"minLength\":15,\"maxLength\":15,\"maximum\":999999999999999,\"minimum\":100000000000000}}");
 
 		DbDataField dbf4 = new DbDataField();
 		dbf4.setDbFieldName("BRANCH_ADDRESS");
