@@ -558,7 +558,7 @@ public class DbInit implements IDbInit {
 		dbe7.setDbFieldName("STREET");
 		dbe7.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe7.setDbFieldSize(200);
-		dbe7.setIsNull(false);
+		dbe7.setIsNull(true);
 		dbe7.setLabel_code("address.street");
 		dbe7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
