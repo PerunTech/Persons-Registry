@@ -213,7 +213,6 @@ const Address = (props, context) => {
                     dataTableName={
                         `/ReactElements/getObjectsByParentId/${props.svSession}/${props.personObjId}/ADDRESS/100000`
                     }
-                    minHeight={800}
                     onRowClickFunct={handleRowClick}
                     refreshData={true}
                     toggleCustomButton={true}
@@ -221,6 +220,7 @@ const Address = (props, context) => {
                     customButtonLabel={labelsManager.importLabel(
                         "add_address", "persons_registry", context
                     )}
+                    heightRatio={0.58}
                 />
                 {show && <Modal className={style["person-registry-modal"]} show={show} onHide={() => setShow(false)}>
                     <Modal.Header className={style["person-registry-modal-header"]} closeButton>
