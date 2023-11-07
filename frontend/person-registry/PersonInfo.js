@@ -85,7 +85,7 @@ class PersonInfo extends React.Component {
             configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
             dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000'}
             onRowClickFunct={this.rowClickFunction}
-            heightRatio={0.60}
+            heightRatio={0.58}
             toggleCustomButton={true}
             customButton={() => this.manageSave('add', gridId)}
             customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
@@ -115,7 +115,7 @@ class PersonInfo extends React.Component {
             configTableName={'/SvPersonRegistry/getTableFieldListForResponsiblePersons/%session'}
             dataTableName={'/SvPersonRegistry/getResponsiblePersons/%session/' + objectId + '/' + false}
             onRowClickFunct={this.getRespPersonOnRowClick}
-            heightRatio={0.6}
+            heightRatio={0.58}
             toggleCustomButton={true}
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
@@ -137,7 +137,7 @@ class PersonInfo extends React.Component {
             configTableName={'/SvPersonRegistry/getTableFieldListForResponsiblePersons/%session'}
             dataTableName={'/SvPersonRegistry/getResponsiblePersons/%session/' + objectId + '/' + true}
             onRowClickFunct={this.getRespPersonOnRowClick}
-            heightRatio={0.5}
+            heightRatio={0.58}
             toggleCustomButton={true}
             customButton={() => this.manageSave('delete')}
             customButtonLabel={labelsManager.importLabel('delete', p_r, this.context)}
@@ -171,7 +171,7 @@ class PersonInfo extends React.Component {
             configTableName={'/ReactElements/getTableFieldList/%session/' + gridId}
             dataTableName={'/ReactElements/getObjectsByParentId/%session/' + objectId + '/' + gridId + '/10000/PKID'}
             onRowClickFunct={this.rowClickFunction}
-            heightRatio={0.60}
+            heightRatio={0.58}
             toggleCustomButton={true}
             customButton={() => this.manageSave('add', gridId)}
             customButtonLabel={labelsManager.importLabel('add', p_r, this.context)}
