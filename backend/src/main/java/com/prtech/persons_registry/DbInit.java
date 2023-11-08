@@ -580,7 +580,7 @@ public class DbInit implements IDbInit {
 		DbDataField dbe9 = new DbDataField();
 		dbe9.setDbFieldName("PHONE");
 		dbe9.setDbFieldType(DbFieldType.NVARCHAR);
-		dbe9.setDbFieldSize(15);
+		dbe9.setDbFieldSize(25);
 		dbe9.setIsNull(true);
 		dbe9.setSort_order(900);
 		dbe9.setLabel_code("address.phone");
@@ -589,7 +589,7 @@ public class DbInit implements IDbInit {
 		DbDataField dbe10 = new DbDataField();
 		dbe10.setDbFieldName("FAX");
 		dbe10.setDbFieldType(DbFieldType.NVARCHAR);
-		dbe10.setDbFieldSize(15);
+		dbe10.setDbFieldSize(25);
 		dbe10.setIsNull(true);
 		dbe10.setSort_order(1000);
 		dbe10.setLabel_code("address.fax");
@@ -599,7 +599,7 @@ public class DbInit implements IDbInit {
 		DbDataField dbe12 = new DbDataField();
 		dbe12.setDbFieldName("PHONE_MOBILE");
 		dbe12.setDbFieldType(DbFieldType.NVARCHAR);
-		dbe12.setDbFieldSize(15);
+		dbe12.setDbFieldSize(25);
 		dbe12.setIsNull(true);
 		dbe12.setSort_order(1100);
 		dbe12.setLabel_code("address.phone_mobile");
