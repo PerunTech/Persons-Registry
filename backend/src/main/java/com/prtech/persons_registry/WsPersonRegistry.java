@@ -27,6 +27,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.prtech.perun.PerunUtil;
 import com.prtech.perun_core.ws.Rc;
 import com.prtech.perun_core.ws.WsReactElements;
 import com.prtech.svarog.I18n;
@@ -85,34 +86,11 @@ public class WsPersonRegistry {
 					jArray.add(jObj);
 				}
 			}
-			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS), I18n.getText(PRC.SUCCESS_GET_OPTIONS),
-					jArray);
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS),
+					I18n.getText(PRC.SUCCESS_GET_OPTIONS), jArray);
 
 		} catch (Exception e) {
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
-						I18n.getText(ex.getLabelCode()), new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
-						I18n.getText("person_registry.error.get_options"), new JsonObject());
-				return Response.status(500).entity(jrh.getAll()).build();
-			}
-
+			return PerunUtil.handleException(e, "Error getting options");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
@@ -123,11 +101,9 @@ public class WsPersonRegistry {
 	public Response getTableJSONSchemaPerson(@PathParam("sessionId") String sessionId,
 			@PathParam("table_name") String tableName, @PathParam("personType") String personType,
 			@Context HttpServletRequest httpRequest) {
-
 		ResponseHandler jrh = new ResponseHandler();
 		JsonObject jObj2 = null;
 		try {
-
 			Response response = (new WsReactElements()).getTableJSONSchema(sessionId, tableName, httpRequest);
 			if (response.getStatus() == 200) {
 				String defaultCountry = SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase();
@@ -150,8 +126,6 @@ public class WsPersonRegistry {
 						listRequired.add("CITY_VILLAGE");
 						listRequired.add("CITY");
 					}
-					
-
 
 					response = (new WsReactElements()).getTableJSONSchema(sessionId, PRC.PHYSICAL_ENTITY, httpRequest);
 
@@ -159,7 +133,6 @@ public class WsPersonRegistry {
 						jObj2 = (new Gson()).fromJson((String) response.getEntity(), JsonObject.class);
 						if (jObj2.has(Rc.REQUIRED)) {
 							jARequired = jObj2.get(Rc.REQUIRED).getAsJsonArray();
-
 						}
 					}
 
@@ -189,7 +162,6 @@ public class WsPersonRegistry {
 
 						if (jObj2.has(Rc.REQUIRED)) {
 							jARequired = jObj2.get(Rc.REQUIRED).getAsJsonArray();
-
 						}
 					}
 
@@ -201,7 +173,7 @@ public class WsPersonRegistry {
 					jObj.addProperty(Rc.TITLE, jObj2.get(Rc.TITLE).getAsString());
 					JsonObject properties = jObj.get(Rc.PROPERTIES).getAsJsonObject();
 					if (personType.equalsIgnoreCase("p")) {
-						
+
 						switch (defaultCountry) {
 						case "MDA":
 							properties.remove("NAME");
@@ -211,13 +183,8 @@ public class WsPersonRegistry {
 							properties.remove("NAME");
 							properties.remove(PRC.TAX_NO);
 						}
-						
-						
-						
-
 					}
 					if (personType.equalsIgnoreCase("g")) {
-						
 						switch (defaultCountry) {
 						case "MDA":
 
@@ -228,15 +195,10 @@ public class WsPersonRegistry {
 								jIdNo.addProperty("minLength", 7);
 								jIdNo.addProperty("maxLength", 7);
 								properties.add(PRC.ID_NO, jIdNo);
-
 							}
 						}
-						
-						
-
 					}
 					for (Map.Entry<String, JsonElement> entry : jObj2.entrySet()) {
-
 						if (entry.getKey().equals(Rc.PROPERTIES))
 							for (Map.Entry<String, JsonElement> entry1 : entry.getValue().getAsJsonObject()
 									.entrySet()) {
@@ -246,7 +208,6 @@ public class WsPersonRegistry {
 									properties.add(entry1.getKey(), entry1.getValue());
 								}
 							}
-
 					}
 					jObj.add(Rc.PROPERTIES, properties);
 				}
@@ -264,31 +225,7 @@ public class WsPersonRegistry {
 			}
 
 		} catch (Exception e) {
-
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
-						new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-					return Response.status(401).entity(jrh.getAll().toString()).build();
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll().toString()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
-						new JsonObject());
-				return Response.status(500).entity(jrh.getAll().toString()).build();
-			}
+			return PerunUtil.handleException(e, "Error getting table json schema");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 
@@ -304,7 +241,7 @@ public class WsPersonRegistry {
 		Gson gson = new Gson();
 		try {
 			String personTypeTableName = "";
-			switch(personType.toUpperCase()) {
+			switch (personType.toUpperCase()) {
 			case "P":
 				personTypeTableName = "PHYSICAL_ENTITY";
 				break;
@@ -368,8 +305,7 @@ public class WsPersonRegistry {
 
 			}
 		} catch (SvException e) {
-			log4j.error(e.getFormattedMessage(), e);
-			return Response.status(401).entity(e.getFormattedMessage()).build();
+			return PerunUtil.handleException(e, "Error getting table ui schema");
 		}
 		return Response.status(200).entity(jsonData.toString()).build();
 	}
@@ -418,12 +354,10 @@ public class WsPersonRegistry {
 					jsonData.addProperty(Rc.OBJECT_TYPE, jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
 					jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
 					jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
-
 				}
 				vdataObject = re.prepareObjectToSave(jsonData, parentId, svr);
 
 				svw.saveObject(vdataObject, false);
-
 				svw.dbCommit();
 
 				jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
@@ -433,31 +367,7 @@ public class WsPersonRegistry {
 						I18n.getText("perrun.bad_data.save"), new JsonObject());
 			}
 		} catch (SvException e) {
-
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
-						new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-					return Response.status(401).entity(jrh.getAll().toString()).build();
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll().toString()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
-						new JsonObject());
-				return Response.status(500).entity(jrh.getAll().toString()).build();
-			}
+			return PerunUtil.handleException(e, "Error saving person");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
@@ -544,31 +454,7 @@ public class WsPersonRegistry {
 			}
 
 		} catch (SvException e) {
-
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
-						new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-					return Response.status(401).entity(jrh.getAll().toString()).build();
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll().toString()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
-						new JsonObject());
-				return Response.status(500).entity(jrh.getAll().toString()).build();
-			}
+			return PerunUtil.handleException(e, "Error getting person");
 		}
 		return Response.status(200).entity(responseJson.toString()).build();
 	}
@@ -577,9 +463,8 @@ public class WsPersonRegistry {
 	@GET
 	@Produces("application/json")
 	public Response getLinkTypeOptions(@PathParam("token") String token) {
-
 		ResponseHandler jrh = new ResponseHandler();
-		try (SvReader svr = new SvReader(token)) {
+		try (SvReader svr = new SvReader(token);) {
 			JsonArray jArray = new JsonArray();
 			JsonObject jObj;
 
@@ -599,40 +484,16 @@ public class WsPersonRegistry {
 			DbDataArray linkTypes = svr.getObjects(exp, SvReader.getTypeIdByName(Rc.LINK_TYPE), null, 0, 0);
 
 			for (DbDataObject linkType : linkTypes.getItems()) {
-
 				jObj = new JsonObject();
 				jObj.addProperty("text", I18n.getText(linkType.getVal(PRC.LINK_TYPE_DESCRIPTION).toString()));
 				jObj.addProperty(PRC.VALUE, linkType.getVal(Rc.LINK_TYPE).toString());
 				jArray.add(jObj);
 			}
-			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS), I18n.getText(PRC.SUCCESS_GET_OPTIONS),
-					jArray);
+			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_GET_OPTIONS),
+					I18n.getText(PRC.SUCCESS_GET_OPTIONS), jArray);
 
 		} catch (Exception e) {
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
-						I18n.getText(ex.getLabelCode()), new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText("person_registry.error.get_options"),
-						I18n.getText("person_registry.error.get_options"), new JsonObject());
-				return Response.status(500).entity(jrh.getAll()).build();
-			}
-
+			return PerunUtil.handleException(e, "Error getting link options");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
@@ -644,7 +505,6 @@ public class WsPersonRegistry {
 	public Response linkTwoPersons(@PathParam("session_id") String sessionId, MultivaluedMap<String, String> formVals,
 			@Context HttpServletRequest httpRequest) {
 		ResponseHandler jrh = new ResponseHandler();
-
 		Long objectId1 = null;
 		Long objectId2 = null;
 		String linkName = "";
@@ -667,17 +527,15 @@ public class WsPersonRegistry {
 
 			if (jsonData.has("objId1") && jsonData.has("objId2") && jsonData.has("linkName")) {
 				objectId1 = jsonData.get("objId1").getAsLong();
-
 				objectId2 = jsonData.get("objId2").getAsLong();
-
 				linkName = jsonData.get("linkName").getAsString();
 				lockKey = linkName + "-" + objectId1 + "-" + objectId2;
 
 				lock = SvLock.getLock(lockKey, false, 0);
 				if (lock != null) {
-					svl.linkObjects(objectId1, objectId2, SvLink
-							.getLinkType(linkName, SvCore.getTypeIdByName(PRC.PERSON), SvCore.getTypeIdByName(PRC.PERSON))
-							.getObjectId(), "", true, true);
+					svl.linkObjects(objectId1, objectId2, SvLink.getLinkType(linkName,
+							SvCore.getTypeIdByName(PRC.PERSON), SvCore.getTypeIdByName(PRC.PERSON)).getObjectId(), "",
+							true, true);
 
 					jrh.create(MessageType.SUCCESS, I18n.getText("success.object_is_linked"),
 							I18n.getText("success.object_is_linked"), jObj);
@@ -690,31 +548,7 @@ public class WsPersonRegistry {
 						new JsonObject());
 			}
 		} catch (Exception e) {
-			if (e instanceof SvException) {
-				SvException ex = (SvException) e;
-
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
-						new JsonObject());
-				if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-					jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-							new JsonObject());
-					log4j.error(ex.getFormattedMessage());
-					return Response.status(401).entity(jrh.getAll().toString()).build();
-				} else {
-					log4j.error(ex.getLabelCode(), ex);
-					if (ex.getLabelCode().startsWith("sys")) {
-						return Response.status(500).entity(jrh.getAll().toString()).build();
-					}
-				}
-
-			} else {
-				log4j.error(e.getMessage(), e);
-				jrh.create(MessageType.ERROR, I18n.getText("error.create_link"), I18n.getText("error.create_link"),
-						new JsonObject());
-				return Response.status(500).entity(jrh.getAll().toString()).build();
-			}
-
+			return PerunUtil.handleException(e, "Error creating link");
 		} finally {
 			if (lock != null) {
 				SvLock.releaseLock(lockKey, lock);
@@ -722,14 +556,15 @@ public class WsPersonRegistry {
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
-	
-	/** TAKEN FROM WSIPARDSPA 
+
+	/**
+	 * TAKEN FROM WSIPARDSPA
 	 * 
 	 * Method to get responsible persons for a given objectId
 	 * 
-	 * @param sessionId String token access
-	 * @param objectId Long OBJECT_ID for the PERSON 
-	 * @param isReverse what is the orientation of the responsibility 
+	 * @param sessionId   String token access
+	 * @param objectId    Long OBJECT_ID for the PERSON
+	 * @param isReverse   what is the orientation of the responsibility
 	 * @param httpRequest
 	 * @return ResponseHandler
 	 * @throws SvException
@@ -767,10 +602,8 @@ public class WsPersonRegistry {
 			tablesUsedArray[0] = PRC.PERSON;
 			tableShowArray[0] = true;
 			Long personObjTypeId = SvCore.getTypeIdByName(PRC.PERSON);
-			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJ_TYPE_1", DbCompareOperand.EQUAL,
-					personObjTypeId);
-			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJ_TYPE_2", DbCompareOperand.EQUAL,
-					personObjTypeId);
+			DbSearchCriterion crit = new DbSearchCriterion("LINK_OBJ_TYPE_1", DbCompareOperand.EQUAL, personObjTypeId);
+			DbSearchCriterion crit2 = new DbSearchCriterion("LINK_OBJ_TYPE_2", DbCompareOperand.EQUAL, personObjTypeId);
 			DbSearchExpression exp = new DbSearchExpression().addDbSearchItem(crit).addDbSearchItem(crit2);
 
 			DbDataArray linkTypes = svr.getObjects(exp, SvReader.getTypeIdByName(PRC.LINK_TYPE), null, 0, 0);
@@ -803,39 +636,19 @@ public class WsPersonRegistry {
 					joPerson.addProperty(PRC.LINK_TYPE, linkType.getVal(PRC.LINK_TYPE).toString());
 					responseJArray.add(joPerson);
 				}
-
 			}
 
 			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
 					I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), responseJArray);
 
-		} catch (SvException ex) {
-
-			jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(ex.getLabelCode()),
-					new JsonObject());
-			if (ex.getLabelCode().equals(PRC.ERROR_INVALID_SESSION)) {
-
-				jrh.create(MessageType.ERROR, I18n.getText(ex.getLabelCode()), I18n.getText(ex.getJsonMessage()),
-						new JsonObject());
-				log4j.error(ex.getFormattedMessage());
-				return Response.status(401).entity(jrh.getAll().toString()).build();
-			} else {
-				log4j.error(ex.getLabelCode(), ex);
-				if (ex.getLabelCode().startsWith("sys")) {
-					return Response.status(500).entity(jrh.getAll().toString()).build();
-				}
-			}
 		} catch (Exception e) {
-			log4j.error(e.getMessage(), e);
-			jrh.create(MessageType.ERROR, I18n.getText(PRC.PERUN_ERROR_SAVE), I18n.getText(PRC.PERUN_ERROR_SAVE),
-					new JsonObject());
-			return Response.status(500).entity(jrh.getAll().toString()).build();
-
+			return PerunUtil.handleException(e, "Error getting responsible persons");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
 
-	/** fielt list for method /getResponsiblePersons/
+	/**
+	 * field list for method /getResponsiblePersons/
 	 * 
 	 * @param sessionId
 	 * @param httpRequest
@@ -865,9 +678,7 @@ public class WsPersonRegistry {
 			jResponse.add(linkType);
 			jrh.create(MessageType.SUCCESS, I18n.getText(PRC.SUCCESS_PERUN_GET_DATA),
 					I18n.getText(PRC.SUCCESS_PERUN_GET_DATA), jResponse);
-
 		}
-
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
 
@@ -877,7 +688,7 @@ public class WsPersonRegistry {
 	public Response changeBankAccStatus(@PathParam("sId") String sId, @PathParam("oId") Long oId,
 			@PathParam("nextStatus") String nextStatus) {
 		ResponseHandler jrh = new ResponseHandler();
-		try (SvReader svr = new SvReader(sId); SvWorkflow sww = new SvWorkflow(svr)) {
+		try (SvReader svr = new SvReader(sId); SvWorkflow sww = new SvWorkflow(svr);) {
 			if (oId != null && nextStatus != null && !nextStatus.equalsIgnoreCase(PRC.EMPTY_STRING)
 					&& (nextStatus.equalsIgnoreCase(PRC.ACTIVE) || nextStatus.equalsIgnoreCase(PRC.INACTIVE))) {
 				DbDataObject bankAcc = svr.getObjectById(oId, SvReader.getTypeIdByName(PRC.BANKACC), null);
@@ -899,11 +710,11 @@ public class WsPersonRegistry {
 						I18n.getText(PRC.ERROR_PERUN_CHANGED_STATUS));
 			}
 		} catch (Exception e) {
-			return handleException(e, jrh, PRC.ERROR_PERUN_CHANGED_STATUS);
+			return PerunUtil.handleException(e, "Error changing status");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
 	}
-	
+
 	@Path("/get/dependency-dropdown/location/sid/{sid}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -918,7 +729,7 @@ public class WsPersonRegistry {
 					jObject = (new Gson()).fromJson(value.get(0), JsonObject.class);
 				}
 			}
-			
+
 			Reader perunCoreRdr = new Reader();
 			String tableName = "REGION";
 			JsonObject jModifiedFormData = new JsonObject();
@@ -944,32 +755,10 @@ public class WsPersonRegistry {
 				break;
 			}
 			jResult = perunCoreRdr.getDependentElements(jModifiedFormData, tableName, svr);
-			
 		} catch (Exception e) {
-			ResponseHandler jrh = new ResponseHandler();
-			log4j.error(e.getMessage(), e);
-			jrh.create(MessageType.ERROR, I18n.getText("ERROR_DEFAULT_TITLE"), I18n.getText("ERROR_DEFAULT_TITLE"), new JsonObject());
+			return PerunUtil.handleException(e, "Error getting location dependencies");
 		}
 		return Response.status(200).entity(jResult.toString()).build();
 	}
 
-	private Response handleException(Exception e, ResponseHandler jrh, String message) {
-		if (e instanceof SvException) {
-			SvException sve = (SvException) e;
-			log4j.error(sve.getFormattedMessage(), sve);
-			if (sve.getLabelCode().equals("error_invalid_session")) {
-				jrh.create(MessageType.ERROR, I18n.getText("error_invalid_session"),
-						I18n.getText("error_invalid_session"), new JsonObject());
-				return Response.status(401).entity(jrh.getAll().toString()).build();
-			} else if (sve.getLabelCode().equals(PRC.ERROR_USER_NOT_AUTHORIZED)) {
-				jrh.create(MessageType.ERROR, I18n.getText(PRC.ERROR_USER_NOT_AUTHORIZED),
-						I18n.getText(PRC.ERROR_USER_NOT_AUTHORIZED), new JsonObject());
-				return Response.status(403).entity(jrh.getAll().toString()).build();
-			}
-		} else {
-			log4j.error(e.getMessage(), e);
-			jrh.create(MessageType.ERROR, I18n.getText(message), I18n.getText(message), new JsonObject());
-		}
-		return Response.status(200).entity(jrh.getAll().toString()).build();
-	}
 }
