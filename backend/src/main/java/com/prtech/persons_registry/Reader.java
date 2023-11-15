@@ -7,12 +7,14 @@ import com.google.gson.JsonObject;
 import com.prtech.svarog.CodeList;
 import com.prtech.svarog.SvCore;
 import com.prtech.svarog.SvException;
+import com.prtech.svarog.SvLink;
 import com.prtech.svarog.SvReader;
 import com.prtech.svarog.svCONST;
 import com.prtech.svarog_common.DbDataArray;
 import com.prtech.svarog_common.DbDataObject;
 import com.prtech.svarog_common.DbSearchCriterion;
 import com.prtech.svarog_common.DbSearchExpression;
+import com.prtech.svarog_common.DbSearch.DbLogicOperand;
 import com.prtech.svarog_common.DbSearchCriterion.DbCompareOperand;
 
 public class Reader {
@@ -158,5 +160,54 @@ public class Reader {
 		} catch (SvException e) {
 		}
 		return dbArr;
+	}
+	
+	/** method to check if link between objects exist so we don't have to blow exceptions
+	 * 
+	 * @param svr
+	 * @param obejct1
+	 * @param object2
+	 * @param linkType
+	 * @return
+	 * @throws SvException
+	 */
+	public Boolean linkExists(DbDataObject obejct1, DbDataObject object2, String linkType, SvReader svr)
+			throws SvException {
+		DbDataObject dbl = SvLink.getLinkType(linkType, obejct1.getObjectType(), object2.getObjectType());
+		return linkExists( obejct1, object2, dbl, svr);
+	}
+	
+	/** method to check if link between objects exist so we don't have to blow exceptions
+	 * 
+	 * @param svr
+	 * @param obejct1
+	 * @param object2
+	 * @param linkType
+	 * @return
+	 * @throws SvException
+	 */
+	public Boolean linkExists(DbDataObject obejct1, DbDataObject object2, DbDataObject linkType, SvReader svr)
+			throws SvException {
+		Boolean exists = false;
+
+		DbSearchCriterion searchObj1 = new DbSearchCriterion("LINK_OBJ_ID_1", DbCompareOperand.EQUAL,
+				obejct1.getObjectId());
+		searchObj1.setNextCritOperand(DbLogicOperand.AND.toString());
+		DbSearchCriterion searchObj2 = new DbSearchCriterion("LINK_OBJ_ID_2", DbCompareOperand.EQUAL,
+				object2.getObjectId());
+		searchObj2.setNextCritOperand(DbLogicOperand.AND.toString());
+		DbSearchCriterion searchLinkType = new DbSearchCriterion("LINK_TYPE_ID", DbCompareOperand.EQUAL,
+				linkType.getObjectId());
+		searchLinkType.setNextCritOperand(DbLogicOperand.AND.toString());
+		DbSearchCriterion searchStatus = new DbSearchCriterion("STATUS", DbCompareOperand.EQUAL, "VALID");
+		DbSearchExpression expr = new DbSearchExpression();
+		expr.addDbSearchItem(searchObj1);
+		expr.addDbSearchItem(searchObj2);
+		expr.addDbSearchItem(searchLinkType);
+		expr.addDbSearchItem(searchStatus);
+		DbDataArray areLinked = svr.getObjects(expr, SvReader.getTypeIdByName("SVAROG_LINK"), null, 0, 0);
+		if (areLinked != null && !areLinked.getItems().isEmpty())
+			exists = true;
+		return exists;
 	}
 }

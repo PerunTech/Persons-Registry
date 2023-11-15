@@ -533,12 +533,19 @@ public class WsPersonRegistry {
 
 				lock = SvLock.getLock(lockKey, false, 0);
 				if (lock != null) {
-					svl.linkObjects(objectId1, objectId2, SvLink.getLinkType(linkName,
+					DbDataObject obj1 = svr.getObjectById(objectId1, SvCore.getDbtByName(PRC.PERSON), null);
+					DbDataObject obj2 = svr.getObjectById(objectId2, SvCore.getDbtByName(PRC.PERSON), null);
+					if (! new Reader().linkExists(obj1, obj2, linkName, svr)) {
+						svl.linkObjects(objectId1, objectId2, SvLink.getLinkType(linkName,
 							SvCore.getTypeIdByName(PRC.PERSON), SvCore.getTypeIdByName(PRC.PERSON)).getObjectId(), "",
 							true, true);
-
-					jrh.create(MessageType.SUCCESS, I18n.getText("success.object_is_linked"),
+						
+						jrh.create(MessageType.SUCCESS, I18n.getText("success.object_is_linked"),
 							I18n.getText("success.object_is_linked"), jObj);
+					} else {
+						jrh.create(MessageType.WARNING, I18n.getText("warning_message"),
+								I18n.getText("warning.object_already_linked"), jObj);
+					}
 				} else {
 					jrh.create(MessageType.WARNING, I18n.getText("warning.object_is_locked"),
 							I18n.getText("warning.object_is_locked"), jObj);
