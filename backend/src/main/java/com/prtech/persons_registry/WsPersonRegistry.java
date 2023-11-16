@@ -333,7 +333,7 @@ public class WsPersonRegistry {
 
 			if (jsonData.has("PERSON_TYPE") && jsonData.has("ID_NO")) {
 				DbDataArray people = new Reader().searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL,
-						SvCore.getTypeIdByName(PRC.PERSON), "ID_NO", jsonData.get("ID_NO"), svr);
+						SvCore.getTypeIdByName(PRC.PERSON), "ID_NO", jsonData.get("ID_NO").getAsString(), svr);
 				if (null == people || people.isEmpty()) {
 					jsonData.addProperty("tableName", PRC.PERSON);
 					DbDataObject vdataObject = re.prepareObjectToSave(jsonData, 0L, svr);
