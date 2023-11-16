@@ -326,42 +326,47 @@ public class WsPersonRegistry {
 				}
 			}
 
-		DbDataObject vdataObject = null;
-		WsReactElements re = new WsReactElements();
-		JsonObject jsonData = null;
-		Gson gson = new Gson();
-		Long parentId = 0L;
-		String tableName = PRC.PERSON;
 		try (SvReader svr = new SvReader(sessionId); SvWriter svw = new SvWriter(svr);) {
+			WsReactElements re = new WsReactElements();
+			Gson gson = new Gson();
+			JsonObject jsonData = gson.fromJson(jsonObjString, JsonObject.class);
 
-			jsonData = gson.fromJson(jsonObjString, JsonObject.class);
+			if (jsonData.has("PERSON_TYPE") && jsonData.has("ID_NO")) {
+				DbDataArray people = new Reader().searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL,
+						SvCore.getTypeIdByName(PRC.PERSON), "ID_NO", jsonData.get("ID_NO"), svr);
+				if (null == people || people.isEmpty()) {
+					jsonData.addProperty("tableName", PRC.PERSON);
+					DbDataObject vdataObject = re.prepareObjectToSave(jsonData, 0L, svr);
 
-			if (jsonData.has("PERSON_TYPE")) {
-				jsonData.addProperty("tableName", tableName);
-				vdataObject = re.prepareObjectToSave(jsonData, parentId, svr);
+					String tableName = jsonData.get("PERSON_TYPE").getAsString().equalsIgnoreCase("g")
+							? PRC.LEGAL_ENTITY
+							: PRC.PHYSICAL_ENTITY;
+					if (tableName.equals(PRC.PHYSICAL_ENTITY)) {
+						vdataObject.setVal("NAME", jsonData.get("FIRST_NAME").getAsString() + " "
+								+ jsonData.get("LAST_NAME").getAsString());
+					}
+					svw.saveObject(vdataObject, false);
 
-				tableName = jsonData.get("PERSON_TYPE").getAsString().equalsIgnoreCase("g") ? PRC.LEGAL_ENTITY
-						: PRC.PHYSICAL_ENTITY;
-				if (tableName.equals(PRC.PHYSICAL_ENTITY)) {
-					vdataObject.setVal("NAME",
-							jsonData.get("FIRST_NAME").getAsString() + " " + jsonData.get("LAST_NAME").getAsString());
+					jsonData.addProperty("tableName", tableName);
+					if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
+							&& jsonData.has(tableName + "." + Rc.PKID)) {
+						jsonData.addProperty(Rc.OBJECT_TYPE,
+								jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
+						jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
+						jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
+					}
+					vdataObject = re.prepareObjectToSave(jsonData, vdataObject.getObjectId(), svr);
+
+					svw.saveObject(vdataObject, false);
+					svw.dbCommit();
+
+					jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
+							I18n.getText("perrun.success.save"), vdataObject.toSimpleJson());
+
+				} else {
+					jrh.create(MessageType.WARNING, I18n.getText("warning_message"),
+							I18n.getText("warning.person_id_no_exist"), jsonData);
 				}
-				svw.saveObject(vdataObject, false);
-				parentId = vdataObject.getObjectId();
-				jsonData.addProperty("tableName", tableName);
-				if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
-						&& jsonData.has(tableName + "." + Rc.PKID)) {
-					jsonData.addProperty(Rc.OBJECT_TYPE, jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
-					jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
-					jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
-				}
-				vdataObject = re.prepareObjectToSave(jsonData, parentId, svr);
-
-				svw.saveObject(vdataObject, false);
-				svw.dbCommit();
-
-				jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
-						I18n.getText("perrun.success.save"), vdataObject.toSimpleJson());
 			} else {
 				jrh.create(MessageType.WARNING, I18n.getText("perrun.bad_data.save"),
 						I18n.getText("perrun.bad_data.save"), new JsonObject());
