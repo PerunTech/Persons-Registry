@@ -1,16 +1,15 @@
 import {
     React,
     connect,
-    elements,
-    GenericGrid,
     ComponentManager,
-    PropTypes,
-    axios,
-    GridManager,
-    GenericForm,
 } from "perun-core";
-const { useEffect } = React
-const InitialEditFormWrapper = (props, context) => {
+import { setInputFilter } from '../utils/utils'
+
+const { useState, useEffect } = React
+
+const InitialEditFormWrapper = (props) => {
+    const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
+
     useEffect(() => {
         const setPersonName = ComponentManager.getStateForComponent(
             'PERSON_FORM',
@@ -21,7 +20,20 @@ const InitialEditFormWrapper = (props, context) => {
             "formTableData"
         );
         setPersonName(formData.NAME, formData.FIRST_NAME, formData.LAST_NAME)
+        const personalIdNumberInput = document.getElementById('root_ID_NO')
+        if (personalIdNumberInput) {
+            setPersonalIdNumberInputField(personalIdNumberInput)
+        }
     }, [])
+
+    useEffect(() => {
+        if (personalIdNumberInputField) {
+            // Allow only a maximum amount of 13 characters
+            setInputFilter(personalIdNumberInputField, function (value) {
+                return /^.{0,13}$/.test(value)
+            })
+        }
+    }, [personalIdNumberInputField])
 
     return (
         <>
@@ -33,6 +45,5 @@ const InitialEditFormWrapper = (props, context) => {
 const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 });
-
 
 export default connect(mapStateToProps)(InitialEditFormWrapper);
