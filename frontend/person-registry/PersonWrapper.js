@@ -4,6 +4,7 @@ import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './components/SearchComponent'
 import { PersonIdNoFieldFormWrapper } from './wrappers'
+import PersonInfo from './PersonInfo'
 
 const p_r = 'persons_registry'
 
@@ -89,6 +90,11 @@ class PersonWrapper extends React.Component {
   savePerson = (formData) => {
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
+    let naturalName = form_params.FIRST_NAME
+    let lastNameP = form_params.LAST_NAME
+    let shortName = form_params.NAME
+    let legalName = form_params.SHORT_NAME
+
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
     }
@@ -116,7 +122,7 @@ class PersonWrapper extends React.Component {
           if (response.data.type === 'SUCCESS') {
             this.setState({ selectedPersonType: '', objectId: '' })
             this.closeModalFn()
-            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType))
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, naturalName, legalName, shortName, lastNameP))
           }
         }
       }
@@ -129,15 +135,13 @@ class PersonWrapper extends React.Component {
     })
   }
 
-  redirectPerson = (formParams, personType) => {
+  redirectPerson = (formParams, personType, naturalName, shortName, legalName, lastNameP) => {
     const objectId = formParams.data.PERSON_OBJECT_ID
     if (personType === 'P') {
-      const personName = formParams.data.FIRST_NAME + ' ' + formParams.data.LAST_NAME
-      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + personName
+      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + naturalName + ' ' + lastNameP
       this.hashHistory.push(href)
     } else {
-      const personName = formParams.data.SHORT_NAME
-      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + personName
+      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + shortName + ' ' + legalName
       this.hashHistory.push(href)
     }
   }
