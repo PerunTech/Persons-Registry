@@ -130,7 +130,8 @@ class PersonWrapper extends React.Component {
   }
 
   redirectPerson = (formParams, personType) => {
-    const objectId = formParams.data.object_id
+    console.log(formParams);
+    const objectId = formParams.data.PERSON_OBJECT_ID
     if (personType === 'P') {
       const personName = formParams.data.FIRST_NAME + ' ' + formParams.data.LAST_NAME
       let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + personName
