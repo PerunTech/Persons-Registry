@@ -358,6 +358,7 @@ public class WsPersonRegistry {
 					vdataObject = re.prepareObjectToSave(jsonData, vdataObject.getObjectId(), svr);
 
 					svw.saveObject(vdataObject, false);
+					vdataObject.setVal("PERSON_OBJECT_ID", vdataObject.getParentId());
 					svw.dbCommit();
 
 					jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
