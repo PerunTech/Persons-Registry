@@ -3,7 +3,7 @@ import {
     connect,
     GenericForm
 } from "perun-core";
-import InitialEditFormWrapper from './InitialEditFormWrapper';
+import { InitialEditFormWrapper } from './wrappers';
 const InitialEditForm = (props) => {
     const generateForm = () => {
         const { objId, personType } = props

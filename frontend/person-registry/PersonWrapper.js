@@ -3,7 +3,7 @@ const { alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './components/SearchComponent'
-import PersonRegistrationFormWrapper from './PersonRegistrationFormWrapper'
+import { PersonIdNoFieldFormWrapper } from './wrappers'
 
 const p_r = 'persons_registry'
 
@@ -26,7 +26,7 @@ class PersonWrapper extends React.Component {
       document.getElementById('identificationScreen').className = 'identificationScreen'
       document.getElementById('identificationScreen').innerText = this.context.intl.formatMessage({ id: 'perun.plugin.persons_registry', defaultMessage: 'perun.plugin.persons_registry' })
     }
-    this.setState({ searchForm: searchRender(this.searchComponentParent, this.context) })
+    this.setState({ searchForm: searchRender(this.searchComponentParent, this.context, PersonIdNoFieldFormWrapper) })
   }
 
   callBack = (formData) => {
@@ -142,7 +142,7 @@ class PersonWrapper extends React.Component {
         addSaveFunction={this.savePerson}
         hideBtns={'closeAndDelete'}
         className={'form-test person-registry-forms person-registration-form'}
-        inputWrapper={PersonRegistrationFormWrapper}
+        inputWrapper={PersonIdNoFieldFormWrapper}
       />
     )
 
