@@ -130,7 +130,6 @@ class PersonWrapper extends React.Component {
   }
 
   redirectPerson = (formParams, personType) => {
-    console.log(formParams);
     const objectId = formParams.data.PERSON_OBJECT_ID
     if (personType === 'P') {
       const personName = formParams.data.FIRST_NAME + ' ' + formParams.data.LAST_NAME
