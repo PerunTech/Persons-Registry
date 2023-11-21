@@ -88,6 +88,7 @@ class PersonWrapper extends React.Component {
 
   savePerson = (formData) => {
     let form_params = formData.formData
+    let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
     }
@@ -115,6 +116,7 @@ class PersonWrapper extends React.Component {
           if (response.data.type === 'SUCCESS') {
             this.setState({ selectedPersonType: '', objectId: '' })
             this.closeModalFn()
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType))
           }
         }
       }
@@ -125,6 +127,19 @@ class PersonWrapper extends React.Component {
         }
       }
     })
+  }
+
+  redirectPerson = (formParams, personType) => {
+    const objectId = formParams.data.object_id
+    if (personType === 'P') {
+      const personName = formParams.data.FIRST_NAME + ' ' + formParams.data.LAST_NAME
+      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + personName
+      this.hashHistory.push(href)
+    } else {
+      const personName = formParams.data.SHORT_NAME
+      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + personName
+      this.hashHistory.push(href)
+    }
   }
 
   generatePersonRegistrationForm = (personType) => {
