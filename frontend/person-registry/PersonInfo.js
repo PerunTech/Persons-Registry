@@ -6,6 +6,7 @@ import { searchRender, searchComponent, searchResult } from './components/Search
 import { logOut } from './components/LogOut'
 import InitialEditForm from './InitialEditForm'
 import Address from './Address/Address'
+import { CombineAuthorizedPersonFormWrappers } from './wrappers'
 let arrOfGrids = []
 const p_r = 'persons_registry'
 class PersonInfo extends React.Component {
@@ -266,7 +267,7 @@ class PersonInfo extends React.Component {
   generateSearch = () => {
     let showAddAuthPerson = []
     let title = <div>{labelsManager.importLabel('please_search_person', p_r, this.context)}</div>
-    let form = searchRender(this.searchComponentParent, this.context)
+    let form = searchRender(this.searchComponentParent, this.context, CombineAuthorizedPersonFormWrappers)
     showAddAuthPerson.push(title, form)
     this.setState({ additionalInfoRender: showAddAuthPerson, active: undefined, pureRender: showAddAuthPerson })
   }

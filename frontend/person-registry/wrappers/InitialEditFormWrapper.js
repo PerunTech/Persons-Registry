@@ -3,7 +3,7 @@ import {
     connect,
     ComponentManager,
 } from "perun-core";
-import { setInputFilter } from '../utils/utils'
+import { setInputFilter } from '../../utils/utils'
 
 const { useState, useEffect } = React
 

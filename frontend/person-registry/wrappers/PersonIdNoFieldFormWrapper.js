@@ -1,16 +1,22 @@
 import {
   React,
+  ComponentManager,
   connect,
 } from "perun-core";
-import { setInputFilter } from '../utils/utils'
+import { setInputFilter } from '../../utils/utils'
 
 const { useState, useEffect } = React
 
-const PersonRegistrationFormWrapper = (props) => {
+const PersonIdNoFieldFormWrapper = (props) => {
   const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
 
   useEffect(() => {
-    const input = document.querySelectorAll('.person-registration-form #root_ID_NO')
+    // Get the form classNames
+    const formClassNames = ComponentManager.getStateForComponent(props.formid, 'className')
+    // Append a dot to each of them, so we can use them to get the needed input
+    const finalFormClassNames = formClassNames?.split(' ')?.map(value => `.${value}`)?.join('') || ''
+    // Get the needed input
+    const input = document.querySelectorAll(`${finalFormClassNames} #root_ID_NO`)
     if (input) {
       const personalIdNumberInput = input[0]
       if (personalIdNumberInput) {
@@ -39,4 +45,4 @@ const mapStateToProps = (state) => ({
   svSession: state.security.svSession,
 });
 
-export default connect(mapStateToProps)(PersonRegistrationFormWrapper);
+export default connect(mapStateToProps)(PersonIdNoFieldFormWrapper);
