@@ -44,7 +44,7 @@ export function searchComponent(formData, _form, callback, session) {
 this function returns <GenericForm/>  with custom save function recieved from param searchComponent
     @param {function} searchComponent
     @param {object} context
-    @param {Element} wrapper
+    @param {Node} wrapper
 **/
 export const searchRender = (searchComponent, context, wrapper) => {
   let InputWrapper = wrapper
