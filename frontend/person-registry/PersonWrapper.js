@@ -90,10 +90,8 @@ class PersonWrapper extends React.Component {
   savePerson = (formData) => {
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
-    let naturalName = form_params.FIRST_NAME
-    let lastNameP = form_params.LAST_NAME
-    let shortName = form_params.NAME
-    let legalName = form_params.SHORT_NAME
+    const nameP = `${personType}/${form_params.FIRST_NAME} ${form_params.LAST_NAME}`
+    const nameG = `${personType}/${form_params.NAME} ${form_params.SHORT_NAME}`
 
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
@@ -122,7 +120,7 @@ class PersonWrapper extends React.Component {
           if (response.data.type === 'SUCCESS') {
             this.setState({ selectedPersonType: '', objectId: '' })
             this.closeModalFn()
-            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, naturalName, legalName, shortName, lastNameP))
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, nameP, nameG))
           }
         }
       }
@@ -135,13 +133,13 @@ class PersonWrapper extends React.Component {
     })
   }
 
-  redirectPerson = (formParams, personType, naturalName, shortName, legalName, lastNameP) => {
+  redirectPerson = (formParams, personType, nameP, nameG) => {
     const objectId = formParams.data.PERSON_OBJECT_ID
     if (personType === 'P') {
-      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + naturalName + ' ' + lastNameP
+      let href = `/main/persons-registry/person/${objectId}/${nameP}`
       this.hashHistory.push(href)
     } else {
-      let href = '/main/persons-registry/person/' + objectId + '/' + personType + '/' + shortName + ' ' + legalName
+      let href = `/main/persons-registry/person/${objectId}/${nameG}`
       this.hashHistory.push(href)
     }
   }
