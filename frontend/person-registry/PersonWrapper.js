@@ -89,8 +89,8 @@ class PersonWrapper extends React.Component {
   savePerson = (formData) => {
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
-    const nameP = `${personType}/${form_params.FIRST_NAME} ${form_params.LAST_NAME}`.toUpperCase()
-    const nameG = `${personType}/${form_params.SHORT_NAME} ${form_params.NAME}`.toUpperCase()
+    const nameP = `${personType}/${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
+    const nameG = `${personType}/${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase()
 
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
