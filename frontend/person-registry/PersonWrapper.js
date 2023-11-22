@@ -4,7 +4,6 @@ import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './components/SearchComponent'
 import { PersonIdNoFieldFormWrapper } from './wrappers'
-import PersonInfo from './PersonInfo'
 
 const p_r = 'persons_registry'
 
@@ -136,7 +135,7 @@ class PersonWrapper extends React.Component {
   redirectPerson = (formParams, personType, nameP, nameG) => {
     const objectId = formParams.data.PERSON_OBJECT_ID
     const name = personType === 'P' ? nameP : nameG;
-    const href = `/main/persons-registry/person/${objectId}/${name}`
+    const href = `/main/persons-registry/person/${objectId}/${name}/edit-name`
     this.hashHistory.push(href)
   }
 
