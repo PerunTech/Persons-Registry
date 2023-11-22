@@ -73,8 +73,9 @@ class PersonWrapper extends React.Component {
     let objectId = row[`${tableName}.OBJECT_ID`]
     let selectedPersonType = row[`${tableName}.PERSON_TYPE`]
     let personName = row[`${tableName}.NAME`]
+    let encodedPersonName = encodeURIComponent(personName).replace(/%20/g, '/');
     th1s.setState({ objectId, selectedPersonType })
-    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + personName
+    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + encodedPersonName
     this.hashHistory.push(href)
   }
 
@@ -88,6 +89,10 @@ class PersonWrapper extends React.Component {
 
   savePerson = (formData) => {
     let form_params = formData.formData
+    let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
+    const nameP = `${personType}/${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
+    const nameG = `${personType}/${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase()
+
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
     }
@@ -115,6 +120,7 @@ class PersonWrapper extends React.Component {
           if (response.data.type === 'SUCCESS') {
             this.setState({ selectedPersonType: '', objectId: '' })
             this.closeModalFn()
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, nameP, nameG))
           }
         }
       }
@@ -125,6 +131,13 @@ class PersonWrapper extends React.Component {
         }
       }
     })
+  }
+
+  redirectPerson = (formParams, personType, nameP, nameG) => {
+    const objectId = formParams.data.PERSON_OBJECT_ID
+    const name = personType === 'P' ? nameP : nameG;
+    const href = `/main/persons-registry/person/${objectId}/${name}/edit-name`
+    this.hashHistory.push(href)
   }
 
   generatePersonRegistrationForm = (personType) => {
