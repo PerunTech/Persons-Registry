@@ -90,8 +90,8 @@ class PersonWrapper extends React.Component {
   savePerson = (formData) => {
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
-    const nameP = `${personType}/${form_params.FIRST_NAME} ${form_params.LAST_NAME}`
-    const nameG = `${personType}/${form_params.NAME} ${form_params.SHORT_NAME}`
+    const nameP = `${personType}/${form_params.FIRST_NAME} ${form_params.LAST_NAME}`.toUpperCase()
+    const nameG = `${personType}/${form_params.SHORT_NAME} ${form_params.NAME}`.toUpperCase()
 
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
@@ -135,13 +135,9 @@ class PersonWrapper extends React.Component {
 
   redirectPerson = (formParams, personType, nameP, nameG) => {
     const objectId = formParams.data.PERSON_OBJECT_ID
-    if (personType === 'P') {
-      let href = `/main/persons-registry/person/${objectId}/${nameP}`
-      this.hashHistory.push(href)
-    } else {
-      let href = `/main/persons-registry/person/${objectId}/${nameG}`
-      this.hashHistory.push(href)
-    }
+    const name = personType === 'P' ? nameP : nameG;
+    const href = `/main/persons-registry/person/${objectId}/${name}`
+    this.hashHistory.push(href)
   }
 
   generatePersonRegistrationForm = (personType) => {
