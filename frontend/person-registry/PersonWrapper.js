@@ -73,8 +73,9 @@ class PersonWrapper extends React.Component {
     let objectId = row[`${tableName}.OBJECT_ID`]
     let selectedPersonType = row[`${tableName}.PERSON_TYPE`]
     let personName = row[`${tableName}.NAME`]
+    let encodedPersonName = encodeURIComponent(personName).replace(/%20/g, '/');
     th1s.setState({ objectId, selectedPersonType })
-    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + personName
+    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + encodedPersonName
     this.hashHistory.push(href)
   }
 
