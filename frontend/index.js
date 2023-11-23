@@ -8,17 +8,17 @@ import PersonInfo from './person-registry/PersonInfo'
 import Connector from './person-registry/components/Connector'
 
 const routes = [{
-    name: 'persons-registry-person',
-    path: '/main/persons-registry',
-    render: PersonWrapper,
-    isExact: true
-  } , {
-    name: 'persons-registry-person-info',
-    path: '/main/persons-registry/person/:objId/:personType/:name',
-    render: PersonInfo,
-    isExact: false
-  }
+  name: 'persons-registry-person',
+  path: '/main/persons-registry',
+  render: PersonWrapper,
+  isExact: true
+}, {
+  name: 'persons-registry-person-info',
+  path: '/main/persons-registry/person/:objId/:personType/:name/:component',
+  render: PersonInfo,
+  isExact: false
+}
 
 ]
 
-export {PersonWrapper, PersonInfo, routes, Connector}
+export { PersonWrapper, PersonInfo, routes, Connector }

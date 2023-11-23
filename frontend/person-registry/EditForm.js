@@ -3,8 +3,8 @@ import {
     connect,
     GenericForm
 } from "perun-core";
-import { InitialEditFormWrapper } from './wrappers';
-const InitialEditForm = (props) => {
+import { EditFormWrapper } from './wrappers';
+const EditForm = (props) => {
     const generateForm = () => {
         const { objId, personType } = props
         return <GenericForm
@@ -18,7 +18,7 @@ const InitialEditForm = (props) => {
             addSaveFunction={props.savePerson}
             hideBtns={'closeAndDelete'}
             className={'form-test person-registry-forms person-registration-form'}
-            inputWrapper={InitialEditFormWrapper}
+            inputWrapper={EditFormWrapper}
         />
     }
     return (
@@ -33,4 +33,4 @@ const mapStateToProps = (state) => ({
 
 });
 
-export default connect(mapStateToProps)(InitialEditForm);
+export default connect(mapStateToProps)(EditForm);
