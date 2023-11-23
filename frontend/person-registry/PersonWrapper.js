@@ -73,9 +73,9 @@ class PersonWrapper extends React.Component {
     let objectId = row[`${tableName}.OBJECT_ID`]
     let selectedPersonType = row[`${tableName}.PERSON_TYPE`]
     let personName = row[`${tableName}.NAME`]
-    let encodedPersonName = encodeURIComponent(personName).replace(/%20/g, '/');
+    let encodedPersonName = encodeURIComponent(personName).replace(/%20/g, '_');
     th1s.setState({ objectId, selectedPersonType })
-    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + encodedPersonName
+    let href = '/main/persons-registry/person/' + objectId + '/' + selectedPersonType + '/' + encodedPersonName + '/editPerson'
     this.hashHistory.push(href)
   }
 
@@ -90,9 +90,9 @@ class PersonWrapper extends React.Component {
   savePerson = (formData) => {
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
-    const nameP = `${personType}/${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
-    const nameG = `${personType}/${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase()
-
+    const nameP = `${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
+    const nameG = `${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase()
+    const name = personType === 'P' ? nameP : nameG;
     if (!form_params.PERSON_TYPE) {
       form_params.PERSON_TYPE = this.state.selectedPersonType
     }
@@ -120,7 +120,7 @@ class PersonWrapper extends React.Component {
           if (response.data.type === 'SUCCESS') {
             this.setState({ selectedPersonType: '', objectId: '' })
             this.closeModalFn()
-            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, nameP, nameG))
+            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, name))
           }
         }
       }
@@ -133,10 +133,9 @@ class PersonWrapper extends React.Component {
     })
   }
 
-  redirectPerson = (formParams, personType, nameP, nameG) => {
+  redirectPerson = (formParams, personType, name) => {
     const objectId = formParams.data.PERSON_OBJECT_ID
-    const name = personType === 'P' ? nameP : nameG;
-    const href = `/main/persons-registry/person/${objectId}/${name}/edit-name`
+    const href = `/main/persons-registry/person/${objectId}/${personType}/${name}/editPerson`
     this.hashHistory.push(href)
   }
 

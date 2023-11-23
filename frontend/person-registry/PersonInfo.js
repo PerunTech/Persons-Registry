@@ -4,7 +4,7 @@ import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from './components/LabelsExport'
 import { searchRender, searchComponent, searchResult } from './components/SearchComponent'
 import { logOut } from './components/LogOut'
-import InitialEditForm from './InitialEditForm'
+import EditForm from './EditForm'
 import Address from './Address/Address'
 import { CombineAuthorizedPersonFormWrappers } from './wrappers'
 let arrOfGrids = []
@@ -21,7 +21,7 @@ class PersonInfo extends React.Component {
       uiSchema: {},
       formData: {},
       activeTab: 'editPerson',
-      active: 'initial',
+      active: 'editPerson',
       defaultCountry: ''
 
     }
@@ -30,8 +30,16 @@ class PersonInfo extends React.Component {
   componentDidMount() {
     if (this.props.match) {
       if (this.props.match.params) {
-        const { objId, personType } = this.props.match.params
+        const { objId, personType, component, name } = this.props.match.params
         this.setState({ selectedPersonType: personType, objectId: objId })
+        this.setState({ activeTab: component })
+        if (component === 'editPerson' || component === 'address') {
+          this.setState({ active: component })
+
+        } else {
+          this.additionalInfo(component)
+        }
+        this.formatNameFromParams(name)
       }
     }
     let url = window.server + `/WsConf/params/get/sys/DEFAULT_COUNTRY`
@@ -47,7 +55,11 @@ class PersonInfo extends React.Component {
     })
     arrOfGrids = []
   }
-  setPersonName = (fullname, first, last) => {
+  formatNameFromParams = (name) => {
+    let formatedName = name.replace(/_/g, ' ');
+    this.setPersonName(formatedName)
+  }
+  setPersonName = (fullname, first, last,) => {
     let name
     if (first && last) {
       name = first + " " + last
@@ -64,7 +76,7 @@ class PersonInfo extends React.Component {
    */
 
   additionalInfo = (infoType) => {
-    const { objectId } = this.state
+    const objectId = this.props.match.params.objId
     if (infoType) {
       switch (infoType) {
         case 'bankAcc': {
@@ -433,7 +445,7 @@ class PersonInfo extends React.Component {
     })
       .then(res => {
         alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message)
-        this.setState({ additionalInfoRender: '', active: 'initial' })
+        this.setState({ additionalInfoRender: '', active: 'editPerson' })
       })
       .catch(err => {
         console.error(err)
@@ -777,7 +789,15 @@ class PersonInfo extends React.Component {
       alertUser(true, 'info', labelsManager.importLabel('no_selection', p_r, this.context), labelsManager.importLabel('choose_selection', p_r, this.context))
     }
   }
-
+  changeRouteFunc = (component) => {
+    const href = `/main/persons-registry/person/${this.props.match.params.objId}/${this.props.match.params.personType}/${this.props.match.params.name}/${component}`
+    if (this.props.match.params.component === 'editPerson' || 'address') {
+      this.setState({ active: component })
+    } else {
+      this.additionalInfo(component)
+    }
+    this.hashHistory.push(href)
+  }
   render() {
     const { showRenderBtns, additionalInfoRender, renderForm, selectedPersonType, showModal, isLoading, entityName, activeTab } = this.state;
     return (
@@ -793,45 +813,54 @@ class PersonInfo extends React.Component {
               <div id='alt-btn_holder' className='pr-btn-holder-info'>
                 <div className='pr-btn-container'>
                   <button id='editPerson' onClick={() => {
-                    this.setState({ activeTab: 'editPerson', active: 'initial', additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
+                    this.changeRouteFunc('editPerson')
+                    this.setState({ activeTab: 'editPerson', active: 'editPerson', additionalInfoRender: '', bankObjId: '', contactObjId: '', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
                   }} className={`pr-btn-reg-info  pr-editPerson ${activeTab === 'editPerson' && 'pr-active-tab'}`}>{iconManager.getIcon('editUser')} {labelsManager.importLabel('edit_person', p_r, this.context)} </button>
+
                   <button id='bankAcc' onClick={() => {
+                    this.changeRouteFunc('bankAcc')
                     this.setState({ activeTab: 'bankAcc' })
                     this.additionalInfo('bankAcc')
                   }} className={`pr-btn-reg-info pr-bankAcc  ${activeTab === 'bankAcc' && 'pr-active-tab'}`}>{iconManager.getIcon('bankAcc')} {labelsManager.importLabel('bank_acc', p_r, this.context)} </button>
 
 
                   <button id='address' onClick={() => {
+                    this.changeRouteFunc('address')
                     this.setState({ activeTab: 'address', additionalInfoRender: '', bankObjId: '', active: 'address', linkTypeObjId: '', linkType: '', respPersonName: '', objTypeId: '', bankStatus: '' })
                     this.additionalInfo('address')
                   }} className={`pr-btn-reg-info pr-address  ${activeTab === 'address' && 'pr-active-tab'}`}>{iconManager.getIcon('address')} {labelsManager.importLabel('address', p_r, this.context)} </button>
 
 
-                  {selectedPersonType === 'P' && <button id='authP' onClick={() => {
-                    this.setState({ activeTab: 'authP' })
+                  {selectedPersonType === 'P' && <button id='showAuthC' onClick={() => {
+                    this.changeRouteFunc('showAuthC')
+                    this.setState({ activeTab: 'showAuthC' })
                     this.additionalInfo('showAuthC')
-                  }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {this.context.intl.formatMessage({ id: 'perun.persons_registry.legal_connection', defaultMessage: 'perun.persons_registry.legal_connection' })} </button>}
-                  {selectedPersonType === 'G' && <button id='authP' onClick={() => {
-                    this.setState({ activeTab: 'authP' })
+                  }} className={`pr-btn-reg-info pr-showAuthC  ${activeTab === 'showAuthC' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {this.context.intl.formatMessage({ id: 'perun.persons_registry.legal_connection', defaultMessage: 'perun.persons_registry.legal_connection' })} </button>}
+
+                  {selectedPersonType === 'G' && <button id='authorizedPerson' onClick={() => {
+                    this.changeRouteFunc('authorizedPerson')
+                    this.setState({ activeTab: 'authorizedPerson' })
                     this.additionalInfo('authorizedPerson')
-                  }} className={`pr-btn-reg-info pr-authP  ${activeTab === 'authP' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>}
+                  }} className={`pr-btn-reg-info pr-authorizedPerson  ${activeTab === 'authorizedPerson' && 'pr-active-tab'}`}>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_authorized_person', p_r, this.context)} </button>}
 
                   {this.props.match.params.personType === 'P' && <button id='idData' onClick={() => {
+                    this.changeRouteFunc('idData')
                     this.setState({ activeTab: 'idData' })
                     this.additionalInfo('idData')
                   }} className={`pr-btn-reg-info pr-idData ${activeTab === 'idData' && 'pr-active-tab'}`}>{iconManager.getIcon('idData')} {labelsManager.importLabel('add_identity_data', p_r, this.context)} </button>}
 
-                  {selectedPersonType == 'G' && <button id='authPlist' onClick={() => {
-                    this.setState({ activeTab: 'authPlist' })
+                  {selectedPersonType == 'G' && <button id='showAuthP' onClick={() => {
+                    this.changeRouteFunc('showAuthP')
+                    this.setState({ activeTab: 'showAuthP' })
                     this.additionalInfo('showAuthP')
-                  }} className={`pr-btn-reg-info pr-authPlist  ${activeTab === 'authPlist' && 'pr-active-tab'}`}>{iconManager.getIcon('preview')} {labelsManager.importLabel('show_auth_person', p_r, this.context)} </button>}
+                  }} className={`pr-btn-reg-info pr-showAuthP  ${activeTab === 'showAuthP' && 'pr-active-tab'}`}>{iconManager.getIcon('preview')} {labelsManager.importLabel('show_auth_person', p_r, this.context)} </button>}
                 </div>
               </div>
             </div>
             <div id='alt-content' className='pr-content-info'>
               <div className='pr-content-inner'>
                 {additionalInfoRender}
-                {this.state.active === 'initial' && <InitialEditForm setPersonName={this.setPersonName} objId={this.props.match.params.objId} personType={this.props.match.params.personType} savePerson={this.savePerson} />}
+                {this.state.active === 'editPerson' && <EditForm setPersonName={this.setPersonName} objId={this.props.match.params.objId} personType={this.props.match.params.personType} savePerson={this.savePerson} />}
                 {this.state.active === 'address' && <Address personObjId={this.state.objectId} defaultCountry={this.state.defaultCountry} />}
               </div>
             </div>

@@ -7,7 +7,7 @@ import { setInputFilter } from '../../utils/utils'
 
 const { useState, useEffect } = React
 
-const InitialEditFormWrapper = (props) => {
+const EditFormWrapper = (props) => {
     const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
 
     useEffect(() => {
@@ -46,4 +46,4 @@ const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 });
 
-export default connect(mapStateToProps)(InitialEditFormWrapper);
+export default connect(mapStateToProps)(EditFormWrapper);
