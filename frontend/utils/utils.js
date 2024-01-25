@@ -22,3 +22,6 @@ export function setInputFilter(input, inputFilter) {
     })
   })
 }
+export const getDynamicKey = () => {
+  return (+ new Date() + Math.floor(Math.random() * 999999)).toString(36)
+}

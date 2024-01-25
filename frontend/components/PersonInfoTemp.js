@@ -1,9 +1,9 @@
 import { React, axios, connect, ComponentManager, GenericGrid, GridManager, GenericForm, elements, Modal, Form, Loading, createHashHistory, PropTypes } from 'perun-core'
 const { alertUser, Dropdown } = elements
 import { iconManager } from '../assets/svg/svgHolder'
-import { labelsManager } from './components/LabelsExport'
-import { searchRender, searchComponent, searchResult } from './components/SearchComponent'
-import { logOut } from './components/LogOut'
+import { labelsManager } from '../utils/LabelsExport'
+import { searchRender, searchComponent, searchResult } from './SearchComponent'
+import { logOut } from '../utils/LogOut'
 import EditForm from './EditForm'
 import Address from './Address/Address'
 import { CombineAuthorizedPersonFormWrappers } from './wrappers'

@@ -3,14 +3,14 @@
  * export all content representing the surface of your plugin API. Noone is expected to call, but wth.
  * Wait to be called for render, Core will call you.
  */
-import PersonWrapper from './person-registry/PersonWrapper'
-import PersonInfo from './person-registry/PersonInfo'
-import Connector from './person-registry/components/Connector'
+import Person from './components/Person'
+import PersonInfo from './components/PersonInfo'
+import Connector from './utils/Connector'
 
 const routes = [{
   name: 'persons-registry-person',
   path: '/main/persons-registry',
-  render: PersonWrapper,
+  render: Person,
   isExact: true
 }, {
   name: 'persons-registry-person-info',
@@ -21,4 +21,4 @@ const routes = [{
 
 ]
 
-export { PersonWrapper, PersonInfo, routes, Connector }
+export { Person, PersonInfo, routes, Connector }

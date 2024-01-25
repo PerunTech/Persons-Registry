@@ -1,13 +1,13 @@
 import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, Modal, createHashHistory } from 'perun-core'
 const { alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
-import { labelsManager } from './components/LabelsExport'
-import { searchComponent, searchRender, searchResult } from './components/SearchComponent'
-import { PersonIdNoFieldFormWrapper } from './wrappers'
+import { labelsManager } from '../utils/LabelsExport'
+import { searchComponent, searchRender, searchResult } from './SearchComponent'
+import { PersonIdNoFieldFormWrapper } from '../components/wrappers'
 
 const p_r = 'persons_registry'
 
-class PersonWrapper extends React.Component {
+class Person extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -190,8 +190,8 @@ const mapStateToProps = state => ({
   svSession: state.security.svSession,
 })
 
-PersonWrapper.contextTypes = {
+Person.contextTypes = {
   intl: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(PersonWrapper)
+export default connect(mapStateToProps)(Person)
