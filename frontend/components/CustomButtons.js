@@ -3,6 +3,7 @@ import style from "../assets/style/registration.module.css"
 import { getDynamicKey } from '../utils/utils'
 import { labelsManager } from '../utils/LabelsExport';
 import Address from './Address/Address'
+import SAPWrapper from './wrappers/SAPWrapper';
 const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
@@ -15,10 +16,10 @@ const CustomButtons = (props, context) => {
     const [dynamicFormId, setDynamicFormId] = useState(getDynamicKey())
     const [clickedRowObjectId, setClickedRowObjectId] = useState(0)
     const [wrapperName, setWrapper] = useState(undefined)
-    const [wrappers, _setWrappers] = useState([])
+    const [wrappers, _setWrappers] = useState([{ Showauthorizedperson: SAPWrapper }])
     useEffect(() => {
         setWrapper(props.tableName.replace(/(\w)(\w*)/g,
-            function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, ''))
+            function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, '').replaceAll(' ', ''))
         return () => {
             ComponentManager.cleanComponentReducerState(props.tableName + props.personObjId);
             systemFields = {}
@@ -27,60 +28,98 @@ const CustomButtons = (props, context) => {
         }
     }, [])
 
-    const buildCustomBtnArr = (btnArray, multiSelect) => {
+    const buildCustomBtnArr = (btnArray, multiSelect, maxLength) => {
         const div = <div className={style[`custom-btn-holder-${props.tableName.toLowerCase()}`]}>
             {btnArray.map(el => (
-                <button id={el['ID']} className={`${style[`${props.tableName.toLowerCase()}-btn`]}`} onClick={() => customBtnAction(el, multiSelect)}>
+                <button id={el['ID']} className={`${style[`${props.tableName.toLowerCase()}-btn`]}`} onClick={() => customBtnAction(el, multiSelect, maxLength)}>
                     {el['label']}
                 </button>
             ))}
         </div>
         return div
     }
-    const customBtnAction = (el, multiSelect) => {
-        const saveUrl = `${window.server}${el?.['onSave']}`
-        if (multiSelect && el['type'] === 'POST') {
-            if (props.selectedGridRows.length > 0) {
-                const data = JSON.stringify(props.selectedGridRows)
-                axios({
-                    method: "post",
-                    data,
-                    url: saveUrl,
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                }).then(res => {
-                    if (res.data) {
-                        alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message, () => reloadGrid(props.tableName + props.personObjId, multiSelect));
-
-                    }
-                }).catch(err => {
-                    console.error(err)
-                    const title = err.response?.data?.title || err
-                    const msg = err.response?.data?.message || ''
-                    alertUser(true, "error", title, msg);
-                });
-            } else {
-                alertUser(true, 'info', labelsManager.importLabel('select_parcel', 'person_registry', context));
-            }
-
-        }
-        if (el['type'] === 'link') {
-            let href = el['route']
-            hashHistory.push(href)
-        }
-        if (el['type'] === 'GET') {
+    const customBtnAction = (el, multiSelect, maxLength) => {
+        if ((props.selectedGridRows.length > 0 && props.selectedGridRows.length <= maxLength) || (!multiSelect)) {
             alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'person_registry', context), '', () => {
+
+                let saveUrl = `${window.server}${el?.['onSave']}`
+                let data
                 setLoading(true)
-                axios.get(saveUrl).then(res => {
-                    alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message)
-                    setLoading(false)
-                }).catch(err => {
-                    setLoading(false)
-                    console.error(err)
-                    const title = err.response?.data?.title || err
-                    const msg = err.response?.data?.message || ''
-                    alertUser(true, "error", title, msg);
-                });
+                switch (el['type']) {
+                    case 'GET':
+                        axios.get(saveUrl).then(res => {
+                            alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message)
+                            setLoading(false)
+                        }).catch(err => {
+                            setLoading(false)
+                            console.error(err)
+                            const title = err.response?.data?.title || err
+                            const msg = err.response?.data?.message || ''
+                            alertUser(true, "error", title, msg);
+                        });
+                        break;
+                    case 'POST':
+                        data = JSON.stringify(props.selectedGridRows)
+                        axios({
+                            method: "post",
+                            data,
+                            url: saveUrl,
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        }).then(res => {
+                            if (res.data) {
+                                alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message, () => reloadGrid(props.tableName + props.personObjId, multiSelect));
+
+                            }
+                        }).catch(err => {
+                            console.error(err)
+                            const title = err.response?.data?.title || err
+                            const msg = err.response?.data?.message || ''
+                            alertUser(true, "error", title, msg);
+                        });
+                        break;
+                    case 'status':
+                        saveUrl = saveUrl.replace('{objId}', props.selectedGridRows[0][`${props.tableName}.OBJECT_ID`]).replace('{nextStatus}', el.changeStatus[`${props.selectedGridRows[0][`${props.tableName}.STATUS`]}`])
+                        axios.get(saveUrl).then(res => {
+                            alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message, () => reloadGrid(props.tableName + props.personObjId, multiSelect))
+                            setLoading(false)
+
+                        }).catch(err => {
+                            setLoading(false)
+                            console.error(err)
+                            const title = err.response?.data?.title || err
+                            const msg = err.response?.data?.message || ''
+                            alertUser(true, "error", title, msg);
+                        });
+                        break;
+                    case 'deleteLink':
+                        data = el['payLoad']
+                        data['objectId2'] = props.selectedGridRows[0][`${props.tableName}.OBJECT_ID`]
+                        data['linkType'] = props.selectedGridRows[0]['LINK_TYPE']
+                        axios({
+                            method: "post",
+                            data,
+                            url: saveUrl,
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        }).then(res => {
+                            if (res.data) {
+                                alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message, () => reloadGrid(props.tableName + props.personObjId, multiSelect));
+                            }
+                        }).catch(err => {
+                            console.error(err)
+                            const title = err.response?.data?.title || err
+                            const msg = err.response?.data?.message || ''
+                            alertUser(true, "error", title, msg);
+                        });
+                        break;
+                    default:
+                        break;
+                }
+
+
+
             }, () => { }, true, labelsManager.importLabel('yes', 'person_registry', context), labelsManager.importLabel('no', 'person_registry', context))
+        } else {
+            alertUser(true, 'info', labelsManager.importLabel('select_multi', 'person_registry', context));
         }
     }
 
@@ -89,9 +128,9 @@ const CustomButtons = (props, context) => {
         const dataWs = props.configuration.objectConfiguration.data.onSubmit
         const multiSelect = props.configuration.objectConfiguration.multiSelect || false
         const btnArray = props.configuration.objectConfiguration.additionalBtns
-
+        const maxLength = props.configuration.objectConfiguration.maxLength || 9999
         const grid = <div className={`${style[`custom-grid-container-${props.tableName.toLowerCase()}`]}`}>
-            {btnArray && buildCustomBtnArr(btnArray, multiSelect)}
+            {btnArray && buildCustomBtnArr(btnArray, multiSelect, maxLength)}
 
             <ExportableGrid
                 gridType={"READ_URL"}
@@ -177,7 +216,7 @@ const CustomButtons = (props, context) => {
                 addSaveFunction={(e) => saveForm(e, onSubmitWs, isModal)}
                 addDeleteFunction={(_id, _action, _session, formData) => deleteFunc(_id, _action, _session, formData)}
                 hideBtns={(clickedRowObjectId === 0) || props.configuration.objectConfiguration?.readOnly ? 'closeAndDelete' : 'close'}
-                // inputWrapper={inputWrapper}
+                inputWrapper={inputWrapper}
                 closeModalFunc={() => setShowModal(false)}
             />
         )

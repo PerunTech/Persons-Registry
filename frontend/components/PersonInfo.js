@@ -4,7 +4,8 @@ const { useEffect, useState } = React
 import { iconManager } from '../assets/svg/svgHolder'
 import style from '../assets/style/registration.module.css'
 import CustomButtons from './CustomButtons'
-const PersonInfo = (props) => {
+import { labelsManager } from '../utils/LabelsExport'
+const PersonInfo = (props, context) => {
     const [configuration, setConfig] = useState([])
     const [loading, setLoading] = useState(false)
     const [activeElement, setElement] = useState('SEARCH')
@@ -14,6 +15,11 @@ const PersonInfo = (props) => {
     useEffect(() => {
         getConfiguration()
     }, [])
+
+    const redirectBack = () => {
+        let href = '/main/persons-registry'
+        this.hashHistory.push(href)
+    }
 
 
     const getConfiguration = () => {
@@ -38,7 +44,7 @@ const PersonInfo = (props) => {
                 return (
                     <>
                         <button
-                            className={`${style["btn_sub"]} ${activeElement === el.ID && !el.data && style['active']}`}
+                            className={`${style["btn_sub"]} pr-btn-reg-info  ${activeElement === el.ID && !el.data && style['active']}`}
                             onClick={() => (el.data ? setActive(el) : onButtonClick(el))}
                         >
                             <span className={style['dynamic-comp-icon-holder']}>{iconManager.getIcon(modifiedID)}</span><p>{el.label}</p>
@@ -73,7 +79,7 @@ const PersonInfo = (props) => {
 
     const onButtonClick = (element, childEl) => {
         const id = element.ID;
-        const splitID = id.replace(/\d/g, '').replace(/_$/, '');
+        const splitID = id.replace(/\d/g, '').replace(/_$/, '').replaceAll(' ', '');
         if (childEl) {
             displayComponent(splitID, element);
             setChild(id)
@@ -93,7 +99,7 @@ const PersonInfo = (props) => {
             tableName,
             configuration,
             personObjId: props.match.params.objId,
-            defaultCountry: 'MLD',//change
+            defaultCountry: 'MDA',//change
             getConfiguration: (objId) => getConfiguration(objId)
         }
         comp = <CustomButtons {...customButtonsProps} />
@@ -103,9 +109,28 @@ const PersonInfo = (props) => {
     return (
         <>
             {loading && <Loading />}
-            <div>PersonInfo</div>
-            {generateCustomButtons()}
-            {comp}
+            <div className='pr-background'>
+                <div className='pr-holder-info'>
+                    <div className='pr-main-btn-holder'>
+                        <div className='pr-info-btn-holder'> <button id='back' onClick={() => redirectBack()} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', 'person_registry', context)} </button>
+                            <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', 'person_registry', context)} : <b>{'ahahha'}</b></p></div>
+                        </div >
+                        <div className='pr-btn-holder-info'>
+                            <div className='pr-btn-container'>
+                                {generateCustomButtons()}
+                            </div>
+                        </div>
+                    </div>
+                    <div className='pr-content-info'>
+                        <div className='pr-content-inner'>
+                            {comp}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
         </>
 
     )
