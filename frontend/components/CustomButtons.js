@@ -1,4 +1,4 @@
-import { React, connect, axios, PropTypes, Loading, createHashHistory, elements, GenericGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
+import { React, connect, axios, PropTypes, Loading, elements, GenericGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
 import { getDynamicKey } from '../utils/utils'
 import { labelsManager } from '../utils/LabelsExport';
 import Address from './Address/Address'
@@ -8,7 +8,6 @@ const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
 const { store, updateSelectedRows } = redux;
-let hashHistory = createHashHistory();
 let systemFields = {}
 const CustomButtons = (props, context) => {
     const [loading, setLoading] = useState(false)
