@@ -13,8 +13,21 @@ const PersonInfo = (props, context) => {
     const [activeChild, setChild] = useState('')
     const [activeParent, setParent] = useState('')
     const [comp, setComp] = useState(undefined)
+    const [defaultCountry, setDeafultCountry] = useState(undefined)
     hashHistory = createHashHistory();
     useEffect(() => {
+        let url = window.server + `/WsConf/params/get/sys/DEFAULT_COUNTRY`
+        axios.get(url).then(res => {
+            if (res.data.VALUE) {
+                setDeafultCountry(res.data.VALUE)
+            }
+        }).catch(err => {
+            setLoading(false)
+            console.error(err)
+            const title = err.response?.data?.title || err
+            const msg = err.response?.data?.message || ''
+            alertUser(true, "error", title, msg);
+        });
         getConfiguration()
     }, [])
 
@@ -75,7 +88,6 @@ const PersonInfo = (props, context) => {
         } else {
             return <></>;
         }
-        displayComponent('PERSON')
     }
     const setActive = (el) => {
         if (el.ID === activeParent) {
@@ -108,7 +120,7 @@ const PersonInfo = (props, context) => {
             tableName,
             configuration,
             personObjId: props.match.params.objId,
-            defaultCountry: 'MDA',//change
+            defaultCountry: defaultCountry,//change
             getConfiguration: (objId) => getConfiguration(objId)
         }
         comp = <CustomButtons {...customButtonsProps} />
