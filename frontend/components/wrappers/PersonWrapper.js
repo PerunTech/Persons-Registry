@@ -1,25 +1,15 @@
 import {
     React,
     connect,
-    ComponentManager,
 } from "perun-core";
 import { setInputFilter } from '../../utils/utils'
 
 const { useState, useEffect } = React
 
-const EditFormWrapper = (props) => {
+const PersonWrapper = (props) => {
     const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
 
     useEffect(() => {
-        const setPersonName = ComponentManager.getStateForComponent(
-            'PERSON_FORM',
-            "addDeleteFunction"
-        );
-        const formData = ComponentManager.getStateForComponent(
-            'PERSON_FORM',
-            "formTableData"
-        );
-        setPersonName(formData.NAME, formData.FIRST_NAME, formData.LAST_NAME)
         const personalIdNumberInput = document.getElementById('root_ID_NO')
         if (personalIdNumberInput) {
             setPersonalIdNumberInputField(personalIdNumberInput)
@@ -28,7 +18,7 @@ const EditFormWrapper = (props) => {
 
     useEffect(() => {
         if (personalIdNumberInputField) {
-            // Allow only a maximum amount of 13 characters
+            // Allow only a     maximum amount of 13 characters
             setInputFilter(personalIdNumberInputField, function (value) {
                 return /^.{0,13}$/.test(value)
             })
@@ -46,4 +36,4 @@ const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 });
 
-export default connect(mapStateToProps)(EditFormWrapper);
+export default connect(mapStateToProps)(PersonWrapper);

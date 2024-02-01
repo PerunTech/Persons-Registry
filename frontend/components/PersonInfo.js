@@ -5,6 +5,7 @@ import { iconManager } from '../assets/svg/svgHolder'
 import style from '../assets/style/registration.module.css'
 import CustomButtons from './CustomButtons'
 import { labelsManager } from '../utils/LabelsExport'
+let hashHistory = createHashHistory();
 const PersonInfo = (props, context) => {
     const [configuration, setConfig] = useState([])
     const [loading, setLoading] = useState(false)
@@ -12,13 +13,14 @@ const PersonInfo = (props, context) => {
     const [activeChild, setChild] = useState('')
     const [activeParent, setParent] = useState('')
     const [comp, setComp] = useState(undefined)
+    hashHistory = createHashHistory();
     useEffect(() => {
         getConfiguration()
     }, [])
 
     const redirectBack = () => {
         let href = '/main/persons-registry'
-        this.hashHistory.push(href)
+        hashHistory.push(href)
     }
 
 
@@ -28,6 +30,12 @@ const PersonInfo = (props, context) => {
         axios.get(url).then(res => {
             setConfig(res.data)
             setLoading(false)
+            res.data.data.map(el => {
+                let modifiedID = el.ID.replace(/\d/g, '').replace(/_$/, '').replaceAll(' ', '');
+                if (modifiedID === 'PERSON') {
+                    onButtonClick(el);
+                }
+            })
         }).catch(err => {
             setLoading(false)
             console.error(err)
@@ -40,24 +48,24 @@ const PersonInfo = (props, context) => {
     const generateCustomButtons = () => {
         if (configuration && Array.isArray(configuration.data)) {
             return configuration.data.map(el => {
-                let modifiedID = el.ID.replace(/\d/g, '').replace(/_$/, '');
+                let modifiedID = el.ID.replace(/\d/g, '').replace(/_$/, '').replaceAll(' ', '');
                 return (
                     <>
                         <button
-                            className={`${style["btn_sub"]} pr-btn-reg-info  ${activeElement === el.ID && !el.data && style['active']}`}
+                            className={`btn_sub pr-btn-reg-info  ${activeElement === el.ID && !el.data && 'pr-active-tab'}`}
                             onClick={() => (el.data ? setActive(el) : onButtonClick(el))}
                         >
-                            <span className={style['dynamic-comp-icon-holder']}>{iconManager.getIcon(modifiedID)}</span><p>{el.label}</p>
+                            <span className={'dynamic-comp-icon-holder'}>{iconManager.getIcon(modifiedID)}</span><p>{el.label}</p>
                         </button>
-                        {el.data && <div className={el.ID === activeParent ? style['sub-menu-sub-item-active'] : style['sub-menu-sub-item-hidden']}>
+                        {el.data && <div className={el.ID === activeParent ? 'sub-menu-sub-item-active' : 'sub-menu-sub-item-hidden'}>
                             {el.data.map(sub => {
                                 modifiedID = sub.ID.replace(/\d/g, '').replace(/_$/, '')
                                 return < button
-                                    className={`${style["btn_sub"]} ${activeChild === sub.ID && style['active']}`
+                                    className={`btn_sub ${activeChild === sub.ID && 'pr-active-tab'}`
                                     }
                                     onClick={() => (onButtonClick(sub, true))}
                                 >
-                                    <span className={style['dynamic-comp-icon-holder']}>{iconManager.getIcon(modifiedID)}</span><p>{sub.label}</p>
+                                    <span className={'dynamic-comp-icon-holder'}>{iconManager.getIcon(modifiedID)}</span><p>{sub.label}</p>
                                 </button>
                             })}
                         </div >}
@@ -67,6 +75,7 @@ const PersonInfo = (props, context) => {
         } else {
             return <></>;
         }
+        displayComponent('PERSON')
     }
     const setActive = (el) => {
         if (el.ID === activeParent) {
@@ -112,8 +121,8 @@ const PersonInfo = (props, context) => {
             <div className='pr-background'>
                 <div className='pr-holder-info'>
                     <div className='pr-main-btn-holder'>
-                        <div className='pr-info-btn-holder'> <button id='back' onClick={() => redirectBack()} className='pr-btn-back'>{iconManager.getIcon('back')} {labelsManager.importLabel('back', 'person_registry', context)} </button>
-                            <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', 'person_registry', context)} : <b>{'ahahha'}</b></p></div>
+                        <div className='pr-info-btn-holder'> <button id='back' type={'button'} onClick={() => redirectBack()} className='pr-btn-back'> {iconManager.getIcon('back')} {labelsManager.importLabel('back', 'persons_registry', context)} </button>
+                            <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', 'persons_registry', context)} : <b>{props.match.params.name.replaceAll('_', ' ')}</b></p></div>
                         </div >
                         <div className='pr-btn-holder-info'>
                             <div className='pr-btn-container'>

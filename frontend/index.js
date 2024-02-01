@@ -5,8 +5,6 @@
  */
 import Person from './components/Person'
 import PersonInfo from './components/PersonInfo'
-import Connector from './utils/Connector'
-
 const routes = [{
   name: 'persons-registry-person',
   path: '/main/persons-registry',
@@ -21,4 +19,4 @@ const routes = [{
 
 ]
 
-export { Person, PersonInfo, routes, Connector }
+export { Person, PersonInfo, routes }

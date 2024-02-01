@@ -1,0 +1,117 @@
+.person-registry-modal {
+    z-index: 1041 !important;
+    padding-top: 0 !important;
+}
+
+.person-registry-modal .modal-dialog {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    max-width: none !important;
+}
+
+.person-registry-modal .modal-content {
+    border: none !important;
+    margin: 0 !important;
+    width: 90% !important;
+    max-width: none !important;
+}
+
+.person-registry-modal .modal-header .close {
+    color: white !important;
+}
+
+.person-registry-modal .modal-header .close :focus {
+    outline: none !important;
+    border: none !important;
+}
+
+
+
+.showauthorizedperson-btn,
+.connectionwithlegalentities-btn,
+.person-btn,
+.bankacc-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    color: inherit;
+    background: #f1f1f1 !important;
+    font-size: 1rem !important;
+    margin-left: 0.5rem !important;
+    color: #1d1d1d !important;
+    background: #f1f1f1 !important;
+    border: 1px solid #e7eaec;
+    border-radius: 3px;
+}
+
+.custom-grid-container-showauthorizedperson,
+.custom-grid-container-connectionwithlegalentities,
+.custom-grid-container-person,
+.custom-grid-container-bankacc {
+    position: relative;
+}
+
+.custom-btn-holder-showauthorizedperson,
+.custom-btn-holder-connectionwithlegalentities,
+.custom-btn-holder-person,
+.custom-btn-holder-bankacc {
+    width: 100%;
+    position: absolute;
+    top: 1.85%;
+    float: right;
+    text-align: right;
+    margin-left: -162px;
+}
+
+.custom-btn-holder-person,
+.custom-btn-holder-connectionwithlegalentities {
+    margin-left: -104px !important;
+}
+
+.showauthorizedperson-dd-container {
+    display: flex;
+    height: 26vh;
+    justify-content: space-evenly;
+    align-items: center;
+    position: relative;
+}
+
+.showauthorizedperson-dd-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #46575f;
+}
+
+.showauthorizedperson-dd-submit {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.showauthorizedperson-dd-holder {
+    width: 72%;
+}
+
+.btn_sub:first-of-type {
+    margin-left: 0;
+}
+
+.btn_sub p {
+    margin: 0;
+    padding: 0;
+}
+
+.custom-menu-showauthorizedperson-container #refreshData {
+    z-index: 999;
+    position: relative;
+}

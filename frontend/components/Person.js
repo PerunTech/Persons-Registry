@@ -170,8 +170,8 @@ class Person extends React.Component {
         <div className='pr-holder '>
           <div id='btn_holder' className='pr-btn-holder'>
             <>
-              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_physical', p_r, this.context)} </button>
-              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_legal', p_r, this.context)} </button>
+              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_physical', p_r, this.context)} </button>
+              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_legal', p_r, this.context)} </button>
             </>
           </div>
           <div id='content' className='pr-content'>

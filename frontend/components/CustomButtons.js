@@ -1,9 +1,9 @@
-import { React, connect, axios, PropTypes, Loading, createHashHistory, elements, ExportableGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
-import style from "../assets/style/registration.module.css"
+import { React, connect, axios, PropTypes, Loading, createHashHistory, elements, GenericGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
 import { getDynamicKey } from '../utils/utils'
 import { labelsManager } from '../utils/LabelsExport';
 import Address from './Address/Address'
 import SAPWrapper from './wrappers/SAPWrapper';
+import PersonwWrapper from './wrappers/PersonWrapper';
 const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
@@ -16,7 +16,7 @@ const CustomButtons = (props, context) => {
     const [dynamicFormId, setDynamicFormId] = useState(getDynamicKey())
     const [clickedRowObjectId, setClickedRowObjectId] = useState(0)
     const [wrapperName, setWrapper] = useState(undefined)
-    const [wrappers, _setWrappers] = useState([{ Showauthorizedperson: SAPWrapper }])
+    const [wrappers, _setWrappers] = useState([{ Showauthorizedperson: SAPWrapper }, { Person: PersonwWrapper }])
     useEffect(() => {
         setWrapper(props.tableName.replace(/(\w)(\w*)/g,
             function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, '').replaceAll(' ', ''))
@@ -29,9 +29,9 @@ const CustomButtons = (props, context) => {
     }, [])
 
     const buildCustomBtnArr = (btnArray, multiSelect, maxLength) => {
-        const div = <div className={style[`custom-btn-holder-${props.tableName.toLowerCase()}`]}>
+        const div = <div className={`custom-btn-holder-${props.tableName.toLowerCase()}`}>
             {btnArray.map(el => (
-                <button id={el['ID']} className={`${style[`${props.tableName.toLowerCase()}-btn`]}`} onClick={() => customBtnAction(el, multiSelect, maxLength)}>
+                <button id={el['ID']} className={`${props.tableName.toLowerCase()}-btn`} onClick={() => customBtnAction(el, multiSelect, maxLength)}>
                     {el['label']}
                 </button>
             ))}
@@ -40,7 +40,7 @@ const CustomButtons = (props, context) => {
     }
     const customBtnAction = (el, multiSelect, maxLength) => {
         if ((props.selectedGridRows.length > 0 && props.selectedGridRows.length <= maxLength) || (!multiSelect)) {
-            alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'person_registry', context), '', () => {
+            alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'persons_registry', context), '', () => {
 
                 let saveUrl = `${window.server}${el?.['onSave']}`
                 let data
@@ -110,6 +110,7 @@ const CustomButtons = (props, context) => {
                             const msg = err.response?.data?.message || ''
                             alertUser(true, "error", title, msg);
                         });
+                        setLoading(false)
                         break;
                     default:
                         break;
@@ -117,9 +118,9 @@ const CustomButtons = (props, context) => {
 
 
 
-            }, () => { }, true, labelsManager.importLabel('yes', 'person_registry', context), labelsManager.importLabel('no', 'person_registry', context))
+            }, () => { }, true, labelsManager.importLabel('yes', 'persons_registry', context), labelsManager.importLabel('no', 'persons_registry', context))
         } else {
-            alertUser(true, 'info', labelsManager.importLabel('select_multi', 'person_registry', context));
+            alertUser(true, 'info', labelsManager.importLabel('select_multi', 'persons_registry', context));
         }
     }
 
@@ -129,24 +130,24 @@ const CustomButtons = (props, context) => {
         const multiSelect = props.configuration.objectConfiguration.multiSelect || false
         const btnArray = props.configuration.objectConfiguration.additionalBtns
         const maxLength = props.configuration.objectConfiguration.maxLength || 9999
-        const grid = <div className={`${style[`custom-grid-container-${props.tableName.toLowerCase()}`]}`}>
+        const grid = <div className={`${`custom-grid-container-${props.tableName.toLowerCase()}`}`}>
             {btnArray && buildCustomBtnArr(btnArray, multiSelect, maxLength)}
 
-            <ExportableGrid
+            <GenericGrid
                 gridType={"READ_URL"}
                 key={props.tableName + props.personObjId}
                 id={props.tableName + props.personObjId}
                 configTableName={configWs}
                 dataTableName={dataWs}
-                heightRatio={0.7}
-                onRowClickFunct={handleRowClick}
+                heightRatio={0.58}
+                onRowClickFunct={props.configuration.objectConfiguration.disableRowClick ? () => { } : handleRowClick}
                 refreshData={() => reloadGrid(props.tableName + props.personObjId, multiSelect)}
                 toggleCustomButton={!props.configuration.objectConfiguration.readOnly}
                 customButton={() => setShowModal(true)}
-                customButtonLabel={labelsManager.importLabel('add', 'person_registry', context)}
+                customButtonLabel={labelsManager.importLabel('add', 'persons_registry', context)}
                 enableMultiSelect={multiSelect}
                 onSelectChangeFunct={customRowSelection}
-                editContextFunc={handleRowClick}
+                editContextFunc={props.configuration.objectConfiguration.disableRowClick ? () => { } : handleRowClick}
             />
 
         </div>
@@ -206,7 +207,7 @@ const CustomButtons = (props, context) => {
         }
         return (
             <GenericForm
-                className={`form-test custom-farm-registry-form ${isModal && 'hide-legend-form'} ${props.tableName.toLowerCase()}-farm-registry-form ${props.configuration.objectConfiguration?.readOnly && 'read-only-form'} `}
+                className={`form-test custom-persons-registry-form  person-registry-forms person-registration-form ${isModal && 'hide-legend-form'} ${props.tableName.toLowerCase()}-persons-registry-form ${props.configuration.objectConfiguration?.readOnly && 'read-only-form'} `}
                 params={'READ_URL'}
                 key={dynamicFormId}
                 id={dynamicFormId}
@@ -218,6 +219,7 @@ const CustomButtons = (props, context) => {
                 hideBtns={(clickedRowObjectId === 0) || props.configuration.objectConfiguration?.readOnly ? 'closeAndDelete' : 'close'}
                 inputWrapper={inputWrapper}
                 closeModalFunc={() => setShowModal(false)}
+                objId={props.personObjId}
             />
         )
     }
@@ -233,6 +235,7 @@ const CustomButtons = (props, context) => {
     }
 
     const resetFormDeleteState = () => {
+        setLoading(false)
         ComponentManager.setStateForComponent(dynamicFormId, null, { deleteExecuted: false })
     }
 
@@ -249,7 +252,7 @@ const CustomButtons = (props, context) => {
         // Check if the filtered form data object has only four keys and they are only system fields
         const onlyHasSystemFields = Object.keys(nonNullishFormData).length === 4 && Object.keys(nonNullishFormData).every(k => k === 'OBJECT_ID' || k === 'OBJECT_TYPE' || k === 'PKID' || k === 'PARENT_ID')
         if (isEmpty || onlyHasSystemFields) {
-            const label = labelsManager.importLabel('enter_some_values', 'person_registry', context)
+            const label = labelsManager.importLabel('enter_some_values', 'persons_registry', context)
             alertUser(true, 'info', label, '', () => resetFormSaveState())
         } else {
             if (!isModal) {
@@ -305,7 +308,7 @@ const CustomButtons = (props, context) => {
             const title = res.data.title || ''
             const msg = res.data.message || ''
             if (resType?.toLowerCase() === "success") {
-                alertUser(true, "success", title, msg);
+                alertUser(true, "success", title, msg, () => resetFormDeleteState());
                 closeFormModal()
                 GridManager.reloadGridData(props.tableName + props.personObjId);
             } else {
@@ -321,19 +324,19 @@ const CustomButtons = (props, context) => {
     return (
         <>
             {loading && <Loading />}
-            <div className={`${style['custom-menu-holder']} ${style[`custom-menu-${props.tableName.toLowerCase()}-container`]}`}>
+            <div className={`'custom-menu-holder' ${`custom-menu-${props.tableName.toLowerCase()}-container`}`}>
                 {props.configuration?.objectConfiguration?.type === 'form' && generateForm()}
                 {props.configuration?.objectConfiguration?.type === 'grid' && generateGrid()}
                 {props.configuration?.objectConfiguration?.type === 'address' && <Address personObjId={props.personObjId} defaultCountry={props.defaultCountry} />}
                 {showModal && (
-                    <Modal className={style["person-registry-modal"]} show={showModal} onHide={() => closeFormModal()}>
-                        <Modal.Header className={style["person-registry-modal-header"]} closeButton>
+                    <Modal className={"person-registry-modal"} show={showModal} onHide={() => closeFormModal()}>
+                        <Modal.Header className={"person-registry-modal-header"} closeButton>
                             <Modal.Title>{props.configuration.label}</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body className={style["person-registry-modal-body"]}>
+                        <Modal.Body className={"person-registry-modal-body"}>
                             {generateForm(true, false)}
                         </Modal.Body>
-                        <Modal.Footer className={style["person-registry-modal-footer"]} />
+                        <Modal.Footer className={"person-registry-modal-footer"} />
                     </Modal>
                 )}
             </div>
