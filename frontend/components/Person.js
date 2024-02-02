@@ -1,13 +1,13 @@
 import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, Modal, createHashHistory } from 'perun-core'
 const { alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
-import { labelsManager } from './components/LabelsExport'
-import { searchComponent, searchRender, searchResult } from './components/SearchComponent'
-import { PersonIdNoFieldFormWrapper } from './wrappers'
+import { labelsManager } from '../utils/LabelsExport'
+import { searchComponent, searchRender, searchResult } from './SearchComponent'
+import { PersonIdNoFieldFormWrapper } from '../components/wrappers'
 
 const p_r = 'persons_registry'
 
-class PersonWrapper extends React.Component {
+class Person extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -170,8 +170,8 @@ class PersonWrapper extends React.Component {
         <div className='pr-holder '>
           <div id='btn_holder' className='pr-btn-holder'>
             <>
-              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_physical', p_r, this.context)} </button>
-              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('addPerson')} {labelsManager.importLabel('add_legal', p_r, this.context)} </button>
+              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_physical', p_r, this.context)} </button>
+              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_legal', p_r, this.context)} </button>
             </>
           </div>
           <div id='content' className='pr-content'>
@@ -190,8 +190,8 @@ const mapStateToProps = state => ({
   svSession: state.security.svSession,
 })
 
-PersonWrapper.contextTypes = {
+Person.contextTypes = {
   intl: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(PersonWrapper)
+export default connect(mapStateToProps)(Person)

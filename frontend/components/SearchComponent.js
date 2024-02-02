@@ -1,6 +1,6 @@
 import { React, GenericForm, GenericGrid, ComponentManager, GridManager } from 'perun-core'
-import { axiosCall } from './AxiosCalls'
-import { labelsManager } from './LabelsExport'
+import { axiosCall } from '../utils/AxiosCalls'
+import { labelsManager } from '../utils/LabelsExport'
 
 const dynamicKey = function () {
   return (+ new Date() + Math.floor(Math.random() * 999999)).toString(36)
