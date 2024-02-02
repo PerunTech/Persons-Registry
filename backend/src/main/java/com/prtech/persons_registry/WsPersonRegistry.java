@@ -334,7 +334,15 @@ public class WsPersonRegistry {
 			if (jsonData.has("PERSON_TYPE") && jsonData.has("ID_NO")) {
 				DbDataArray people = new Reader().searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL,
 						SvCore.getTypeIdByName(PRC.PERSON), "ID_NO", jsonData.get("ID_NO").getAsString(), svr);
-				if (null == people || people.isEmpty()) {
+				// can insert new only if the ID_NO does not exist, can change the ID_NO of a
+				// person to a ID_NO that does not exist, can edit the PERSON only if OBJECT_ID
+				// are match
+				if (null == people || people.isEmpty() || 
+						(!people.isEmpty() && jsonData.has("OBJECT_ID")
+						&& people.getItems().get(0).getObjectId().compareTo(jsonData.get("OBJECT_ID").getAsLong()) == 0)
+						|| 
+						(!people.isEmpty() && jsonData.has("PERSON_OBJECT_ID") && 
+						people.getItems().get(0).getObjectId().compareTo(jsonData.get("PERSON_OBJECT_ID").getAsLong()) == 0)) {
 					jsonData.addProperty("tableName", PRC.PERSON);
 					DbDataObject vdataObject = re.prepareObjectToSave(jsonData, 0L, svr);
 
