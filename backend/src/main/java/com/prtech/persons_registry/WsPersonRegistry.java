@@ -354,7 +354,7 @@ public class WsPersonRegistry {
 								+ jsonData.get("LAST_NAME").getAsString());
 					}
 					svw.saveObject(vdataObject, false);
-
+					
 					jsonData.addProperty("tableName", tableName);
 					if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
 							&& jsonData.has(tableName + "." + Rc.PKID)) {
@@ -369,8 +369,72 @@ public class WsPersonRegistry {
 					vdataObject.setVal("PERSON_OBJECT_ID", vdataObject.getParentId());
 					svw.dbCommit();
 
+					DbDataObject person = svr.getObjectById(vdataObject.getParentId(), SvCore.getTypeIdByName(PRC.PERSON), null);
+					JsonObject responseJsonObject = new JsonObject();
+					responseJsonObject.addProperty("OBJECT_ID", person.getObjectId());
+					responseJsonObject.addProperty("OBJECT_TYPE", person.getObjectType());
+					responseJsonObject.addProperty("PKID", person.getPkid());
+					responseJsonObject.addProperty("PARENT_ID", person.getParentId());
+					responseJsonObject.addProperty("PERSON_TYPE", (String) person.getVal("PERSON_TYPE"));
+					responseJsonObject.addProperty("ID_NO", (String) person.getVal("ID_NO"));
+					responseJsonObject.addProperty("NAME", (String) person.getVal("NAME"));
+					responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_ID, vdataObject.getObjectId());
+					responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_TYPE, vdataObject.getObjectType());
+					
+					DbDataArray vFields = svr.getObjectsByParentId(SvCore.getTypeIdByName(tableName),
+							svCONST.OBJECT_TYPE_FIELD, null, 0, 0, Rc.SORT_ORDER);
+					String fieldType = "";
+					
+					for (int j = 0; j < vFields.getItems().size(); j++) {
+
+						String tmpFieldname = vFields.getItems().get(j).getVal(Rc.FIELD_NAME).toString();
+						fieldType = vFields.getItems().get(j).getVal(Rc.FIELD_TYPE).toString();
+						if (tmpFieldname.equalsIgnoreCase(Rc.PKID)) {
+							tmpFieldname = tableName + "." + tmpFieldname;
+							responseJsonObject.addProperty(tmpFieldname, vdataObject.getPkid());
+						} else {
+							if (vdataObject.getVal(tmpFieldname) != null) {
+								switch (fieldType) {
+								case Rc.NUMERIC:
+									responseJsonObject.addProperty(tmpFieldname,
+											(Long) vdataObject.getVal(tmpFieldname));
+									break;
+								case Rc.NVARCHAR:
+								case "TEXT":
+									responseJsonObject.addProperty(tmpFieldname,
+											(String) vdataObject.getVal(tmpFieldname));
+									break;
+								case Rc.BOOLEAN:
+									responseJsonObject.addProperty(tmpFieldname,
+											(Boolean) vdataObject.getVal(tmpFieldname));
+									break;
+								case Rc.DATE:
+									DateTime tmpDsh = new DateTime(vdataObject.getVal(tmpFieldname));
+
+									if (tmpDsh != null) {
+										int monthInt = tmpDsh.monthOfYear().get();
+										int dayInt = tmpDsh.dayOfMonth().get();
+										String monthStr = ((monthInt < 10) ? "0" : "") + String.valueOf(monthInt);
+										String dayStr = ((dayInt < 10) ? "0" : "") + String.valueOf(dayInt);
+										responseJsonObject.addProperty(tmpFieldname,
+												tmpDsh.year().get() + "-" + monthStr + "-" + dayStr);
+									}
+									break;
+								case Rc.TIMESTAMP:
+								case Rc.DATETIME:
+									DateTime tmpDl = (DateTime) vdataObject.getVal(tmpFieldname);
+									if (tmpDl != null)
+										responseJsonObject.addProperty(tmpFieldname, tmpDl.toString());
+									break;
+								default:
+									break;
+								}
+							}
+						}
+					}
+
 					jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
-							I18n.getText("perrun.success.save"), vdataObject.toSimpleJson());
+							I18n.getText("perrun.success.save"), responseJsonObject);
 
 				} else {
 					jrh.create(MessageType.WARNING, I18n.getText("warning_message"),
