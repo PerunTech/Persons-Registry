@@ -8,7 +8,6 @@ const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
 const { store, updateSelectedRows } = redux;
-let systemFields = {}
 const CustomButtons = (props, context) => {
     const [loading, setLoading] = useState(false)
     const [showModal, setShowModal] = useState(false)
@@ -16,6 +15,7 @@ const CustomButtons = (props, context) => {
     const [clickedRowObjectId, setClickedRowObjectId] = useState(0)
     const [wrapperName, setWrapper] = useState(undefined)
     const [wrappers, _setWrappers] = useState([{ Showauthorizedperson: SAPWrapper }, { Person: PersonwWrapper }])
+    const [renderForm, setRender] = useState(true)
     useEffect(() => {
         setWrapper(props.tableName.replace(/(\w)(\w*)/g,
             function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, '').replaceAll(' ', ''))
@@ -240,23 +240,22 @@ const CustomButtons = (props, context) => {
 
     const resetFormSaveState = () => {
         ComponentManager.setStateForComponent(dynamicFormId, null, { saveExecuted: false })
+        ComponentManager.cleanComponentReducerState(dynamicFormId)
+        setRender(true)
     }
 
     const saveForm = (e, wsPath, isModal) => {
         let formData = e.formData
-        // Check if every value in the form data object is nullish
+        // // Check if every value in the form data object is nullish
         const isEmpty = Object.values(formData).every(v => v === null || v === undefined)
-        // Filter out every nullish value from the form data object
+        // // Filter out every nullish value from the form data object
         const nonNullishFormData = Object.fromEntries(Object.entries(formData).filter(([_, v]) => v !== null && v !== undefined))
-        // Check if the filtered form data object has only four keys and they are only system fields
+        // // Check if the filtered form data object has only four keys and they are only system fields
         const onlyHasSystemFields = Object.keys(nonNullishFormData).length === 4 && Object.keys(nonNullishFormData).every(k => k === 'OBJECT_ID' || k === 'OBJECT_TYPE' || k === 'PKID' || k === 'PARENT_ID')
         if (isEmpty || onlyHasSystemFields) {
             const label = labelsManager.importLabel('enter_some_values', 'persons_registry', context)
             alertUser(true, 'info', label, '', () => resetFormSaveState())
         } else {
-            if (!isModal) {
-                formData = { ...formData, ...systemFields }
-            }
             const url = `${window.server}${wsPath}`
             axios({
                 method: "post",
@@ -264,25 +263,17 @@ const CustomButtons = (props, context) => {
                 url,
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
             }).then(res => {
-                const createdRecord = res.data.data
                 const resType = res.data.type
                 const title = res.data.title || ''
                 const msg = res.data.message || ''
                 if (resType?.toLowerCase() === 'error') {
                     alertUser(true, 'error', title, msg, () => resetFormSaveState());
                 } else {
-                    alertUser(true, resType?.toLowerCase(), title, msg, () => resetFormSaveState());
+                    setRender(false)
+                    alertUser(true, resType?.toLowerCase(), title, msg, () => { resetFormSaveState() });
                     if (isModal) {
                         GridManager.reloadGridData(props.tableName + props.personObjId)
                         closeFormModal()
-                    } else {
-                        props.getConfiguration(props.personObjId)
-                        systemFields = {
-                            OBJECT_ID: createdRecord.object_id,
-                            OBJECT_TYPE: createdRecord.object_type,
-                            PARENT_ID: createdRecord.parent_id,
-                            PKID: createdRecord.pkid
-                        }
                     }
                 }
             }).catch(err => {
@@ -324,7 +315,7 @@ const CustomButtons = (props, context) => {
         <>
             {loading && <Loading />}
             <div className={`'custom-menu-holder' ${`custom-menu-${props.tableName.toLowerCase()}-container`}`}>
-                {props.configuration?.objectConfiguration?.type === 'form' && generateForm()}
+                {renderForm && props.configuration?.objectConfiguration?.type === 'form' && generateForm()}
                 {props.configuration?.objectConfiguration?.type === 'grid' && generateGrid()}
                 {props.configuration?.objectConfiguration?.type === 'address' && <Address personObjId={props.personObjId} defaultCountry={props.defaultCountry} />}
                 {showModal && (
