@@ -397,7 +397,12 @@ public class WsPersonRegistry {
 		responseJsonObject.addProperty("PARENT_ID", person.getParentId());
 		responseJsonObject.addProperty("PERSON_TYPE", (String) person.getVal("PERSON_TYPE"));
 		responseJsonObject.addProperty("ID_NO", (String) person.getVal("ID_NO"));
-		responseJsonObject.addProperty("NAME", (String) person.getVal("NAME"));
+		if (person.getVal("NAME") != null)
+			responseJsonObject.addProperty("NAME", (String) person.getVal("NAME"));
+		DateTime dt_birth_reg = (DateTime) person.getVal("DT_BIRTH_REG");
+		if (dt_birth_reg != null)
+			responseJsonObject.addProperty("DT_BIRTH_REG", dt_birth_reg.toString());
+		responseJsonObject.addProperty("DT_BIRTH_REG", person.getVal("DT_BIRTH_REG").toString());
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_ID, vdataObject.getObjectId());
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_TYPE, vdataObject.getObjectType());
 		responseJsonObject.addProperty(tableName + "." + Rc.PKID, vdataObject.getPkid());
