@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.prtech.mk/perunv3/persons-registry.git"
+    "url": "https://gitlab.prtech.mk/svarog4/persons-registry.git"
   },
   "dependencies": {
     "bootstrap": "^4.5.3",
