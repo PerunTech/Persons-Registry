@@ -11,12 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.prtech.mk/perunv3/persons-registry.git"
+    "url": "https://gitlab.prtech.mk/svarog4/persons-registry.git"
   },
   "dependencies": {
-    "bootstrap": "^4.5.3",
-    "perun-core": "git+https://git@gitlab.prtech.mk/svarog4/perun-core#dev",
-    "query-string": "^6.12.1"
+    "perun-core": "git+https://git@gitlab.prtech.mk/svarog4/perun-core#dev"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
