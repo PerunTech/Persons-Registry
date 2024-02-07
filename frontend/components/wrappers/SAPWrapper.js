@@ -26,7 +26,7 @@ const SAPWrapper = (props, context) => {
     useEffect(() => {
         handleInputs();
         return () => {
-            ComponentManager.cleanComponentReducerState(`SHOWAUTH_${personObjId}`);
+            ComponentManager.cleanComponentReducerState(`AUTH_${personObjId}`);
         }
     }, []);
 
@@ -90,9 +90,9 @@ const SAPWrapper = (props, context) => {
             url: url,
         }).then(res => {
             if (res.data.data.length > 0) {
-                showDropdown = (<div className={'showauthorizedperson-dd-container'}>
-                    <button className="showauthorizedperson-dd-back btn-success btn_save_form" onClick={() => { setGridFlag(true), setDD(undefined), linkType = undefined }}>{iconManager.getIcon('back')} {labelsManager.importLabel('back', 'persons_registry', context)}</button>
-                    <div className={'showauthorizedperson-dd-holder'}><p>{labelsManager.importLabel('your_selection', 'persons_registry', context)} <strong>{name}</strong></p>
+                showDropdown = (<div className={'authorizedperson-dd-container'}>
+                    <button className="authorizedperson-dd-back btn-success btn_save_form" onClick={() => { setGridFlag(true), setDD(undefined), linkType = undefined }}>{iconManager.getIcon('back')} {labelsManager.importLabel('back', 'persons_registry', context)}</button>
+                    <div className={'authorizedperson-dd-holder'}><p>{labelsManager.importLabel('your_selection', 'persons_registry', context)} <strong>{name}</strong></p>
                         <p>{labelsManager.importLabel('connection_type', 'persons_registry', context)}</p>
                         <Dropdown
                             id={'setAuthPerson'}
@@ -102,7 +102,7 @@ const SAPWrapper = (props, context) => {
                             options={res.data.data}
                         />
                     </div>
-                    <button className="showauthorizedperson-dd-submit btn-success btn_save_form" type='button' onClick={() =>
+                    <button className="authorizedperson-dd-submit btn-success btn_save_form" type='button' onClick={() =>
                         alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'persons_registry', context), '', () => { saveAuthPerson(obj) }, () => { }, true, labelsManager.importLabel('yes', 'persons_registry', context), labelsManager.importLabel('no', 'persons_registry', context))}>{labelsManager.importLabel('save', 'persons_registry', context)}</button></div >)
                 setDD(showDropdown)
                 setGridFlag(false)
@@ -144,14 +144,14 @@ const SAPWrapper = (props, context) => {
     const resetFunc = () => {
         setShow(false)
         linkType = ''
-        ComponentManager.cleanComponentReducerState(`SHOWAUTH_${personObjId}`);
+        ComponentManager.cleanComponentReducerState(`AUTH_${personObjId}`);
         setGridFlag(undefined)
         setDD(undefined)
         const closeModalFunc = ComponentManager.getStateForComponent(
             props.formid,
             "closeModalFunc"
         );
-        GridManager.reloadGridData('Showauthorizedperson' + personObjId)
+        GridManager.reloadGridData('authorizedperson' + personObjId)
         closeModalFunc()
         setFormData(undefined)
     }
@@ -162,8 +162,8 @@ const SAPWrapper = (props, context) => {
     }
 
     const generateGrid = () => {
-        let grid = <GenericGrid gridType={'SEARCH_GRID_DATA'} key={`SHOWAUTH_${personObjId}`}
-            id={`SHOWAUTH_${personObjId}`}
+        let grid = <GenericGrid gridType={'SEARCH_GRID_DATA'} key={`AUTH_${personObjId}`}
+            id={`AUTH_${personObjId}`}
             configTableName={"/ReactElements/getTableFieldList/%session/PERSON"}
             dataTableName={formData}
             onRowClickFunct={onRowClick}

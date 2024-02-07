@@ -14,7 +14,7 @@ const CustomButtons = (props, context) => {
     const [dynamicFormId, setDynamicFormId] = useState(getDynamicKey())
     const [clickedRowObjectId, setClickedRowObjectId] = useState(0)
     const [wrapperName, setWrapper] = useState(undefined)
-    const [wrappers, _setWrappers] = useState([{ Showauthorizedperson: SAPWrapper }, { Person: PersonwWrapper }])
+    const [wrappers, _setWrappers] = useState([{ Authorizedperson: SAPWrapper }, { Person: PersonwWrapper }])
     const [renderForm, setRender] = useState(true)
     useEffect(() => {
         setWrapper(props.tableName.replace(/(\w)(\w*)/g,
