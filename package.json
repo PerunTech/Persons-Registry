@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.5.3",
-    "perun-core": "git+https://git@gitlab.prtech.mk/perunv3/perun-core#dev",
+    "perun-core": "git+https://git@gitlab.prtech.mk/svarog4/perun-core#dev",
     "query-string": "^6.12.1"
   },
   "devDependencies": {
