@@ -5,8 +5,9 @@
  *  - The name of your plugin, by convention the name specified in package.json
  *  - Your plugin implementation, assembled as an object.
  */
-import { name } from '../package.json'
+
+import pkg from '../package.json'
 import { pluginManager } from 'perun-core'
 import * as plugin from './index'
 
-pluginManager.registerPlugin(name, plugin)
+pluginManager.registerPlugin(pkg.name, plugin)
