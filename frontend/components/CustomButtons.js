@@ -21,7 +21,6 @@ const CustomButtons = (props, context) => {
             function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, '').replaceAll(' ', ''))
         return () => {
             ComponentManager.cleanComponentReducerState(props.tableName + props.personObjId);
-            systemFields = {}
             store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], props.tableName + props.personObjId] })
             ComponentManager.setStateForComponent(props.tableName + props.personObjId, 'selectedIndexes', [])
         }
