@@ -251,7 +251,7 @@ const Address = (props, context) => {
                         >
                             <></>
                             <div className={style['person-registry-btn-holder']} >
-                                {deleteBtn && <button onClick={() => alertUser(true, 'warning', labelsManager.importLabel('delete_record_prompt_title', 'main', context), labelsManager.importLabel('delete_record_prompt_message', 'main', context), () => { deleteFunc(formData) }, () => { }, true, labelsManager.importLabel('yes', context, 'admin_console'), labelsManager.importLabel('no', 'admin_console', context))
+                                {deleteBtn && <button onClick={() => alertUser(true, 'warning', labelsManager.importLabel('delete_record_prompt_title', 'main', context), labelsManager.importLabel('delete_record_prompt_message', 'main', context), () => { deleteFunc(formData) }, () => { }, true, labelsManager.importLabel('yes', 'admin_console', context), labelsManager.importLabel('no', 'admin_console', context))
                                 } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel(
                                     "delete",
                                     "persons_registry", context
