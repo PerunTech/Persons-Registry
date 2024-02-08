@@ -62,7 +62,9 @@ module.exports = (_, { mode }) => {
             {
               loader: 'css-loader',
               options: {
-                modules: true,
+                modules: {
+                  localIdentName: '[name]-[local]'
+                }
               },
             },
           ],
