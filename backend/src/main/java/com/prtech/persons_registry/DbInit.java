@@ -516,6 +516,7 @@ public class DbInit implements IDbInit {
 		dbe2.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe2.setDbFieldSize(5);
 		dbe2.setIsNull(true);
+		dbe2.setSort_order(200);
 		dbe2.setCode_list_user_code("COUNTRY_CODE");
 		dbe2.setLabel_code("address.country");
 		dbe2.setGui_metadata(CONST_GUI_FIL_HIDE);
@@ -525,6 +526,7 @@ public class DbInit implements IDbInit {
 		dbe3.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe3.setDbFieldSize(60);
 		dbe3.setIsNull(true);
+		dbe3.setSort_order(300);
 		dbe3.setCode_list_user_code("CUATM0");
 		dbe3.setLabel_code("address.locality1");
 		dbe3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
@@ -534,6 +536,7 @@ public class DbInit implements IDbInit {
 		dbe4.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe4.setDbFieldSize(60);
 		dbe4.setIsNull(true);
+		dbe4.setSort_order(400);
 		dbe4.setCode_list_user_code("CUATM_DISPLAY");
 		dbe4.setLabel_code("address.locality2");
 		dbe4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
@@ -543,6 +546,7 @@ public class DbInit implements IDbInit {
 		dbe5.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe5.setDbFieldSize(60);
 		dbe5.setIsNull(true);
+		dbe5.setSort_order(500);
 		dbe5.setLabel_code("address.locality3");
 		dbe5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
@@ -551,6 +555,7 @@ public class DbInit implements IDbInit {
 		dbe6.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe6.setDbFieldSize(60);
 		dbe6.setIsNull(true);
+		dbe6.setSort_order(600);
 		dbe6.setLabel_code("address.locality4");
 		dbe6.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
@@ -558,7 +563,8 @@ public class DbInit implements IDbInit {
 		dbe7.setDbFieldName("STREET");
 		dbe7.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe7.setDbFieldSize(200);
-		dbe7.setIsNull(false);
+		dbe7.setIsNull(true);
+		dbe7.setSort_order(700);
 		dbe7.setLabel_code("address.street");
 		dbe7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
@@ -567,42 +573,58 @@ public class DbInit implements IDbInit {
 		dbe8.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe8.setDbFieldSize(10);
 		dbe8.setIsNull(true);
+		dbe8.setSort_order(800);
 		dbe8.setLabel_code("address.postal_code");
 		dbe8.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
 		DbDataField dbe9 = new DbDataField();
 		dbe9.setDbFieldName("PHONE");
 		dbe9.setDbFieldType(DbFieldType.NVARCHAR);
-		dbe9.setDbFieldSize(15);
+		dbe9.setDbFieldSize(25);
 		dbe9.setIsNull(true);
+		dbe9.setSort_order(900);
 		dbe9.setLabel_code("address.phone");
 		dbe9.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
 		DbDataField dbe10 = new DbDataField();
 		dbe10.setDbFieldName("FAX");
 		dbe10.setDbFieldType(DbFieldType.NVARCHAR);
-		dbe10.setDbFieldSize(15);
+		dbe10.setDbFieldSize(25);
 		dbe10.setIsNull(true);
+		dbe10.setSort_order(1000);
 		dbe10.setLabel_code("address.fax");
 		dbe10.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		
+		DbDataField dbe12 = new DbDataField();
+		dbe12.setDbFieldName("PHONE_MOBILE");
+		dbe12.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe12.setDbFieldSize(25);
+		dbe12.setIsNull(true);
+		dbe12.setSort_order(1100);
+		dbe12.setLabel_code("address.phone_mobile");
+		dbe12.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
 		DbDataField dbe11 = new DbDataField();
 		dbe11.setDbFieldName("EMAIL");
 		dbe11.setDbFieldType(DbFieldType.NVARCHAR);
 		dbe11.setDbFieldSize(150);
 		dbe11.setIsNull(true);
+		dbe11.setSort_order(1200);
 		dbe11.setLabel_code("address.email");
 		dbe11.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
 		DbDataField dbe17 = new DbDataField();
 		dbe17.setDbFieldName("IS_DEFAULT");
-		dbe17.setDbFieldType(DbFieldType.BOOLEAN);
-		dbe17.setCode_list_user_code("BOOLEAN_TRUE_FALSE");
+		dbe17.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe17.setDbFieldSize(1);
+		dbe17.setSort_order(1300);
+		dbe17.setCode_list_user_code("NUMERIC_YES_NO_WITHOUT_CHOOSE");
 		dbe17.setLabel_code("address.is_default");
 		dbe17.setIsNull(true);
 		dbe17.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
-		DbDataField[] dbTableFields = new DbDataField[12];
+		DbDataField[] dbTableFields = new DbDataField[13];
 		dbTableFields[0] = dbe1;
 		dbTableFields[1] = dbe2;
 		dbTableFields[2] = dbe3;
@@ -613,8 +635,9 @@ public class DbInit implements IDbInit {
 		dbTableFields[7] = dbe8;
 		dbTableFields[8] = dbe9;
 		dbTableFields[9] = dbe10;
-		dbTableFields[10] = dbe11;
-		dbTableFields[11] = dbe17;
+		dbTableFields[10] = dbe12;
+		dbTableFields[11] = dbe11;
+		dbTableFields[12] = dbe17;
 		dbe.setDbTableFields(dbTableFields);
 		return dbe;
 	}
@@ -655,7 +678,7 @@ public class DbInit implements IDbInit {
 		dbf3.setIsUnique(true);
 		dbf3.setIsNull(false);
 		dbf3.setLabel_code("bankacc.bank_account");
-		dbf3.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"minLength\":15,\"maxLength\":15,\"maximum\":\"\"}}");
+		dbf3.setGui_metadata("{\"react\":{\"filterable\":true,\"visible\":true,\"minLength\":15,\"maxLength\":15,\"maximum\":999999999999999,\"minimum\":100000000000000}}");
 
 		DbDataField dbf4 = new DbDataField();
 		dbf4.setDbFieldName("BRANCH_ADDRESS");

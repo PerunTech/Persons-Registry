@@ -8,14 +8,16 @@ import {
     elements,
     GenericGrid,
     GridManager,
-    ComponentManager
+    ComponentManager,
+    validator
 } from 'perun-core'
-import style from "../Address/address.module.css"
-import { labelsManager } from '../components/LabelsExport';
+import style from "./address.module.css"
 const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
-
+import { labelsManager } from '../../utils/LabelsExport'
+import { CustomOnchangeFunction } from './CustomOnchangeFunction';
+let changeField = 'LOCALITY1'
 const Address = (props, context) => {
     const [schema, setSchema] = useState({})
     const [uiSchema, setUiSchema] = useState({})
@@ -26,9 +28,11 @@ const Address = (props, context) => {
     const [show, setShow] = useState(false)
     const [flagForm, setFlagForm] = useState(false)
     const [deleteBtn, setDelete] = useState(false)
+
     useEffect(() => {
         return () => {
             ComponentManager.cleanComponentReducerState("ADDRESS_GRID" + props.personObjId);
+            changeField = undefined
         }
     }, [])
 
@@ -87,13 +91,12 @@ const Address = (props, context) => {
 
     };
 
-    const generateNewTest = (data) => {
+    const generateNewDependentForm = (data) => {
         let tempUi = JSON.parse(JSON.stringify(permaUi))
         if (data['COUNTRY'] === props.defaultCountry) {
             if (data['LOCALITY1']) {
                 tempUi.LOCALITY2 = {}
-
-                if (formData['LOCALITY1'] !== data['LOCALITY1']) {
+                if (formData['LOCALITY1'] !== data['LOCALITY1'] || formData['LOCALITY1'] === data['LOCALITY1']) {
                     setFlagForm(false)
                     let tempSchema = JSON.parse(JSON.stringify(permaSchema))
                     let tempEnum = []
@@ -111,14 +114,12 @@ const Address = (props, context) => {
                     tempSchema.properties['LOCALITY2'].enum = tempEnum
                     tempSchema.properties['LOCALITY2'].enumNames = tempEnumNames
                     setSchema(tempSchema)
-
                     setFlagForm(true)
                 }
             } else {
                 tempUi.LOCALITY2 = { 'ui:widget': 'hidden' }
             }
         }
-
         setUiSchema(tempUi)
     }
 
@@ -162,6 +163,7 @@ const Address = (props, context) => {
 
     const handleRowClick = (_id, _rowIdx, row) => {
         generateMainForm(row)
+        changeField = 'LOCALITY1'
     }
 
     const deleteFunc = (formData) => {
@@ -189,7 +191,20 @@ const Address = (props, context) => {
 
             });
     };
+    const onFieldChange = (name, _formData) => {
+        changeField = name
 
+    }
+    const formContext = {
+        onFieldChange: onFieldChange
+    };
+
+    const onChange = (e) => {
+        setFormData(e.formData)
+        if (changeField === 'LOCALITY1' || changeField === 'LOCALITY2') {
+            generateNewDependentForm(e.formData)
+        }
+    }
     return (
         <>{loading && <Loading />}
             <div>
@@ -203,40 +218,48 @@ const Address = (props, context) => {
                     dataTableName={
                         `/ReactElements/getObjectsByParentId/${props.svSession}/${props.personObjId}/ADDRESS/100000`
                     }
-                    minHeight={800}
+                    heightRatio={0.58}
                     onRowClickFunct={handleRowClick}
                     refreshData={true}
                     toggleCustomButton={true}
                     customButton={() => generateMainForm()}
                     customButtonLabel={labelsManager.importLabel(
-                        "add_address", "persons_registry", context
+                        "add_address",
+                        "persons_registry", context
                     )}
+                    editContextFunc={handleRowClick}
                 />
                 {show && <Modal className={style["person-registry-modal"]} show={show} onHide={() => setShow(false)}>
                     <Modal.Header className={style["person-registry-modal-header"]} closeButton>
                         <Modal.Title>{labelsManager.importLabel(
                             "add_address",
-                            "persons_registry",
-                            context
+
+                            "persons_registry", context
                         )}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={style["person-registry-modal-body"]}>
                         {flagForm && <Form
+                            validator={validator}
                             schema={schema}
                             uiSchema={uiSchema}
                             onSubmit={(e) => saveAddress(e)}
+                            fields={{ SchemaField: CustomOnchangeFunction }}
                             className={`person-registry-forms`}
                             formData={formData}
-                            onChange={(e) => {
-                                setFormData(e.formData)
-                                generateNewTest(e.formData)
-                            }}
+                            formContext={formContext}
+                            onChange={(e) => onChange(e)}
                         >
                             <></>
                             <div className={style['person-registry-btn-holder']} >
                                 {deleteBtn && <button onClick={() => alertUser(true, 'warning', labelsManager.importLabel('delete_record_prompt_title', 'main', context), labelsManager.importLabel('delete_record_prompt_message', 'main', context), () => { deleteFunc(formData) }, () => { }, true, labelsManager.importLabel('yes', 'admin_console', context), labelsManager.importLabel('no', 'admin_console', context))
-                                } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel("delete", "persons_registry", context)}</button>}
-                                <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel("add_address", "persons_registry", context)}</button>
+                                } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel(
+                                    "delete",
+                                    "persons_registry", context
+                                )}</button>}
+                                <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel(
+                                    "add_address",
+                                    "persons_registry", context
+                                )}</button>
                             </div>
                         </Form>}
                     </Modal.Body>

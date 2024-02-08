@@ -1,6 +1,6 @@
 import { React, GenericForm, GenericGrid, ComponentManager, GridManager } from 'perun-core'
-import { axiosCall } from './AxiosCalls'
-import { labelsManager } from './LabelsExport'
+import { axiosCall } from '../utils/AxiosCalls'
+import { labelsManager } from '../utils/LabelsExport'
 
 const dynamicKey = function () {
   return (+ new Date() + Math.floor(Math.random() * 999999)).toString(36)
@@ -40,11 +40,14 @@ export function searchComponent(formData, _form, callback, session) {
     callback('inside_error')
   }
 }
-/** 
+/**
 this function returns <GenericForm/>  with custom save function recieved from param searchComponent
-@param {function} searchComponent
+    @param {function} searchComponent
+    @param {object} context
+    @param {Node} wrapper
 **/
-export const searchRender = (searchComponent, context) => {
+export const searchRender = (searchComponent, context, wrapper) => {
+  let InputWrapper = wrapper
   let formId = 'PERSON'
   return <GenericForm
     params={'READ_URL'}
@@ -58,6 +61,7 @@ export const searchRender = (searchComponent, context) => {
     customSave={true}
     customSaveButtonName={labelsManager.importLabel('search', 'persons_registry', context)}
     className={`form-test person-registry-forms`}
+    inputWrapper={InputWrapper}
   />
 }
 /** 

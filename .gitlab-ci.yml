@@ -99,6 +99,7 @@ after_script:
     - cd $CI_PROJECT_DIR/
     - cd backend
     - mvn sonar:sonar -Dsonar.analysis.mode=preview -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+  when: manual
 
 2_perun-sonarqube_backend_publish:
   stage: 4_sonarqube
@@ -118,5 +119,5 @@ after_script:
   script:
     - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.analysis.mode=preview -Dsonar.login=a02003f1f8f90382d7570b57a85c00c38132f85f -Dsonar.branch=$CI_BUILD_REF_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID
     - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.analysis.mode=publish -Dsonar.login=a02003f1f8f90382d7570b57a85c00c38132f85f -Dsonar.branch=$CI_BUILD_REF_NAME -Dsonar.projectName=$CI_PROJECT_NAME
-
+  when: manual
 
