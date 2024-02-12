@@ -138,10 +138,10 @@ public class WsPersonRegistry {
 					switch (defaultCountry) {
 					case "MDA":
 						listRequired.add(PRC.ID_NO);
-						listRequired.add("ADDRESS");
+						//listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
-						listRequired.add("MUNICIPALITY");
-						listRequired.add("CITY");
+						//listRequired.add("MUNICIPALITY");
+						//listRequired.add("CITY");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
@@ -167,13 +167,14 @@ public class WsPersonRegistry {
 
 				} else if (personType.equalsIgnoreCase("g")) {
 					switch (defaultCountry) {
+					//http://192.168.100.130/svarog4/persons-registry/-/issues/40#note_149926
 					case "MDA":
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("NAME");
-						listRequired.add("ADDRESS");
+						//listRequired.add("ADDRESS");
 						listRequired.add("DT_BIRTH_REG");
-						listRequired.add("MUNICIPALITY");
-						listRequired.add("CITY");
+						//listRequired.add("MUNICIPALITY");
+						//listRequired.add("CITY");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
