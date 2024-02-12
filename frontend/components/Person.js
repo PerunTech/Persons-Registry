@@ -134,7 +134,7 @@ class Person extends React.Component {
   }
 
   redirectPerson = (formParams, personType, name) => {
-    const objectId = formParams.data.OBJECT_ID
+    const objectId = formParams.data.OBJECT_ID || formParams.data.object_id
     const href = `/main/persons-registry/person/${objectId}/${personType}/${name}/editPerson`
     this.hashHistory.push(href)
   }
