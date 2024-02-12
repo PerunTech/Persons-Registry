@@ -1,10 +1,10 @@
-import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, Modal, createHashHistory } from 'perun-core'
-const { alertUser } = elements
+import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory } from 'perun-core'
+const { ReactBootstrap, alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from '../utils/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './SearchComponent'
 import { PersonIdNoFieldFormWrapper } from '../components/wrappers'
-
+const { Modal } = ReactBootstrap;
 const p_r = 'persons_registry'
 
 class Person extends React.Component {
@@ -157,7 +157,17 @@ class Person extends React.Component {
       />
     )
 
-    const modal = <Modal key={modalTitle} id={modalTitle} modalTitle={modalTitle} closeModal={() => this.closeModalFn()} modalContent={form} />
+    const modal = (
+      <Modal className={'person-registry-modal'} show onHide={() => this.closeModalFn()}>
+        <Modal.Header className={'person-registry-modal-header'} closeButton>
+          <Modal.Title>{modalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={'person-registry-modal-body'}>
+          {form}
+        </Modal.Body>
+        <Modal.Footer className={'person-registry-modal-footer'} />
+      </Modal>
+    )
     this.setState({ showModal: true, modal, selectedPersonType: personType })
   }
 
