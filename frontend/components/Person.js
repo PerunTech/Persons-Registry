@@ -124,12 +124,11 @@ class Person extends React.Component {
           }
         }
       }
-    }).catch((error) => {
-      if (error) {
-        if (error.response.data) {
-          alertUser(true, 'error', error.response.data.title, error.response.data.message)
-        }
-      }
+    }).catch((err) => {
+      console.error(err)
+      const title = err.response?.data?.title || err
+      const msg = err.response?.data?.message || ''
+      alertUser(true, 'error', title, msg, () => this.resetRegisterPersonFormSaveState());
     })
   }
 
