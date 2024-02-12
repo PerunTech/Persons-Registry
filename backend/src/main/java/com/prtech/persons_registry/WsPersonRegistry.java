@@ -210,15 +210,15 @@ public class WsPersonRegistry {
 						properties.remove("NAME");
 						properties.remove(PRC.TAX_NO);
 					}
-					if (personType.equalsIgnoreCase("g")) {
-						if (properties.has(PRC.ID_NO)) {
-							JsonObject jIdNo = properties.get(PRC.ID_NO).getAsJsonObject();
-							jIdNo.addProperty("minLength", 7);
-							jIdNo.addProperty("maxLength", 7);
-							properties.add(PRC.ID_NO, jIdNo);
-
-						}
-					}
+//					if (personType.equalsIgnoreCase("g")) {
+//						if (properties.has(PRC.ID_NO)) {
+//							JsonObject jIdNo = properties.get(PRC.ID_NO).getAsJsonObject();
+//							jIdNo.addProperty("minLength", 7);
+//							jIdNo.addProperty("maxLength", 7);
+//							properties.add(PRC.ID_NO, jIdNo);
+//
+//						}
+//					}
 					for (Map.Entry<String, JsonElement> entry : jObj2.entrySet()) {
 
 						if (entry.getKey().equals(Rc.PROPERTIES))
