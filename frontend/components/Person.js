@@ -1,4 +1,4 @@
-import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory } from 'perun-core'
+import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory, Loading } from 'perun-core'
 const { ReactBootstrap, alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from '../utils/LabelsExport'
@@ -173,6 +173,8 @@ class Person extends React.Component {
 
   render() {
     const { personsGrid, searchForm, showSearchForm, showModal, showPersonsGrid, modal } = this.state;
+    const { loading } = this.props
+
 
     return (
       <React.Fragment>
@@ -184,6 +186,7 @@ class Person extends React.Component {
             </>
           </div>
           <div id='content' className='pr-content'>
+            {loading && <Loading />}
             {showSearchForm && searchForm}
             {(showPersonsGrid && personsGrid) && '* ' + labelsManager.importLabel('additional_info_select_row', p_r, this.context)}
             {showPersonsGrid && personsGrid}
@@ -197,6 +200,7 @@ class Person extends React.Component {
 
 const mapStateToProps = state => ({
   svSession: state.security.svSession,
+  loading: state['person-registry.loading'].loading
 })
 
 Person.contextTypes = {
