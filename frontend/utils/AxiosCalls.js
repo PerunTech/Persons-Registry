@@ -7,12 +7,12 @@
 * OPTIONAL PARAMETERS
 * @param {object} form_params - form_params for 'post' method
 */
-
-import { axios, elements } from 'perun-core'
+import { axios, elements, redux } from 'perun-core'
 const { alertUser } = elements
 import { logOut } from './LogOut'
 
 export function axiosCall(urlArr, session, hasCallback, methodType, form_params) {
+  redux.store.dispatch({ type: 'SEARCH_LOADING', payload: true })
   if (urlArr) {
     for (let i = 0; i < urlArr.length; i++) {
       axios({
@@ -33,6 +33,7 @@ export function axiosCall(urlArr, session, hasCallback, methodType, form_params)
             }
             hasCallback(response.data, urlArr.length - 1, i, personType)
           }
+          redux.store.dispatch({ type: 'SEARCH_LOADING_FINISHED', payload: false })
         }
       }).catch(function (error) {
         if (error.response && error.response.data && error.response.data.type) {
