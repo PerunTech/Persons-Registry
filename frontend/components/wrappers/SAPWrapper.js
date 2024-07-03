@@ -151,7 +151,7 @@ const SAPWrapper = (props, context) => {
             props.formid,
             "closeModalFunc"
         );
-        GridManager.reloadGridData('authorizedperson' + personObjId)
+        GridManager.reloadGridData('Authorizedperson' + personObjId)
         closeModalFunc()
         setFormData(undefined)
     }

@@ -1,10 +1,10 @@
-import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, Modal, createHashHistory } from 'perun-core'
-const { alertUser } = elements
+import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory, Loading } from 'perun-core'
+const { ReactBootstrap, alertUser } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from '../utils/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './SearchComponent'
 import { PersonIdNoFieldFormWrapper } from '../components/wrappers'
-
+const { Modal } = ReactBootstrap;
 const p_r = 'persons_registry'
 
 class Person extends React.Component {
@@ -124,17 +124,16 @@ class Person extends React.Component {
           }
         }
       }
-    }).catch((error) => {
-      if (error) {
-        if (error.response.data) {
-          alertUser(true, 'error', error.response.data.title, error.response.data.message)
-        }
-      }
+    }).catch((err) => {
+      console.error(err)
+      const title = err.response?.data?.title || err
+      const msg = err.response?.data?.message || ''
+      alertUser(true, 'error', title, msg, () => this.resetRegisterPersonFormSaveState());
     })
   }
 
   redirectPerson = (formParams, personType, name) => {
-    const objectId = formParams.data.OBJECT_ID
+    const objectId = formParams.data.OBJECT_ID || formParams.data.object_id
     const href = `/main/persons-registry/person/${objectId}/${personType}/${name}/editPerson`
     this.hashHistory.push(href)
   }
@@ -158,12 +157,24 @@ class Person extends React.Component {
       />
     )
 
-    const modal = <Modal key={modalTitle} id={modalTitle} modalTitle={modalTitle} closeModal={() => this.closeModalFn()} modalContent={form} />
+    const modal = (
+      <Modal className={'person-registry-modal'} show onHide={() => this.closeModalFn()}>
+        <Modal.Header className={'person-registry-modal-header'} closeButton>
+          <Modal.Title>{modalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={'person-registry-modal-body'}>
+          {form}
+        </Modal.Body>
+        <Modal.Footer className={'person-registry-modal-footer'} />
+      </Modal>
+    )
     this.setState({ showModal: true, modal, selectedPersonType: personType })
   }
 
   render() {
     const { personsGrid, searchForm, showSearchForm, showModal, showPersonsGrid, modal } = this.state;
+    const { loading } = this.props
+
 
     return (
       <React.Fragment>
@@ -175,6 +186,7 @@ class Person extends React.Component {
             </>
           </div>
           <div id='content' className='pr-content'>
+            {loading && <Loading />}
             {showSearchForm && searchForm}
             {(showPersonsGrid && personsGrid) && '* ' + labelsManager.importLabel('additional_info_select_row', p_r, this.context)}
             {showPersonsGrid && personsGrid}
@@ -188,6 +200,7 @@ class Person extends React.Component {
 
 const mapStateToProps = state => ({
   svSession: state.security.svSession,
+  loading: state['person-registry.loading'].loading
 })
 
 Person.contextTypes = {

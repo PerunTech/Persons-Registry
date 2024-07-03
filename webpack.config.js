@@ -15,8 +15,6 @@ module.exports = (_, { mode }) => {
     devServer: {
       client: {
         overlay: false
-      }, client: {
-        overlay: false
       },
       static: {
         directory: path.join(__dirname, './backend/www'),
