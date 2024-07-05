@@ -6,8 +6,9 @@ import SAPWrapper from './wrappers/SAPWrapper';
 import PersonwWrapper from './wrappers/PersonWrapper';
 const { ReactBootstrap, alertUser } = elements;
 const { Modal } = ReactBootstrap;
-const { useState, useEffect } = React
+const { useState, useEffect } = React;
 const { store, updateSelectedRows } = redux;
+
 const CustomButtons = (props, context) => {
     const [loading, setLoading] = useState(false)
     const [showModal, setShowModal] = useState(false)
@@ -16,6 +17,7 @@ const CustomButtons = (props, context) => {
     const [wrapperName, setWrapper] = useState(undefined)
     const [wrappers, _setWrappers] = useState([{ Authorizedperson: SAPWrapper }, { Person: PersonwWrapper }])
     const [renderForm, setRender] = useState(true)
+
     useEffect(() => {
         let wrapper = props.tableName.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
             return g1.toUpperCase() + g2.toLowerCase();
@@ -40,10 +42,10 @@ const CustomButtons = (props, context) => {
         </div>
         return div
     }
+
     const customBtnAction = (el, multiSelect, maxLength) => {
         if ((props.selectedGridRows.length > 0 && props.selectedGridRows.length <= maxLength) || (!multiSelect)) {
             alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'persons_registry', context), '', () => {
-
                 let saveUrl = `${window.server}${el?.['onSave']}`
                 let data
                 setLoading(true)
@@ -119,9 +121,6 @@ const CustomButtons = (props, context) => {
                     default:
                         break;
                 }
-
-
-
             }, () => { }, true, labelsManager.importLabel('yes', 'persons_registry', context), labelsManager.importLabel('no', 'persons_registry', context))
         } else {
             alertUser(true, 'info', labelsManager.importLabel('select_multi', 'persons_registry', context));
@@ -157,6 +156,7 @@ const CustomButtons = (props, context) => {
         </div>
         return grid
     }
+
     //multiselect functions 
     const customRowSelection = (selectedRows, gridId) => {
         store.dispatch(updateSelectedRows(selectedRows, gridId));
@@ -200,14 +200,19 @@ const CustomButtons = (props, context) => {
         let onSubmitWs = props.configuration.objectConfiguration?.save?.onSave
         // If we're rendering a modal, the configuration services are a bit nested
         if (isModal) {
-            // #revise_me
-            // We need to find a smarter way to get the WS paths, instead of duplicating the nested properties all over again
-            jsonSchemaConfig = props.configuration.objectConfiguration?.form?.configuration?.onSubmit
-            uiSchemaConfig = props.configuration.objectConfiguration?.form?.uischema?.onSubmit
-            formDataWs = props.configuration.objectConfiguration?.form?.data?.onSubmit
-            // If the form data WS contains something like {TABLE_NAME.OBJECT_ID} find it and replace it with the clicked object's ID
-            formDataWs = replaceFunc(formDataWs, props.tableName, clickedRowObjectId)
-            onSubmitWs = props.configuration.objectConfiguration?.form?.save?.onSave
+            // First, check if there is any form configuration
+            if (props.configuration?.objectConfiguration?.form) {
+                // #revise_me
+                // We need to find a smarter way to get the WS paths, instead of duplicating the nested properties all over again
+                jsonSchemaConfig = props.configuration.objectConfiguration?.form?.configuration?.onSubmit
+                uiSchemaConfig = props.configuration.objectConfiguration?.form?.uischema?.onSubmit
+                formDataWs = props.configuration.objectConfiguration?.form?.data?.onSubmit
+                // If the form data WS contains something like {TABLE_NAME.OBJECT_ID} find it and replace it with the clicked object's ID
+                formDataWs = replaceFunc(formDataWs, props.tableName, clickedRowObjectId)
+                onSubmitWs = props.configuration.objectConfiguration?.form?.save?.onSave
+            } else {
+                return false
+            }
         }
         return (
             <GenericForm
@@ -227,6 +232,7 @@ const CustomButtons = (props, context) => {
             />
         )
     }
+
     const handleRowClick = (_id, _rowIdx, row) => {
         setClickedRowObjectId(row[`${props.tableName}.OBJECT_ID`] || 0)
         setShowModal(true)
@@ -316,6 +322,7 @@ const CustomButtons = (props, context) => {
             alertUser(true, "error", title, msg, () => resetFormDeleteState());
         });
     };
+
     return (
         <>
             {loading && <Loading />}

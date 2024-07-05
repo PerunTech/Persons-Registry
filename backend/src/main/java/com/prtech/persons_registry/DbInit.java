@@ -498,6 +498,7 @@ public class DbInit implements IDbInit {
 		dbe.setDbRepoName(CONST_MASTER_REPO);
 		dbe.setDbSchema(CONST_DEFAULT_SCHEMA);
 		dbe.setIsSystemTable(false);
+		dbe.setParentName("PERSON");
 		dbe.setIsRepoTable(false);
 		dbe.setLabel_code("master_repo.address");
 		dbe.setUse_cache(false);

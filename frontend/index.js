@@ -5,6 +5,12 @@
  */
 import Person from './components/Person'
 import PersonInfo from './components/PersonInfo'
+import { redux } from 'perun-core'
+import axiosReducer from './components/axiosReducer'
+const { store, injectAsyncReducer } = redux
+
+injectAsyncReducer(store, 'person-registry.loading', axiosReducer)
+
 const routes = [{
   name: 'persons-registry-person',
   path: '/main/persons-registry',
