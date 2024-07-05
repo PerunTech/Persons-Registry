@@ -19,8 +19,12 @@ const CustomButtons = (props, context) => {
     const [renderForm, setRender] = useState(true)
 
     useEffect(() => {
-        setWrapper(props.tableName.replace(/(\w)(\w*)/g,
-            function (g0, g1, g2) { return g1.toUpperCase() + g2.toLowerCase(); }).replace(/_/g, '').replaceAll(' ', ''))
+        let wrapper = props.tableName.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
+            return g1.toUpperCase() + g2.toLowerCase();
+        }).replace(/_/g, '').replaceAll(' ', '');
+        wrapper = wrapper.charAt(0).toUpperCase() + wrapper.slice(1).toLowerCase();
+        wrapper = wrapper.replace(/[0-9]/g, '');
+        setWrapper(wrapper)
         return () => {
             ComponentManager.cleanComponentReducerState(props.tableName + props.personObjId);
             store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], props.tableName + props.personObjId] })
@@ -93,7 +97,9 @@ const CustomButtons = (props, context) => {
                         break;
                     case 'deleteLink':
                         data = el['payLoad']
-                        data['objectId2'] = props.selectedGridRows[0][`${props.tableName}.OBJECT_ID`]
+                        let grid = props.tableName === 'AUTHORIZED_PERSON' ? 'PERSON.OBJECT_ID' : `${props.tableName}.OBJECT_ID`
+                        data['objectId2'] = Number(props.personObjId)
+                        data['objectId1'] = props.selectedGridRows[0][`${grid}`]
                         data['linkType'] = props.selectedGridRows[0]['LINK_TYPE']
                         axios({
                             method: "post",
