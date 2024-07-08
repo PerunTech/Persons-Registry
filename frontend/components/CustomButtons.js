@@ -229,6 +229,7 @@ const CustomButtons = (props, context) => {
                 inputWrapper={inputWrapper}
                 closeModalFunc={() => setShowModal(false)}
                 objId={props.personObjId}
+                tableNameId={props.tableName}
             />
         )
     }
