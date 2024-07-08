@@ -33,13 +33,15 @@ const SAPWrapper = (props, context) => {
     const handleInputs = () => {
         const { formid } = props;
         const objId = ComponentManager.getStateForComponent(formid, "objId");
-        const uiSchema = ComponentManager.getStateForComponent(props.formid, 'uischema')
-        uiSchema.TAX_NO = { 'ui:widget': 'hidden' }
+        const uiSchema = ComponentManager.getStateForComponent(formid, 'uischema')
+        if (uiSchema) {
+            uiSchema.TAX_NO = { 'ui:widget': 'hidden' }
+            ComponentManager.setStateForComponent(formid, 'uischema', uiSchema)
+            props.formInstance.setState({ uischema: uiSchema })
+        }
         setPerson(objId)
-        ComponentManager.setStateForComponent(props.formid, 'uischema', uiSchema)
         ComponentManager.setStateForComponent(formid, "addSaveFunction", handleWrapperSave);
         props.formInstance.setState({ addSaveFunction: handleWrapperSave });
-        props.formInstance.setState({ uischema: uiSchema })
         setCanRender(true)
     };
     const handleWrapperSave = () => {
@@ -127,8 +129,7 @@ const SAPWrapper = (props, context) => {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })
                 .then(res => {
-                    alertUser(true, res.data.type.toLowerCase(), res.data.message, res.data.title)
-                    resetFunc()
+                    alertUser(true, res.data.type.toLowerCase(), res.data.message, res.data.title, () => resetFunc())
                 })
                 .catch(err => {
                     console.error(err)
@@ -151,7 +152,8 @@ const SAPWrapper = (props, context) => {
             props.formid,
             "closeModalFunc"
         );
-        GridManager.reloadGridData('Authorizedperson' + personObjId)
+        const tableNameId = ComponentManager.getStateForComponent(props.formid, 'tableNameId')
+        GridManager.reloadGridData(tableNameId + personObjId)
         closeModalFunc()
         setFormData(undefined)
     }
