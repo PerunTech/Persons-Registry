@@ -144,9 +144,6 @@ public class WsPersonRegistry {
 						//listRequired.add("CITY");
 						break;
 					case "CYP":
-						listRequired.add(PRC.ID_NO);
-						listRequired.add("NAME");
-						listRequired.add("DT_BIRTH_REG");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
@@ -182,9 +179,6 @@ public class WsPersonRegistry {
 						//listRequired.add("CITY");
 						break;
 					case "CYP":
-						listRequired.add(PRC.ID_NO);
-						listRequired.add("NAME");
-						listRequired.add("DT_BIRTH_REG");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
