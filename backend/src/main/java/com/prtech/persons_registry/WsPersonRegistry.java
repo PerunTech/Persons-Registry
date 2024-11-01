@@ -143,6 +143,11 @@ public class WsPersonRegistry {
 						//listRequired.add("MUNICIPALITY");
 						//listRequired.add("CITY");
 						break;
+					case "CYP":
+						listRequired.add(PRC.ID_NO);
+						listRequired.add("NAME");
+						listRequired.add("DT_BIRTH_REG");
+						break;
 					default:
 						listRequired.add(PRC.ID_NO);
 						listRequired.add("ADDRESS");
@@ -175,6 +180,11 @@ public class WsPersonRegistry {
 						listRequired.add("DT_BIRTH_REG");
 						//listRequired.add("MUNICIPALITY");
 						//listRequired.add("CITY");
+						break;
+					case "CYP":
+						listRequired.add(PRC.ID_NO);
+						listRequired.add("NAME");
+						listRequired.add("DT_BIRTH_REG");
 						break;
 					default:
 						listRequired.add(PRC.ID_NO);
