@@ -650,7 +650,7 @@ public class DbInit implements IDbInit {
 		dbe.setDbSchema(CONST_DEFAULT_SCHEMA);
 		dbe.setIsSystemTable(false);
 		dbe.setIsRepoTable(false);
-		dbe.setLabel_code("master_repo.nuts_territories");
+		dbe.setLabel_code("nuts_territories.general");
 		dbe.setUse_cache(false);
 
 		DbDataField dbe1 = new DbDataField();
@@ -710,7 +710,7 @@ public class DbInit implements IDbInit {
 		dbe7.setLabel_code("nuts_territories.lau2");
 		dbe7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
-		DbDataField[] dbTableFields = new DbDataField[13];
+		DbDataField[] dbTableFields = new DbDataField[7];
 		dbTableFields[0] = dbe1;
 		dbTableFields[1] = dbe2;
 		dbTableFields[2] = dbe3;
