@@ -25,6 +25,7 @@ after_script:
     - git reset --hard HEAD
     - rm -rf node_modules
     - pnpm install
+    - pnpm run test
     - pnpm run build
 
 1_build_test_java:
