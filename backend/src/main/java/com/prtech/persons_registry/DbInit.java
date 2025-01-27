@@ -642,6 +642,86 @@ public class DbInit implements IDbInit {
 		dbe.setDbTableFields(dbTableFields);
 		return dbe;
 	}
+	
+	private static DbDataTable createNutsTerritories() {
+		DbDataTable dbe = new DbDataTable();
+		dbe.setDbTableName("NUTS_TERRITORIES");
+		dbe.setDbRepoName(CONST_MASTER_REPO);
+		dbe.setDbSchema(CONST_DEFAULT_SCHEMA);
+		dbe.setIsSystemTable(false);
+		dbe.setIsRepoTable(false);
+		dbe.setLabel_code("master_repo.nuts_territories");
+		dbe.setUse_cache(false);
+
+		DbDataField dbe1 = new DbDataField();
+		dbe1.setDbFieldName("PKID");
+		dbe1.setIsPrimaryKey(true);
+		dbe1.setDbFieldType(DbFieldType.NUMERIC);
+		dbe1.setDbFieldSize(18);
+		dbe1.setDbFieldScale(0);
+		dbe1.setIsNull(false);
+		dbe1.setLabel_code("master_repo.pkid");
+
+		DbDataField dbe2 = new DbDataField();
+		dbe2.setDbFieldName("code");
+		dbe2.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe2.setDbFieldSize(18);
+		dbe2.setIsNull(true);
+		dbe2.setLabel_code("nuts_territories.code");
+		dbe2.setGui_metadata(CONST_GUI_FIL_HIDE);
+
+		DbDataField dbe3 = new DbDataField();
+		dbe3.setDbFieldName("NUTS1");
+		dbe3.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe3.setDbFieldSize(50);
+		dbe3.setIsNull(true);
+		dbe3.setLabel_code("nuts_territories.nuts1");
+		dbe3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+
+		DbDataField dbe4 = new DbDataField();
+		dbe4.setDbFieldName("NUTS2");
+		dbe4.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe4.setDbFieldSize(50);
+		dbe4.setIsNull(true);
+		dbe4.setLabel_code("nuts_territories.nuts2");
+		dbe4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+
+		DbDataField dbe5 = new DbDataField();
+		dbe5.setDbFieldName("NUTS3");
+		dbe5.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe5.setDbFieldSize(50);
+		dbe5.setIsNull(true);
+		dbe5.setLabel_code("nuts_territories.nuts3");
+		dbe5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe6 = new DbDataField();
+		dbe6.setDbFieldName("LAU1");
+		dbe6.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe6.setDbFieldSize(50);
+		dbe6.setIsNull(true);
+		dbe6.setLabel_code("nuts_territories.lau1");
+		dbe6.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField dbe7 = new DbDataField();
+		dbe7.setDbFieldName("LAU2");
+		dbe7.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe7.setDbFieldSize(50);
+		dbe7.setIsNull(true);
+		dbe7.setLabel_code("nuts_territories.lau2");
+		dbe7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		
+		DbDataField[] dbTableFields = new DbDataField[13];
+		dbTableFields[0] = dbe1;
+		dbTableFields[1] = dbe2;
+		dbTableFields[2] = dbe3;
+		dbTableFields[3] = dbe4;
+		dbTableFields[4] = dbe5;
+		dbTableFields[5] = dbe6;
+		dbTableFields[6] = dbe7;
+		dbe.setDbTableFields(dbTableFields);
+		return dbe;
+	}
+
 
 	private static DbDataTable createBankAcc() {
 
@@ -997,6 +1077,8 @@ public class DbInit implements IDbInit {
 		dbtt = mkAddressDict();
 		dbtList.add(addSortOrder(dbtt));
 		dbtt = address();
+		dbtList.add(addSortOrder(dbtt));
+		dbtt = createNutsTerritories();
 		dbtList.add(addSortOrder(dbtt));
 		dbtt = createBankAcc();
 		dbtList.add(addSortOrder(dbtt));
