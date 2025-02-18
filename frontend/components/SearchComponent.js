@@ -60,7 +60,7 @@ export const searchRender = (searchComponent, context, wrapper) => {
     hideBtns={'closeAndDelete'}
     customSave={true}
     customSaveButtonName={labelsManager.importLabel('search', 'persons_registry', context)}
-    className={`form-test person-registry-forms`}
+    className={`form-test person-registry-forms admin-console-search-from`}
     inputWrapper={InputWrapper}
   />
 }
