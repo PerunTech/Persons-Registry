@@ -235,7 +235,7 @@ public class WsPersonRegistry {
 							for (Map.Entry<String, JsonElement> entry1 : entry.getValue().getAsJsonObject()
 									.entrySet()) {
 								if (!entry1.getKey().equalsIgnoreCase("DT_DEATH")
-										&& !entry1.getKey().equalsIgnoreCase("PLACE_OF_BIRTH")
+										&& (defaultCountry.equals("CYP") || !entry1.getKey().equalsIgnoreCase("PLACE_OF_BIRTH"))
 										&& !entry1.getKey().equalsIgnoreCase("STATE_OF_BIRTH")) {
 									properties.add(entry1.getKey(), entry1.getValue());
 								}
