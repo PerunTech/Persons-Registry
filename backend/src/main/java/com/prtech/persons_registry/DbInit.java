@@ -1064,6 +1064,18 @@ public class DbInit implements IDbInit {
 		return dbLink;
 	}
 
+	// LINK_POA_ORG_UNIT_NUTS_TERRITORIES
+	private static DbDataObject createLinkOrgUnitTerritory() {
+			DbDataObject dbLink = new DbDataObject();
+			dbLink.setObjectType(svCONST.OBJECT_TYPE_LINK_TYPE);
+			dbLink.setVal("LINK_TYPE", "POA");
+			dbLink.setVal("DEFER_SECURITY", true);
+			dbLink.setVal("LINK_TYPE_DESCRIPTION", "link between ORG_UNITS and NUTS_TERRITORIES");
+			dbLink.setVal("LINK_OBJ_TYPE_1", ("ORG_UNITS"));
+			dbLink.setVal("LINK_OBJ_TYPE_2", ("NUTS_TERRITORIES"));
+			return dbLink;
+	}
+
 	@Override
 	public ArrayList<DbDataTable> getCustomObjectTypes() {
 		DbDataTable dbtt = null;
@@ -1124,6 +1136,8 @@ public class DbInit implements IDbInit {
 		dbio = createLinkLegalSubsidiary();
 		dbiList.add(dbio);
 		dbio = createPoaLinkUserPerson();
+		dbiList.add(dbio);
+		dbio = createLinkOrgUnitTerritory();
 		dbiList.add(dbio);
 
 		return dbiList;
