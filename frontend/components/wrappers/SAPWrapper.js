@@ -57,7 +57,7 @@ const SAPWrapper = (props, context) => {
             }
             axios({
                 method: "post",
-                data: formData,
+                data: JSON.stringify(formData),
                 url: window.server + `/ReactElements/searchTable/${props.svSession}/PERSON/1000`,
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
             }).then(res => {
@@ -125,7 +125,7 @@ const SAPWrapper = (props, context) => {
             axios({
                 method: 'post',
                 url: url,
-                data: params,
+                data: JSON.stringify(params),
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })
                 .then(res => {

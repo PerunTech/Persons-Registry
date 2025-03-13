@@ -103,7 +103,7 @@ const CustomButtons = (props, context) => {
                         data['linkType'] = props.selectedGridRows[0]['LINK_TYPE']
                         axios({
                             method: "post",
-                            data,
+                            data: JSON.stringify(data),
                             url: saveUrl,
                             headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         }).then(res => {
@@ -271,7 +271,7 @@ const CustomButtons = (props, context) => {
             const url = `${window.server}${wsPath}`
             axios({
                 method: "post",
-                data: formData,
+                data: JSON.stringify(formData),
                 url,
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
             }).then(res => {
@@ -302,7 +302,7 @@ const CustomButtons = (props, context) => {
         let url = window.server + `/ReactElements/deleteObject/${svSession}`;
         axios({
             method: "post",
-            data: formData[4]["PARAM_VALUE"],
+            data: JSON.stringify(formData[4]["PARAM_VALUE"]),
             url: url,
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }).then((res) => {

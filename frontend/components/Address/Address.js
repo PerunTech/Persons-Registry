@@ -134,7 +134,7 @@ const Address = (props, context) => {
         setLoading(true)
         axios({
             method: "post",
-            data: form_params,
+            data: JSON.stringify(form_params),
             url: restUrl,
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
         })
@@ -171,7 +171,7 @@ const Address = (props, context) => {
         let url = window.server + `/ReactElements/deleteObject/${svSession}`;
         axios({
             method: "post",
-            data: formData,
+            data: JSON.stringify(formData),
             url: url,
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
         })
