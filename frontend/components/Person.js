@@ -1,5 +1,5 @@
 import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory, Loading } from 'perun-core'
-const { ReactBootstrap, alertUser } = elements
+const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements
 import { iconManager } from '../assets/svg/svgHolder'
 import { labelsManager } from '../utils/LabelsExport'
 import { searchComponent, searchRender, searchResult } from './SearchComponent'
@@ -32,7 +32,11 @@ class Person extends React.Component {
   callBack = (formData) => {
     let th1s = this
     if (formData == 'inside_error') {
-      alertUser(true, 'info', labelsManager.importLabel('empty_field', p_r, th1s.context), labelsManager.importLabel('please_enter_filter', p_r, th1s.context))
+      alertUserV2({
+        type: 'info',
+        title: labelsManager.importLabel('empty_field', p_r, th1s.context),
+        message: labelsManager.importLabel('please_enter_filter', p_r, th1s.context)
+      })
       th1s.setState({ showPersonsGrid: false })
     } else {
       let name, taxNo, idNo
@@ -88,6 +92,7 @@ class Person extends React.Component {
   }
 
   savePerson = (formData) => {
+    let onConfirm = () => this.resetRegisterPersonFormSaveState()
     let form_params = formData.formData
     let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
     const nameP = `${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
@@ -111,24 +116,18 @@ class Person extends React.Component {
       url: restUrl,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).then((response) => {
-      if (response.data) {
-        if (response.data.type === 'ERROR' && response.data.title === 'Невалидна сесија') {
-          alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message)
-          logOut()
-        } else {
-          alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.resetRegisterPersonFormSaveState())
-          if (response.data.type === 'SUCCESS') {
-            this.setState({ selectedPersonType: '', objectId: '' })
-            this.closeModalFn()
-            alertUser(true, response.data.type.toLowerCase(), response.data.title, response.data.message, () => this.redirectPerson(response.data, personType, name))
-          }
+      if (response?.data) {
+        const resType = response.data?.type?.toLowerCase() || 'info'
+        if (resType === 'success') {
+          this.setState({ selectedPersonType: '', objectId: '' })
+          this.closeModalFn()
+          onConfirm = () => this.redirectPerson(response.data, personType, name)
         }
+        alertUserResponse({ response: response.data, onConfirm })
       }
     }).catch((err) => {
       console.error(err)
-      const title = err.response?.data?.title || err
-      const msg = err.response?.data?.message || ''
-      alertUser(true, 'error', title, msg, () => this.resetRegisterPersonFormSaveState());
+      alertUserResponse({ response: err, onConfirm })
     })
   }
 
