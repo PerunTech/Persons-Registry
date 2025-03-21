@@ -8,7 +8,7 @@ import {
     GenericGrid,
     GridManager
 } from "perun-core";
-const { alertUser, Dropdown } = elements
+const { alertUserResponse, alertUserV2, Dropdown } = elements
 const { useState, useEffect } = React;
 const { ReactBootstrap } = elements;
 const { Modal } = ReactBootstrap;
@@ -68,17 +68,15 @@ const SAPWrapper = (props, context) => {
                 }
             }).catch(err => {
                 console.error(err)
-                const title = err.response?.data?.title || err
-                const msg = err.response?.data?.message || ''
-                alertUser(true, "error", title, msg);
+                alertUserResponse({ response: err })
             });
         } else {
-            alertUser(true, 'info', labelsManager.importLabel('search_value', 'persons_registry', context), '', () => {
-                ComponentManager.setStateForComponent(props.formid, null, { saveExecuted: false })
-
+            alertUserV2({
+                type: 'info',
+                title: labelsManager.importLabel('search_value', 'persons_registry', context),
+                onConfirm: () => ComponentManager.setStateForComponent(props.formid, null, { saveExecuted: false }),
             })
         }
-
     };
 
     const onRowClick = (_id, _rowIdx, row) => {
@@ -104,16 +102,22 @@ const SAPWrapper = (props, context) => {
                             options={res.data.data}
                         />
                     </div>
-                    <button className="authorizedperson-dd-submit btn-success btn_save_form" type='button' onClick={() =>
-                        alertUser(true, 'info', labelsManager.importLabel('confirm_btn_action', 'persons_registry', context), '', () => { saveAuthPerson(obj) }, () => { }, true, labelsManager.importLabel('yes', 'persons_registry', context), labelsManager.importLabel('no', 'persons_registry', context))}>{labelsManager.importLabel('save', 'persons_registry', context)}</button></div >)
+                    <button className="authorizedperson-dd-submit btn-success btn_save_form" type='button' onClick={() => {
+                        alertUserV2({
+                            type: 'info',
+                            title: labelsManager.importLabel('confirm_btn_action', 'persons_registry', context),
+                            onConfirm: () => saveAuthPerson(obj),
+                            confirmButtonText: labelsManager.importLabel('yes', 'persons_registry', context),
+                            showCancel: true,
+                            cancelButtonText: labelsManager.importLabel('no', 'persons_registry', context)
+                        })
+                    }}>{labelsManager.importLabel('save', 'persons_registry', context)}</button></div >)
                 setDD(showDropdown)
                 setGridFlag(false)
             }
         }).catch(err => {
             console.error(err)
-            const title = err.response?.data?.title || err
-            const msg = err.response?.data?.message || ''
-            alertUser(true, "error", title, msg, () => resetFormSaveState());
+            alertUserResponse({ response: err })
         });
     }
 
@@ -127,18 +131,20 @@ const SAPWrapper = (props, context) => {
                 url: url,
                 data: JSON.stringify(params),
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
-                .then(res => {
-                    alertUser(true, res.data.type.toLowerCase(), res.data.message, res.data.title, () => resetFunc())
-                })
-                .catch(err => {
-                    console.error(err)
-                    const title = err.response?.data?.title || err
-                    const msg = err.response?.data?.message || ''
-                    alertUser(true, "error", title, msg);
-                });
+            }).then(res => {
+                if (res?.data) {
+                    alertUserResponse({ response: res.data, onConfirm: resetFunc })
+                }
+            }).catch(err => {
+                console.error(err)
+                alertUserResponse({ response: err })
+            });
         } else {
-            alertUser(true, 'info', labelsManager.importLabel('missing_dd_value', 'person-registry', context), labelsManager.importLabel('please_choose_dd', 'person-registry', context))
+            alertUserV2({
+                type: 'info',
+                title: labelsManager.importLabel('missing_dd_value', 'person-registry', context),
+                message: labelsManager.importLabel('please_choose_dd', 'person-registry', context)
+            })
         }
     }
 

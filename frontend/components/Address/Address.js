@@ -12,7 +12,7 @@ import {
     validator
 } from 'perun-core'
 import style from "./address.module.css"
-const { ReactBootstrap, alertUser } = elements;
+const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
 import { labelsManager } from '../../utils/LabelsExport'
@@ -57,19 +57,13 @@ const Address = (props, context) => {
                 setShow(true)
             }).catch(err => {
                 console.error(err)
-                const title = err.response?.data?.title || err
-                const msg = err.response?.data?.message || ''
-                alertUser(true, "error", title, msg);
-
                 setLoading(false)
+                alertUserResponse({ response: err })
             })
         }).catch(err => {
             console.error(err)
-            const title = err.response?.data?.title || err
-            const msg = err.response?.data?.message || ''
-            alertUser(true, "error", title, msg);
-
             setLoading(false)
+            alertUserResponse({ response: err })
         })
         let id = row?.['ADDRESS.OBJECT_ID'] || 0
 
@@ -82,13 +76,9 @@ const Address = (props, context) => {
             }
         }).catch(err => {
             console.error(err)
-            const title = err.response?.data?.title || err
-            const msg = err.response?.data?.message || ''
-            alertUser(true, "error", title, msg);
-
             setLoading(false)
+            alertUserResponse({ response: err })
         })
-
     };
 
     const generateNewDependentForm = (data) => {
@@ -124,12 +114,7 @@ const Address = (props, context) => {
     }
 
     const saveAddress = (e) => {
-        let restUrl =
-            window.server +
-            "/ReactElements/createTableRecordFormData/" +
-            props.svSession +
-            "/ADDRESS/" +
-            props.personObjId
+        let restUrl = window.server + "/ReactElements/createTableRecordFormData/" + props.svSession + "/ADDRESS/" + props.personObjId
         let form_params = e.formData;
         setLoading(true)
         axios({
@@ -137,28 +122,21 @@ const Address = (props, context) => {
             data: JSON.stringify(form_params),
             url: restUrl,
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        })
-            .then(res => {
-                if (res.data) {
-                    const resType = res.data.type.toLowerCase()
-                    const title = res.data.title || ''
-                    const msg = res.data.message || ''
-                    alertUser(true, resType, title, msg, () => {
+        }).then(res => {
+            if (res?.data) {
+                alertUserResponse({
+                    response: res.data, onConfirm: () => {
                         GridManager.reloadGridData("ADDRESS_GRID" + props.personObjId)
                         setShow(false)
                         setLoading(false)
                     }
-                    );
-                }
-            })
-            .catch(err => {
-                console.error(err)
-                const title = err.response?.data?.title || err
-                const msg = err.response?.data?.message || ''
-                alertUser(true, "error", title, msg);
-                setLoading(false)
-
-            });
+                })
+            }
+        }).catch(err => {
+            console.error(err)
+            setLoading(false)
+            alertUserResponse({ response: err })
+        });
     };
 
     const handleRowClick = (_id, _rowIdx, row) => {
@@ -174,22 +152,19 @@ const Address = (props, context) => {
             data: JSON.stringify(formData),
             url: url,
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        })
-            .then((res) => {
-                if (res.data) {
-                    alertUser(true, res.data.type.toLowerCase(), res.data.title, res.data.message, () => {
+        }).then((res) => {
+            if (res?.data) {
+                alertUserResponse({
+                    response: res.data, onConfirm: () => {
                         GridManager.reloadGridData('ADDRESS_GRID' + props.personObjId)
                         setShow(false);
-                    });
-                }
-            })
-            .catch(err => {
-                console.error(err)
-                const title = err.response?.data?.title || err
-                const msg = err.response?.data?.message || ''
-                alertUser(true, "error", title, msg);
-
-            });
+                    }
+                })
+            }
+        }).catch(err => {
+            console.error(err)
+            alertUserResponse({ response: err })
+        });
     };
     const onFieldChange = (name, _formData) => {
         changeField = name
@@ -251,11 +226,26 @@ const Address = (props, context) => {
                         >
                             <></>
                             <div className={style['person-registry-btn-holder']} >
-                                {deleteBtn && <button onClick={() => alertUser(true, 'warning', labelsManager.importLabel('delete_record_prompt_title', 'main', context), labelsManager.importLabel('delete_record_prompt_message', 'main', context), () => { deleteFunc(formData) }, () => { }, true, labelsManager.importLabel('yes', 'admin_console', context), labelsManager.importLabel('no', 'admin_console', context))
-                                } className='btn-danger btn_delete_form' type='button'>{labelsManager.importLabel(
-                                    "delete",
-                                    "persons_registry", context
-                                )}</button>}
+                                {deleteBtn && (
+                                    <button
+                                        type='button'
+                                        className='btn-danger btn_delete_form'
+                                        onClick={() => {
+                                            alertUserV2({
+                                                type: 'wanring',
+                                                title: labelsManager.importLabel('delete_record_prompt_title', 'main', context),
+                                                message: labelsManager.importLabel('delete_record_prompt_message', 'main', context),
+                                                confirmButtonText: labelsManager.importLabel('yes', 'admin_console', context),
+                                                confirmButtonColor: '#8d230f',
+                                                onConfirm: () => deleteFunc(formData),
+                                                showCancel: true,
+                                                cancelcancelButtonText: labelsManager.importLabel('no', 'admin_console', context)
+                                            })
+                                        }}
+                                    >
+                                        {labelsManager.importLabel("delete", "persons_registry", context)}
+                                    </button>
+                                )}
                                 <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel(
                                     "add_address",
                                     "persons_registry", context

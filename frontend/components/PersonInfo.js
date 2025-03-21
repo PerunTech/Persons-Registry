@@ -1,8 +1,7 @@
-import { React, axios, connect, Loading, ComponentManager, GenericForm, PropTypes, elements, Modal, createHashHistory } from 'perun-core'
-const { alertUser } = elements
+import { React, axios, connect, Loading, PropTypes, elements, createHashHistory } from 'perun-core'
+const { alertUserResponse } = elements
 const { useEffect, useState } = React
 import { iconManager } from '../assets/svg/svgHolder'
-import style from '../assets/style/registration.module.css'
 import CustomButtons from './CustomButtons'
 import { labelsManager } from '../utils/LabelsExport'
 let hashHistory = createHashHistory();
@@ -24,9 +23,7 @@ const PersonInfo = (props, context) => {
         }).catch(err => {
             setLoading(false)
             console.error(err)
-            const title = err.response?.data?.title || err
-            const msg = err.response?.data?.message || ''
-            alertUser(true, "error", title, msg);
+            alertUserResponse({ response: err })
         });
         getConfiguration()
     }, [])
@@ -52,9 +49,7 @@ const PersonInfo = (props, context) => {
         }).catch(err => {
             setLoading(false)
             console.error(err)
-            const title = err.response?.data?.title || err
-            const msg = err.response?.data?.message || ''
-            alertUser(true, "error", title, msg);
+            alertUserResponse({ response: err })
         });
     }
 
