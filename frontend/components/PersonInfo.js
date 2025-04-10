@@ -65,18 +65,22 @@ const PersonInfo = (props, context) => {
                         >
                             <span className={'dynamic-comp-icon-holder'}>{iconManager.getIcon(modifiedID)}</span><p>{el.label}</p>
                         </button>
-                        {el.data && <div className={el.ID === activeParent ? 'sub-menu-sub-item-active' : 'sub-menu-sub-item-hidden'}>
-                            {el.data.map(sub => {
-                                modifiedID = sub.ID.replace(/\d/g, '').replace(/_$/, '')
-                                return < button
-                                    className={`btn_sub ${activeChild === sub.ID && 'pr-active-tab'}`
-                                    }
-                                    onClick={() => (onButtonClick(sub, true))}
-                                >
-                                    <span className={'dynamic-comp-icon-holder'}>{iconManager.getIcon(modifiedID)}</span><p>{sub.label}</p>
-                                </button>
-                            })}
-                        </div >}
+                        {el.data && (
+                            <div className={el.ID === activeParent ? 'sub-menu-sub-item-active' : 'sub-menu-sub-item-hidden'}>
+                                {el.data.map(sub => {
+                                    modifiedID = sub.ID.replace(/\d/g, '').replace(/_$/, '')
+                                    return (
+                                        <button
+                                            key={sub.ID}
+                                            className={`btn_sub ${activeChild === sub.ID && 'pr-active-tab'}`}
+                                            onClick={() => (onButtonClick(sub, true))}
+                                        >
+                                            <span className={'dynamic-comp-icon-holder'}>{iconManager.getIcon(modifiedID)}</span><p>{sub.label}</p>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </>
                 );
             });

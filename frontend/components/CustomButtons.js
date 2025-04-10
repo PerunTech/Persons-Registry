@@ -35,7 +35,7 @@ const CustomButtons = (props, context) => {
     const buildCustomBtnArr = (btnArray, multiSelect, maxLength) => {
         const div = <div className={`custom-btn-holder-${props.tableName.toLowerCase()}`}>
             {btnArray.map(el => (
-                <button id={el['ID']} className={`${props.tableName.toLowerCase()}-btn`} onClick={() => customBtnAction(el, multiSelect, maxLength)}>
+                <button key={el['ID']} id={el['ID']} className={`${props.tableName.toLowerCase()}-btn`} onClick={() => customBtnAction(el, multiSelect, maxLength)}>
                     {el['label']}
                 </button>
             ))}
@@ -95,7 +95,7 @@ const CustomButtons = (props, context) => {
                                 alertUserResponse({ response: err })
                             });
                             break;
-                        case 'deleteLink':
+                        case 'deleteLink': {
                             data = el['payLoad']
                             let grid = props.tableName === 'AUTHORIZED_PERSON' ? 'PERSON.OBJECT_ID' : `${props.tableName}.OBJECT_ID`
                             data['objectId2'] = Number(props.personObjId)
@@ -116,6 +116,7 @@ const CustomButtons = (props, context) => {
                             });
                             setLoading(false)
                             break;
+                        }
                         default:
                             break;
                     }

@@ -13,7 +13,7 @@ export function setInputFilter(input, inputFilter) {
         this.oldValue = this.value
         this.oldSelectionStart = this.selectionStart
         this.oldSelectionEnd = this.selectionEnd
-      } else if (this.hasOwnProperty('oldValue')) {
+      } else if (Object.prototype.hasOwnProperty.call(this, 'oldValue')) {
         this.value = this.oldValue
         this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd)
       } else {
@@ -22,6 +22,7 @@ export function setInputFilter(input, inputFilter) {
     })
   })
 }
+
 export const getDynamicKey = () => {
   return (+ new Date() + Math.floor(Math.random() * 999999)).toString(36)
 }
