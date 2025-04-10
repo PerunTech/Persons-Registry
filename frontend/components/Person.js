@@ -112,7 +112,7 @@ class Person extends React.Component {
     let restUrl = window.server + '/SvPersonRegistry/savePerson/' + this.props.svSession
     axios({
       method: 'post',
-      data: JSON.stringify(form_params),
+      data: encodeURIComponent(JSON.stringify(form_params)),
       url: restUrl,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).then((response) => {
