@@ -16,7 +16,7 @@ export function axiosCall(urlArr, session, hasCallback, methodType, form_params)
     for (let i = 0; i < urlArr.length; i++) {
       axios({
         method: methodType,
-        data: form_params ? JSON.stringify(form_params) : null,
+        data: form_params ? encodeURIComponent(JSON.stringify(form_params)) : null,
         url: urlArr[i],
         headers: methodType === 'get' ? null : { 'Content-Type': 'application/x-www-form-urlencoded' }
       }).then(function (response) {
