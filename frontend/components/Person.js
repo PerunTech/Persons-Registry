@@ -91,45 +91,57 @@ class Person extends React.Component {
     ComponentManager.setStateForComponent('REGISTER_PERSON_FORM', null, { saveExecuted: false })
   }
 
-  savePerson = (formData) => {
-    let onConfirm = () => this.resetRegisterPersonFormSaveState()
-    let form_params = formData.formData
-    let personType = form_params.PERSON_TYPE || this.state.selectedPersonType
-    const nameP = `${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase()
-    const nameG = `${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase()
+  savePerson = async (formData) => {
+    let onConfirm = () => this.resetRegisterPersonFormSaveState();
+    let form_params = formData;
+
+    const personType = form_params.PERSON_TYPE || this.state.selectedPersonType;
+    const nameP = `${form_params.FIRST_NAME}/${form_params.LAST_NAME}`.toUpperCase();
+    const nameG = `${form_params.SHORT_NAME}/${form_params.NAME}`.toUpperCase();
     const name = personType === 'P' ? nameP : nameG;
+
     if (!form_params.PERSON_TYPE) {
-      form_params.PERSON_TYPE = this.state.selectedPersonType
+      form_params.PERSON_TYPE = this.state.selectedPersonType;
     }
     if (form_params.FIRST_NAME && form_params.LAST_NAME) {
-      form_params.FIRST_NAME = form_params.FIRST_NAME?.toUpperCase()
-      form_params.LAST_NAME = form_params.LAST_NAME?.toUpperCase()
+      form_params.FIRST_NAME = form_params.FIRST_NAME?.toUpperCase();
+      form_params.LAST_NAME = form_params.LAST_NAME?.toUpperCase();
     }
     if (form_params.NAME) {
-      form_params.NAME = form_params.NAME?.toUpperCase()
+      form_params.NAME = form_params.NAME?.toUpperCase();
     }
 
-    let restUrl = window.server + '/SvPersonRegistry/savePerson/' + this.props.svSession
-    axios({
-      method: 'post',
-      data: encodeURIComponent(JSON.stringify(form_params)),
-      url: restUrl,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    }).then((response) => {
+    const url = `${window.server}/SvPersonRegistry/savePerson/${this.props.svSession}`;
+
+    try {
+      const response = await axios({
+        method: 'post',
+        data: encodeURIComponent(JSON.stringify(form_params)),
+        url,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
       if (response?.data) {
-        const resType = response.data?.type?.toLowerCase() || 'info'
+        const resType = response.data?.type?.toLowerCase() || 'info';
+
         if (resType === 'success') {
-          this.setState({ selectedPersonType: '', objectId: '' })
-          this.closeModalFn()
-          onConfirm = () => this.redirectPerson(response.data, personType, name)
+          const objectId = response.data.data?.OBJECT_ID;
+          onConfirm = () => this.redirectPerson(response.data, personType, name);
+          alertUserResponse({ response: response.data, onConfirm });
+
+          return objectId;
         }
-        alertUserResponse({ response: response.data, onConfirm })
+
+        alertUserResponse({ response: response.data, onConfirm });
       }
-    }).catch((err) => {
-      console.error(err)
-      alertUserResponse({ response: err, onConfirm })
-    })
-  }
+
+      return null;
+    } catch (err) {
+      console.error(err);
+      alertUserResponse({ response: err, onConfirm });
+      return null;
+    }
+  };
 
   redirectPerson = (formParams, personType, name) => {
     const objectId = formParams.data.OBJECT_ID || formParams.data.object_id
@@ -153,6 +165,7 @@ class Person extends React.Component {
         hideBtns={'closeAndDelete'}
         className={'form-test person-registry-forms person-registration-form'}
         inputWrapper={PersonIdNoFieldFormWrapper}
+        isAddForm={true}
       />
     )
 
