@@ -163,7 +163,7 @@ class Person extends React.Component {
         tableFormDataMethod={`/SvPersonRegistry/getPerson/${this.props.svSession}/0/${personType}`}
         addSaveFunction={this.savePerson}
         hideBtns={'closeAndDelete'}
-        className={'form-test person-registry-forms person-registration-form-initial'}
+        className={'form-test person-registry-forms person-registration-form-initial aims-forms'}
         inputWrapper={PersonIdNoFieldFormWrapper}
         isAddForm={true}
       />
