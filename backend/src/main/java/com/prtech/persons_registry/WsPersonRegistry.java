@@ -388,6 +388,7 @@ public class WsPersonRegistry {
 			WsReactElements re = new WsReactElements();
 			Gson gson = new Gson();
 			JsonObject jsonData = gson.fromJson(jsonObjString, JsonObject.class);
+			List<String> errors = new ArrayList<>();
 
 			if (jsonData.has("PERSON_TYPE") && jsonData.has("ID_NO")) {
 				DbDataArray people = new Reader().searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL,
@@ -402,48 +403,144 @@ public class WsPersonRegistry {
 						(!people.isEmpty() && jsonData.has("PERSON_OBJECT_ID") && 
 						people.getItems().get(0).getObjectId().compareTo(jsonData.get("PERSON_OBJECT_ID").getAsLong()) == 0)) {
 					jsonData.addProperty("tableName", PRC.PERSON);
-					DbDataObject vdataObject = re.prepareObjectToSave(jsonData, 0L, svr);
-
-					String tableName = jsonData.get("PERSON_TYPE").getAsString().equalsIgnoreCase("g")
-							? PRC.LEGAL_ENTITY
-							: PRC.PHYSICAL_ENTITY;
-					if (tableName.equals(PRC.PHYSICAL_ENTITY)) {
-						vdataObject.setVal("NAME", jsonData.get("FIRST_NAME").getAsString() + " "
-								+ jsonData.get("LAST_NAME").getAsString());
-					}
-					svw.saveObject(vdataObject, false);
 					
-					jsonData.addProperty("tableName", tableName);
-					if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
-							&& jsonData.has(tableName + "." + Rc.PKID)) {
-						jsonData.addProperty(Rc.OBJECT_TYPE,
-								jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
-						jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
-						jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
+					errors = checkValidMandatoryFields(jsonData, jsonData.get("PERSON_TYPE").getAsString(), SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase(), svr.getUserLocaleId(svr.getInstanceUser()));
+					
+					if (errors!= null && !errors.isEmpty()) {
+						jrh.create(MessageType.ERROR, I18n.getText("error.save_person"), errors.toString(),
+								new JsonObject());
 					}
-					vdataObject = re.prepareObjectToSave(jsonData, vdataObject.getObjectId(), svr);
-
-					svw.saveObject(vdataObject, false);
-					vdataObject.setVal("PERSON_OBJECT_ID", vdataObject.getParentId());
-					svw.dbCommit();
-
-					JsonObject responseJsonObject = prepareOutput(vdataObject, tableName, svr);
-
-					jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
-							I18n.getText("perrun.success.save"), responseJsonObject);
+					else {
+					
+						DbDataObject vdataObject = re.prepareObjectToSave(jsonData, 0L, svr);
+						String tableName = jsonData.get("PERSON_TYPE").getAsString().equalsIgnoreCase("g")
+								? PRC.LEGAL_ENTITY
+								: PRC.PHYSICAL_ENTITY;
+						if (tableName.equals(PRC.PHYSICAL_ENTITY)) {
+							vdataObject.setVal("NAME", jsonData.get("FIRST_NAME").getAsString() + " "
+									+ jsonData.get("LAST_NAME").getAsString());
+						}
+						svw.saveObject(vdataObject, false);
+						
+						jsonData.addProperty("tableName", tableName);
+						if (jsonData.has(tableName + "." + Rc.OBJECT_TYPE) && jsonData.has(tableName + "." + Rc.OBJECT_ID)
+								&& jsonData.has(tableName + "." + Rc.PKID)) {
+							jsonData.addProperty(Rc.OBJECT_TYPE,
+									jsonData.get(tableName + "." + Rc.OBJECT_TYPE).getAsLong());
+							jsonData.addProperty(Rc.OBJECT_ID, jsonData.get(tableName + "." + Rc.OBJECT_ID).getAsLong());
+							jsonData.addProperty(Rc.PKID, jsonData.get(tableName + "." + Rc.PKID).getAsLong());
+						}
+						vdataObject = re.prepareObjectToSave(jsonData, vdataObject.getObjectId(), svr);
+	
+						svw.saveObject(vdataObject, false);
+						vdataObject.setVal("PERSON_OBJECT_ID", vdataObject.getParentId());
+						svw.dbCommit();
+	
+						JsonObject responseJsonObject = prepareOutput(vdataObject, tableName, svr);
+	
+						jrh.create(MessageType.SUCCESS, I18n.getText("perrun.success.save"),
+								null, responseJsonObject);
+					}
 
 				} else {
 					jrh.create(MessageType.WARNING, I18n.getText("warning_message"),
 							I18n.getText("warning.person_id_no_exist"), jsonData);
 				}
 			} else {
-				jrh.create(MessageType.WARNING, I18n.getText("perrun.bad_data.save"),
-						I18n.getText("perrun.bad_data.save"), new JsonObject());
+				jrh.create(MessageType.ERROR, I18n.getText("error.save_person"), errors.toString(),
+						new JsonObject());
 			}
-		} catch (SvException e) {
+		} catch (Exception e) {
 			return handleException(e, jrh, "Error saving person");
 		}
 		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
+	
+	protected List<String> checkValidMandatoryFields(JsonObject jsonData, String personType, String defaultCountry, String locale) throws Exception {
+		List<String> errors = new ArrayList<>();
+		for (String field : getMandatoryFieldsPerson(personType, defaultCountry)) {
+			if (jsonData.get(field) == null) {
+				errors.add(getTranslatedLabel(locale, field));
+			}
+		}
+		if (!errors.isEmpty()) {
+			List<String> list = new ArrayList<>();
+			list.add("Fields: " + String.join(", ", errors) + " are required!");
+			return list;
+		} else
+			return errors;
+	}
+	
+	protected String getTranslatedLabel(String locale, String field) {
+        DbDataObject fieldObj = SvReader.getFieldByName(PRC.PERSON, field);
+        if (fieldObj != null) fieldObj = SvReader.getFieldByName(PRC.PHYSICAL_ENTITY, field);
+        if (fieldObj != null) fieldObj = SvReader.getFieldByName(PRC.LEGAL_ENTITY, field);
+        if (fieldObj != null) {
+            Object labelObj = fieldObj.getVal("LABEL_CODE");
+            if (labelObj != null) {
+                String label = labelObj.toString();
+                String translatedLabel = I18n.getText(locale, label);
+                if (translatedLabel != null && !translatedLabel.isEmpty()) {
+                    return translatedLabel;
+                }
+            }
+        }
+        return field;
+    }
+	
+	private List<String> getMandatoryFieldsPerson(String personType, String defaultCountry) {
+		ArrayList<String> listRequired = new ArrayList<>();
+		if (personType.equalsIgnoreCase("p")) {
+			switch (defaultCountry) {
+			case "MDA":
+				listRequired.add(PRC.ID_NO);
+				listRequired.add("DT_BIRTH_REG");
+				break;
+			case "CYP":
+				listRequired.add(PRC.ID_NO);
+				listRequired.add("DT_BIRTH_REG");
+				listRequired.add("FIRST_NAME");
+				listRequired.add("LAST_NAME");
+				listRequired.add("GENDER");
+				listRequired.add("NATIONALITY");
+				listRequired.add("RESIDENCY_STATUS");
+				listRequired.add("EU_CITIZENSHIP");
+				break;
+			default:
+				listRequired.add(PRC.ID_NO);
+				listRequired.add("ADDRESS");
+				listRequired.add("DT_BIRTH_REG");
+				listRequired.add("COUNTRY_CODE");
+				listRequired.add("MUNICIPALITY");
+				listRequired.add("CITY_VILLAGE");
+				listRequired.add("CITY");
+			}
+		} else if (personType.equalsIgnoreCase("g")) {
+			switch (defaultCountry) {
+			case "MDA":
+				listRequired.add(PRC.ID_NO);
+				listRequired.add("NAME");
+				listRequired.add("DT_BIRTH_REG");
+				break;
+			case "CYP":
+				listRequired.add(PRC.ID_NO);
+				listRequired.add(PRC.TAX_NO);
+				listRequired.add("DT_BIRTH_REG");
+				listRequired.add("NAME");
+				break;
+			default:
+				listRequired.add(PRC.ID_NO);
+				listRequired.add(PRC.TAX_NO);
+				listRequired.add("NAME");
+				listRequired.add("ADDRESS");
+				listRequired.add("DT_BIRTH_REG");
+				listRequired.add("COUNTRY_CODE");
+				listRequired.add("MUNICIPALITY");
+				listRequired.add("CITY_VILLAGE");
+				listRequired.add("CITY");
+			}
+		}
+		return listRequired;
 	}
 
 	@Path("/getPerson/{sessionId}/{objectId}/{personType}")
