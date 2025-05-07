@@ -91,7 +91,7 @@ const PersonIdNoFieldFormWrapper = (props, context) => {
           uiSchemaConfigMethod={`/ReactElements/getTableUISchema/${props.svSession}/ADDRESS`}
           tableFormDataMethod={`/ReactElements/getTableFormData/${props.svSession}/0/ADDRESS`}
           addSaveFunction={(e) => saveMultipleForms(e.formData)}
-          customSaveButtonName={labelsManager.importLabel('search', 'persons_registry', context)}
+          customSaveButtonName={labelsManager.importLabel('save', 'persons_registry', context)}
           hideBtns={'closeAndDelete'}
           customSave={true}
         />}
