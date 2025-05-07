@@ -407,7 +407,7 @@ public class WsPersonRegistry {
 					errors = checkValidMandatoryFields(jsonData, jsonData.get("PERSON_TYPE").getAsString(), SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase(), svr.getUserLocaleId(svr.getInstanceUser()));
 					
 					if (errors!= null && !errors.isEmpty()) {
-						jrh.create(MessageType.ERROR, I18n.getText("error.save_person"), errors.toString(),
+						jrh.create(MessageType.ERROR, I18n.getText("error.missing_fields"), errors.toString(),
 								new JsonObject());
 					}
 					else {
@@ -449,7 +449,7 @@ public class WsPersonRegistry {
 			} else {
 				errors = checkValidMandatoryFields(jsonData, null, SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase(), svr.getUserLocaleId(svr.getInstanceUser()));
 				
-				jrh.create(MessageType.ERROR, I18n.getText("error.save_person"), errors.toString(),
+				jrh.create(MessageType.ERROR, I18n.getText("error.missing_fields"), errors.toString(),
 						new JsonObject());
 			}
 		} catch (Exception e) {
@@ -475,8 +475,8 @@ public class WsPersonRegistry {
 	
 	protected String getTranslatedLabel(String locale, String field) {
         DbDataObject fieldObj = SvReader.getFieldByName(PRC.PERSON, field);
-        if (fieldObj != null) fieldObj = SvReader.getFieldByName(PRC.PHYSICAL_ENTITY, field);
-        if (fieldObj != null) fieldObj = SvReader.getFieldByName(PRC.LEGAL_ENTITY, field);
+        if (fieldObj == null) fieldObj = SvReader.getFieldByName(PRC.PHYSICAL_ENTITY, field);
+        if (fieldObj == null) fieldObj = SvReader.getFieldByName(PRC.LEGAL_ENTITY, field);
         if (fieldObj != null) {
             Object labelObj = fieldObj.getVal("LABEL_CODE");
             if (labelObj != null) {
