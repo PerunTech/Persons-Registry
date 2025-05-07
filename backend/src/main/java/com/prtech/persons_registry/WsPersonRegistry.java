@@ -447,6 +447,8 @@ public class WsPersonRegistry {
 							I18n.getText("warning.person_id_no_exist"), jsonData);
 				}
 			} else {
+				errors = checkValidMandatoryFields(jsonData, null, SvParameter.getSysParam("DEFAULT_COUNTRY", "MKD").toUpperCase(), svr.getUserLocaleId(svr.getInstanceUser()));
+				
 				jrh.create(MessageType.ERROR, I18n.getText("error.save_person"), errors.toString(),
 						new JsonObject());
 			}
@@ -490,54 +492,60 @@ public class WsPersonRegistry {
 	
 	private List<String> getMandatoryFieldsPerson(String personType, String defaultCountry) {
 		ArrayList<String> listRequired = new ArrayList<>();
-		if (personType.equalsIgnoreCase("p")) {
-			switch (defaultCountry) {
-			case "MDA":
-				listRequired.add(PRC.ID_NO);
-				listRequired.add("DT_BIRTH_REG");
-				break;
-			case "CYP":
-				listRequired.add(PRC.ID_NO);
-				listRequired.add("DT_BIRTH_REG");
-				listRequired.add("FIRST_NAME");
-				listRequired.add("LAST_NAME");
-				listRequired.add("GENDER");
-				listRequired.add("NATIONALITY");
-				listRequired.add("RESIDENCY_STATUS");
-				listRequired.add("EU_CITIZENSHIP");
-				break;
-			default:
-				listRequired.add(PRC.ID_NO);
-				listRequired.add("ADDRESS");
-				listRequired.add("DT_BIRTH_REG");
-				listRequired.add("COUNTRY_CODE");
-				listRequired.add("MUNICIPALITY");
-				listRequired.add("CITY_VILLAGE");
-				listRequired.add("CITY");
-			}
-		} else if (personType.equalsIgnoreCase("g")) {
-			switch (defaultCountry) {
-			case "MDA":
-				listRequired.add(PRC.ID_NO);
-				listRequired.add("NAME");
-				listRequired.add("DT_BIRTH_REG");
-				break;
-			case "CYP":
-				listRequired.add(PRC.ID_NO);
-				listRequired.add(PRC.TAX_NO);
-				listRequired.add("DT_BIRTH_REG");
-				listRequired.add("NAME");
-				break;
-			default:
-				listRequired.add(PRC.ID_NO);
-				listRequired.add(PRC.TAX_NO);
-				listRequired.add("NAME");
-				listRequired.add("ADDRESS");
-				listRequired.add("DT_BIRTH_REG");
-				listRequired.add("COUNTRY_CODE");
-				listRequired.add("MUNICIPALITY");
-				listRequired.add("CITY_VILLAGE");
-				listRequired.add("CITY");
+		if (personType == null) {
+			listRequired.add(PRC.ID_NO);
+			listRequired.add("PERSON_TYPE");
+		}
+		else {
+			if (personType.equalsIgnoreCase("p")) {
+				switch (defaultCountry) {
+				case "MDA":
+					listRequired.add(PRC.ID_NO);
+					listRequired.add("DT_BIRTH_REG");
+					break;
+				case "CYP":
+					listRequired.add(PRC.ID_NO);
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("FIRST_NAME");
+					listRequired.add("LAST_NAME");
+					listRequired.add("GENDER");
+					listRequired.add("NATIONALITY");
+					listRequired.add("RESIDENCY_STATUS");
+					listRequired.add("EU_CITIZENSHIP");
+					break;
+				default:
+					listRequired.add(PRC.ID_NO);
+					listRequired.add("ADDRESS");
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("COUNTRY_CODE");
+					listRequired.add("MUNICIPALITY");
+					listRequired.add("CITY_VILLAGE");
+					listRequired.add("CITY");
+				}
+			} else if (personType.equalsIgnoreCase("g")) {
+				switch (defaultCountry) {
+				case "MDA":
+					listRequired.add(PRC.ID_NO);
+					listRequired.add("NAME");
+					listRequired.add("DT_BIRTH_REG");
+					break;
+				case "CYP":
+					listRequired.add(PRC.ID_NO);
+					listRequired.add(PRC.TAX_NO);
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("NAME");
+					break;
+				default:
+					listRequired.add(PRC.ID_NO);
+					listRequired.add(PRC.TAX_NO);
+					listRequired.add("NAME");
+					listRequired.add("ADDRESS");
+					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("COUNTRY_CODE");
+					listRequired.add("MUNICIPALITY");
+					listRequired.add("CITY_VILLAGE");
+					listRequired.add("CITY");
+				}
 			}
 		}
 		return listRequired;
