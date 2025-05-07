@@ -1001,6 +1001,8 @@ public class WsPersonRegistry {
 			responseJsonObject.addProperty("NAME", (String) person.getVal("NAME"));
 		if (person.getVal("DT_BIRTH_REG") != null)
 			responseJsonObject.addProperty("DT_BIRTH_REG", person.getVal("DT_BIRTH_REG").toString());
+		if (person.getVal("TAX_NO") != null)
+			responseJsonObject.addProperty("TAX_NO", (String) person.getVal("TAX_NO"));
 
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_ID, vdataObject.getObjectId());
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_TYPE, vdataObject.getObjectType());
