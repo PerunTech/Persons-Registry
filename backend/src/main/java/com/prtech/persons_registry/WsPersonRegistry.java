@@ -534,6 +534,7 @@ public class WsPersonRegistry {
 					listRequired.add(PRC.TAX_NO);
 					listRequired.add("DT_BIRTH_REG");
 					listRequired.add("NAME");
+					listRequired.add("SHORT_NAME");
 					break;
 				default:
 					listRequired.add(PRC.ID_NO);
