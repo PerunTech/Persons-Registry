@@ -5,7 +5,7 @@ import {
     ComponentManager,
     PropTypes,
     axios,
-    GenericGrid,
+    ExportableGrid,
     GridManager
 } from "perun-core";
 const { alertUserResponse, alertUserV2, Dropdown } = elements
@@ -170,7 +170,7 @@ const SAPWrapper = (props, context) => {
     }
 
     const generateGrid = () => {
-        let grid = <GenericGrid gridType={'SEARCH_GRID_DATA'} key={`AUTH_${personObjId}`}
+        let grid = <ExportableGrid gridType={'SEARCH_GRID_DATA'} key={`AUTH_${personObjId}`}
             id={`AUTH_${personObjId}`}
             configTableName={"/ReactElements/getTableFieldList/%session/PERSON"}
             dataTableName={formData}

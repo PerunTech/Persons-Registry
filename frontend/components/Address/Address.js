@@ -6,7 +6,7 @@ import {
     Loading,
     Form,
     elements,
-    GenericGrid,
+    ExportableGrid,
     GridManager,
     ComponentManager,
     validator
@@ -183,7 +183,7 @@ const Address = (props, context) => {
     return (
         <>{loading && <Loading />}
             <div>
-                <GenericGrid
+                <ExportableGrid
                     gridType={"READ_URL"}
                     key={"ADDRESS_GRID" + props.personObjId}
                     id={"ADDRESS_GRID" + props.personObjId}

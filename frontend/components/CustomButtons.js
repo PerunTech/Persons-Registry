@@ -1,4 +1,4 @@
-import { React, connect, axios, PropTypes, Loading, elements, GenericGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
+import { React, connect, axios, PropTypes, Loading, elements, ExportableGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
 import { getDynamicKey } from '../utils/utils'
 import { labelsManager } from '../utils/LabelsExport';
 import Address from './Address/Address'
@@ -138,7 +138,7 @@ const CustomButtons = (props, context) => {
         const grid = <div className={`${`custom-grid-container-${props.tableName.toLowerCase()}`}`}>
             {btnArray && buildCustomBtnArr(btnArray, multiSelect, maxLength)}
 
-            <GenericGrid
+            <ExportableGrid
                 gridType={"READ_URL"}
                 key={props.tableName + props.personObjId}
                 id={props.tableName + props.personObjId}

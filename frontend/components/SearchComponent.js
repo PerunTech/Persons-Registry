@@ -1,4 +1,4 @@
-import { React, GenericForm, GenericGrid, ComponentManager, GridManager } from 'perun-core'
+import { React, GenericForm, ExportableGrid, ComponentManager, GridManager } from 'perun-core'
 import { axiosCall } from '../utils/AxiosCalls'
 import { labelsManager } from '../utils/LabelsExport'
 
@@ -65,7 +65,7 @@ export const searchRender = (searchComponent, context, wrapper) => {
   />
 }
 /** 
-this function returns <GenericGrid/> element based on the data recieved from params
+this function returns <ExportableGrid/> element based on the data recieved from params
 @param {string} gridId
 @param {object} formData
 @param {function} onRowClick
@@ -74,7 +74,7 @@ this function returns <GenericGrid/> element based on the data recieved from par
 
 export const searchResult = (gridId, formData, onRowClick, customHeight) => {
   let dynamic_key = dynamicKey()
-  let grid = <GenericGrid gridType={'SEARCH_GRID_DATA'} key={gridId + dynamic_key}
+  let grid = <ExportableGrid gridType={'SEARCH_GRID_DATA'} key={gridId + dynamic_key}
     id={gridId + dynamic_key}
     configTableName={"/ReactElements/getTableFieldList/%session/PERSON"}
     dataTableName={formData}
