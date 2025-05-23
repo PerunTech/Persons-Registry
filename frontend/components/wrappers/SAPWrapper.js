@@ -176,7 +176,7 @@ const SAPWrapper = (props, context) => {
             dataTableName={formData}
             onRowClickFunct={onRowClick}
             defaultHeight={false}
-            heightRatio={0.58}
+            heightRatio={0.55}
         />
         return grid
     }

@@ -193,7 +193,7 @@ const Address = (props, context) => {
                     dataTableName={
                         `/ReactElements/getObjectsByParentId/${props.svSession}/${props.personObjId}/ADDRESS/100000`
                     }
-                    heightRatio={0.58}
+                    heightRatio={0.55}
                     onRowClickFunct={handleRowClick}
                     refreshData={true}
                     toggleCustomButton={true}

@@ -144,7 +144,7 @@ const CustomButtons = (props, context) => {
                 id={props.tableName + props.personObjId}
                 configTableName={configWs}
                 dataTableName={dataWs}
-                heightRatio={0.58}
+                heightRatio={0.55}
                 onRowClickFunct={props.configuration.objectConfiguration.disableRowClick ? () => { } : handleRowClick}
                 refreshData={() => reloadGrid(props.tableName + props.personObjId, multiSelect)}
                 toggleCustomButton={!props.configuration.objectConfiguration.readOnly}
