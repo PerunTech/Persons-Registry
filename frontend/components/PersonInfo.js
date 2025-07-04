@@ -1,9 +1,9 @@
-import { React, axios, connect, Loading, PropTypes, elements, createHashHistory } from 'perun-core'
+import { React, axios, connect, Loading, PropTypes, elements, utils, createHashHistory } from 'perun-core'
 const { alertUserResponse } = elements
 const { useEffect, useState } = React
 import { iconManager } from '../assets/svg/svgHolder'
 import CustomButtons from './CustomButtons'
-import { labelsManager } from '../utils/LabelsExport'
+const { labelsManager } = utils
 let hashHistory = createHashHistory();
 const PersonInfo = (props, context) => {
     const [configuration, setConfig] = useState([])
@@ -32,7 +32,6 @@ const PersonInfo = (props, context) => {
         let href = '/main/persons-registry'
         hashHistory.push(href)
     }
-
 
     const getConfiguration = () => {
         setLoading(true)
@@ -88,6 +87,7 @@ const PersonInfo = (props, context) => {
             return <></>;
         }
     }
+
     const setActive = (el) => {
         if (el.ID === activeParent) {
             setParent('')
@@ -112,6 +112,7 @@ const PersonInfo = (props, context) => {
             setLoading(false)
         }
     }
+
     const displayComponent = (tableName, configuration) => {
         let comp
         const customButtonsProps = {
@@ -132,8 +133,8 @@ const PersonInfo = (props, context) => {
             <div className='pr-background'>
                 <div className='pr-holder-info'>
                     <div className='pr-main-btn-holder'>
-                        <div className='pr-info-btn-holder'> <button id='back' type={'button'} onClick={() => redirectBack()} className='pr-btn-back'> {iconManager.getIcon('back')} {labelsManager.importLabel('back', 'persons_registry', context)} </button>
-                            <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager.importLabel('selected_user', 'persons_registry', context)} : <b>{props.match.params.name.replaceAll('_', ' ')}</b></p></div>
+                        <div className='pr-info-btn-holder'> <button id='back' type={'button'} onClick={() => redirectBack()} className='pr-btn-back'> {iconManager.getIcon('back')} {labelsManager('back', context, 'persons_registry')} </button>
+                            <div className='pr-selected-user'><p>{iconManager.getIcon('user')}{labelsManager('selected_user', context, 'persons_registry')} : <b>{props.match.params.name.replaceAll('_', ' ')}</b></p></div>
                         </div >
                         <div className='pr-btn-holder-info'>
                             <div className='pr-btn-container'>
@@ -147,12 +148,8 @@ const PersonInfo = (props, context) => {
                         </div>
                     </div>
                 </div>
-
             </div>
-
-
         </>
-
     )
 }
 

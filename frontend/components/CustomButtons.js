@@ -1,6 +1,5 @@
-import { React, connect, axios, PropTypes, Loading, elements, ExportableGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
-import { getDynamicKey } from '../utils/utils'
-import { labelsManager } from '../utils/LabelsExport';
+import { React, connect, axios, PropTypes, Loading, elements, utils, ExportableGrid, GridManager, ComponentManager, GenericForm, redux } from 'perun-core'
+const { getDynamicKey, labelsManager } = utils
 import Address from './Address/Address'
 import SAPWrapper from './wrappers/SAPWrapper';
 import PersonwWrapper from './wrappers/PersonWrapper';
@@ -47,8 +46,8 @@ const CustomButtons = (props, context) => {
         if ((props.selectedGridRows.length > 0 && props.selectedGridRows.length <= maxLength) || (!multiSelect)) {
             alertUserV2({
                 type: 'info',
-                title: labelsManager.importLabel('confirm_btn_action', 'persons_registry', context),
-                confirmButtonText: labelsManager.importLabel('yes', 'persons_registry', context),
+                title: labelsManager('confirm_btn_action', context, 'persons_registry'),
+                confirmButtonText: labelsManager('yes', context, 'persons_registry'),
                 onConfirm: () => {
                     let saveUrl = `${window.server}${el?.['onSave']}`
                     let data
@@ -122,10 +121,10 @@ const CustomButtons = (props, context) => {
                     }
                 },
                 showCancel: true,
-                cancelButtonText: labelsManager.importLabel('no', 'persons_registry', context)
+                cancelButtonText: labelsManager('no', context, 'persons_registry')
             })
         } else {
-            alertUserV2({ type: 'info', title: labelsManager.importLabel('select_multi', 'persons_registry', context) })
+            alertUserV2({ type: 'info', title: labelsManager('select_multi', context, 'persons_registry') })
         }
     }
 
@@ -149,7 +148,7 @@ const CustomButtons = (props, context) => {
                 refreshData={() => reloadGrid(props.tableName + props.personObjId, multiSelect)}
                 toggleCustomButton={!props.configuration.objectConfiguration.readOnly}
                 customButton={() => setShowModal(true)}
-                customButtonLabel={labelsManager.importLabel('add', 'persons_registry', context)}
+                customButtonLabel={labelsManager('add', context, 'persons_registry')}
                 enableMultiSelect={multiSelect}
                 onSelectChangeFunct={customRowSelection}
                 editContextFunc={props.configuration.objectConfiguration.disableRowClick ? () => { } : handleRowClick}
@@ -267,7 +266,7 @@ const CustomButtons = (props, context) => {
         // // Check if the filtered form data object has only four keys and they are only system fields
         const onlyHasSystemFields = Object.keys(nonNullishFormData).length === 4 && Object.keys(nonNullishFormData).every(k => k === 'OBJECT_ID' || k === 'OBJECT_TYPE' || k === 'PKID' || k === 'PARENT_ID')
         if (isEmpty || onlyHasSystemFields) {
-            const label = labelsManager.importLabel('enter_some_values', 'persons_registry', context)
+            const label = labelsManager('enter_some_values', context, 'persons_registry')
             alertUserV2({ type: 'info', title: label, onConfirm: resetFormSaveState })
         } else {
             const url = `${window.server}${wsPath}`

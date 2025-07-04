@@ -1,15 +1,13 @@
 import {
   React,
-  ComponentManager,
+  ComponentManager, utils,
   connect, GenericForm, axios, PropTypes
 } from "perun-core";
-import { setInputFilter } from '../../utils/utils'
-import { labelsManager } from '../../utils/LabelsExport'
+const { labelsManager, setInputFilter } = utils
 const { useState, useEffect } = React
 
 const PersonIdNoFieldFormWrapper = (props, context) => {
   const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
-
   const [isAddForm, setisAddForm] = useState(undefined)
 
   useEffect(() => {
@@ -91,7 +89,7 @@ const PersonIdNoFieldFormWrapper = (props, context) => {
           uiSchemaConfigMethod={`/ReactElements/getTableUISchema/${props.svSession}/ADDRESS`}
           tableFormDataMethod={`/ReactElements/getTableFormData/${props.svSession}/0/ADDRESS`}
           addSaveFunction={(e) => saveMultipleForms(e.formData)}
-          customSaveButtonName={labelsManager.importLabel('save', 'persons_registry', context)}
+          customSaveButtonName={labelsManager('save', context, 'persons_registry')}
           hideBtns={'closeAndDelete'}
           customSave={true}
         />}

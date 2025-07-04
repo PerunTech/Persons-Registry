@@ -1,10 +1,7 @@
-import { React, GenericForm, ExportableGrid, ComponentManager, GridManager } from 'perun-core'
+import { React, GenericForm, ExportableGrid, ComponentManager, GridManager, utils } from 'perun-core'
 import { axiosCall } from '../utils/AxiosCalls'
-import { labelsManager } from '../utils/LabelsExport'
+const { getDynamicKey, labelsManager } = utils
 
-const dynamicKey = function () {
-  return (+ new Date() + Math.floor(Math.random() * 999999)).toString(36)
-}
 /** 
 function used for making a request to the back-end for fetching data to meet search result
 @param {object} formData
@@ -59,7 +56,7 @@ export const searchRender = (searchComponent, context, wrapper) => {
     addSaveFunction={searchComponent}
     hideBtns={'closeAndDelete'}
     customSave={true}
-    customSaveButtonName={labelsManager.importLabel('search', 'persons_registry', context)}
+    customSaveButtonName={labelsManager('search', context, 'persons_registry')}
     className={`form-test person-registry-forms admin-console-search-from`}
     inputWrapper={InputWrapper}
   />
@@ -73,7 +70,7 @@ this function returns <ExportableGrid/> element based on the data recieved from 
 **/
 
 export const searchResult = (gridId, formData, onRowClick, customHeight) => {
-  let dynamic_key = dynamicKey()
+  let dynamic_key = getDynamicKey()
   let grid = <ExportableGrid gridType={'SEARCH_GRID_DATA'} key={gridId + dynamic_key}
     id={gridId + dynamic_key}
     configTableName={"/ReactElements/getTableFieldList/%session/PERSON"}
