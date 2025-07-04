@@ -1,8 +1,9 @@
 import {
     React,
     connect,
+    utils,
 } from "perun-core";
-import { setInputFilter } from '../../utils/utils'
+const { setInputFilter } = utils
 
 const { useState, useEffect } = React
 

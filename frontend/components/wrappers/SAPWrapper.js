@@ -2,6 +2,7 @@ import {
     React,
     connect,
     elements,
+    utils,
     ComponentManager,
     PropTypes,
     axios,
@@ -12,8 +13,8 @@ const { alertUserResponse, alertUserV2, Dropdown } = elements
 const { useState, useEffect } = React;
 const { ReactBootstrap } = elements;
 const { Modal } = ReactBootstrap;
+const { labelsManager } = utils;
 import { iconManager } from '../../assets/svg/svgHolder';
-import { labelsManager } from '../../utils/LabelsExport';
 
 let linkType
 const SAPWrapper = (props, context) => {
@@ -73,7 +74,7 @@ const SAPWrapper = (props, context) => {
         } else {
             alertUserV2({
                 type: 'info',
-                title: labelsManager.importLabel('search_value', 'persons_registry', context),
+                title: labelsManager('search_value', 'persons_registry', context),
                 onConfirm: () => ComponentManager.setStateForComponent(props.formid, null, { saveExecuted: false }),
             })
         }
@@ -91,9 +92,9 @@ const SAPWrapper = (props, context) => {
         }).then(res => {
             if (res.data.data.length > 0) {
                 showDropdown = (<div className={'authorizedperson-dd-container'}>
-                    <button className="authorizedperson-dd-back btn-success btn_save_form" onClick={() => { setGridFlag(true), setDD(undefined), linkType = undefined }}>{iconManager.getIcon('back')} {labelsManager.importLabel('back', 'persons_registry', context)}</button>
-                    <div className={'authorizedperson-dd-holder'}><p>{labelsManager.importLabel('your_selection', 'persons_registry', context)} <strong>{name}</strong></p>
-                        <p>{labelsManager.importLabel('connection_type', 'persons_registry', context)}</p>
+                    <button className="authorizedperson-dd-back btn-success btn_save_form" onClick={() => { setGridFlag(true), setDD(undefined), linkType = undefined }}>{iconManager.getIcon('back')} {labelsManager('back', context, 'persons_registry')}</button>
+                    <div className={'authorizedperson-dd-holder'}><p>{labelsManager('your_selection', context, 'persons_registry')} <strong>{name}</strong></p>
+                        <p>{labelsManager('connection_type', context, 'persons_registry')}</p>
                         <Dropdown
                             id={'setAuthPerson'}
                             name={'setAuthPerson'}
@@ -105,13 +106,13 @@ const SAPWrapper = (props, context) => {
                     <button className="authorizedperson-dd-submit btn-success btn_save_form" type='button' onClick={() => {
                         alertUserV2({
                             type: 'info',
-                            title: labelsManager.importLabel('confirm_btn_action', 'persons_registry', context),
+                            title: labelsManager('confirm_btn_action', context, 'persons_registry'),
                             onConfirm: () => saveAuthPerson(obj),
-                            confirmButtonText: labelsManager.importLabel('yes', 'persons_registry', context),
+                            confirmButtonText: labelsManager('yes', context, 'persons_registry'),
                             showCancel: true,
-                            cancelButtonText: labelsManager.importLabel('no', 'persons_registry', context)
+                            cancelButtonText: labelsManager('no', context, 'persons_registry')
                         })
-                    }}>{labelsManager.importLabel('save', 'persons_registry', context)}</button></div >)
+                    }}>{labelsManager('save', context, 'persons_registry')}</button></div >)
                 setDD(showDropdown)
                 setGridFlag(false)
             }
@@ -142,8 +143,8 @@ const SAPWrapper = (props, context) => {
         } else {
             alertUserV2({
                 type: 'info',
-                title: labelsManager.importLabel('missing_dd_value', 'person-registry', context),
-                message: labelsManager.importLabel('please_choose_dd', 'person-registry', context)
+                title: labelsManager('missing_dd_value', context, 'person-registry'),
+                message: labelsManager('please_choose_dd', context, 'person-registry')
             })
         }
     }

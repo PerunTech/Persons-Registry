@@ -1,7 +1,7 @@
-import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, createHashHistory, Loading } from 'perun-core'
+import { React, axios, connect, ComponentManager, GenericForm, PropTypes, elements, utils, createHashHistory, Loading } from 'perun-core'
 const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements
 import { iconManager } from '../assets/svg/svgHolder'
-import { labelsManager } from '../utils/LabelsExport'
+const { labelsManager } = utils
 import { searchComponent, searchRender, searchResult } from './SearchComponent'
 import { PersonIdNoFieldFormWrapper } from '../components/wrappers'
 const { Modal } = ReactBootstrap;
@@ -20,7 +20,7 @@ class Person extends React.Component {
   }
 
   /*  SEARCH BLOCK START */
-  /* show search component on entering module f.r */
+  /* show search component on entering module */
   componentDidMount() {
     if (document.getElementById('identificationScreen')) {
       document.getElementById('identificationScreen').className = 'identificationScreen'
@@ -34,8 +34,8 @@ class Person extends React.Component {
     if (formData == 'inside_error') {
       alertUserV2({
         type: 'info',
-        title: labelsManager.importLabel('empty_field', p_r, th1s.context),
-        message: labelsManager.importLabel('please_enter_filter', p_r, th1s.context)
+        title: labelsManager('empty_field', th1s.context, p_r),
+        message: labelsManager('please_enter_filter', th1s.context, p_r)
       })
       th1s.setState({ showPersonsGrid: false })
     } else {
@@ -70,7 +70,7 @@ class Person extends React.Component {
   }
 
   /* on row selection show both forms for person_registry table and physical or legal entity, 
-    depending od the person type f.r */
+    depending od the person type */
   onPersonRowClick = (gridId, _rowId, row) => {
     let th1s = this
     let tableName = gridId.split('_')[0]
@@ -193,14 +193,14 @@ class Person extends React.Component {
         <div className='pr-holder '>
           <div id='btn_holder' className='pr-btn-holder'>
             <>
-              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_physical', p_r, this.context)} </button>
-              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager.importLabel('add_legal', p_r, this.context)} </button>
+              <button id='P' onClick={() => this.generatePersonRegistrationForm('P')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager('add_physical', this.context, p_r)} </button>
+              <button id='G' onClick={() => this.generatePersonRegistrationForm('G')} className='pr-btn-reg'>{iconManager.getIcon('IDENTITY_DATA')} {labelsManager('add_legal', this.context, p_r)} </button>
             </>
           </div>
           <div id='content' className='pr-content'>
             {loading && <Loading />}
             {showSearchForm && searchForm}
-            {(showPersonsGrid && personsGrid) && '* ' + labelsManager.importLabel('additional_info_select_row', p_r, this.context)}
+            {(showPersonsGrid && personsGrid) && '* ' + labelsManager('additional_info_select_row', this.context, p_r)}
             {showPersonsGrid && personsGrid}
             {showModal && modal}
           </div>

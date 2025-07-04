@@ -6,6 +6,7 @@ import {
     Loading,
     Form,
     elements,
+    utils,
     ExportableGrid,
     GridManager,
     ComponentManager,
@@ -15,7 +16,7 @@ import style from "./address.module.css"
 const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
-import { labelsManager } from '../../utils/LabelsExport'
+const { labelsManager } = utils
 import { CustomOnchangeFunction } from './CustomOnchangeFunction';
 let changeField = 'LOCALITY1'
 const Address = (props, context) => {
@@ -180,6 +181,7 @@ const Address = (props, context) => {
             generateNewDependentForm(e.formData)
         }
     }
+
     return (
         <>{loading && <Loading />}
             <div>
@@ -187,30 +189,19 @@ const Address = (props, context) => {
                     gridType={"READ_URL"}
                     key={"ADDRESS_GRID" + props.personObjId}
                     id={"ADDRESS_GRID" + props.personObjId}
-                    configTableName={
-                        `/ReactElements/getTableFieldList/${props.svSession}/ADDRESS`
-                    }
-                    dataTableName={
-                        `/ReactElements/getObjectsByParentId/${props.svSession}/${props.personObjId}/ADDRESS/100000`
-                    }
+                    configTableName={`/ReactElements/getTableFieldList/${props.svSession}/ADDRESS`}
+                    dataTableName={`/ReactElements/getObjectsByParentId/${props.svSession}/${props.personObjId}/ADDRESS/100000`}
                     heightRatio={0.55}
                     onRowClickFunct={handleRowClick}
                     refreshData={true}
                     toggleCustomButton={true}
                     customButton={() => generateMainForm()}
-                    customButtonLabel={labelsManager.importLabel(
-                        "add_address",
-                        "persons_registry", context
-                    )}
+                    customButtonLabel={labelsManager("add_address", context, "persons_registry")}
                     editContextFunc={handleRowClick}
                 />
                 {show && <Modal className={style["person-registry-modal"]} show={show} onHide={() => setShow(false)}>
                     <Modal.Header className={style["person-registry-modal-header"]} closeButton>
-                        <Modal.Title>{labelsManager.importLabel(
-                            "add_address",
-
-                            "persons_registry", context
-                        )}</Modal.Title>
+                        <Modal.Title>{labelsManager("add_address", context, "persons_registry")}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={style["person-registry-modal-body"]}>
                         {flagForm && <Form
@@ -232,24 +223,23 @@ const Address = (props, context) => {
                                         className='btn-danger btn_delete_form'
                                         onClick={() => {
                                             alertUserV2({
-                                                type: 'wanring',
-                                                title: labelsManager.importLabel('delete_record_prompt_title', 'main', context),
-                                                message: labelsManager.importLabel('delete_record_prompt_message', 'main', context),
-                                                confirmButtonText: labelsManager.importLabel('yes', 'admin_console', context),
+                                                type: 'warning',
+                                                title: labelsManager('delete_record_prompt_title', context, 'main'),
+                                                message: labelsManager('delete_record_prompt_message', context, 'main'),
+                                                confirmButtonText: labelsManager('yes', context, 'main'),
                                                 confirmButtonColor: '#8d230f',
                                                 onConfirm: () => deleteFunc(formData),
                                                 showCancel: true,
-                                                cancelcancelButtonText: labelsManager.importLabel('no', 'admin_console', context)
+                                                cancelcancelButtonText: labelsManager('no', context, 'main')
                                             })
                                         }}
                                     >
-                                        {labelsManager.importLabel("delete", "persons_registry", context)}
+                                        {labelsManager("delete", context, "persons_registry")}
                                     </button>
                                 )}
-                                <button className='btn-success btn_save_form' type='submit'>{labelsManager.importLabel(
-                                    "add_address",
-                                    "persons_registry", context
-                                )}</button>
+                                <button className='btn-success btn_save_form' type='submit'>
+                                    {labelsManager("add_address", context, "persons_registry")}
+                                </button>
                             </div>
                         </Form>}
                     </Modal.Body>
