@@ -883,7 +883,7 @@ public class DbInit implements IDbInit {
 		dbf7.setSort_order(600);
 		dbf7.setIsNull(false);
 		dbf7.setLabel_code("identity_data.document_type");
-		dbf7.setCode_list_user_code("DOCUMENT_TYPE_CODE");
+		dbf7.setCode_list_user_code("IDENTITY_TYPE");
 		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
 		DbDataField[] dbTableFields = new DbDataField[7];
