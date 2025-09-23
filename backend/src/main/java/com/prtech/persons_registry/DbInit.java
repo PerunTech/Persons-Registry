@@ -843,7 +843,7 @@ public class DbInit implements IDbInit {
 		dbf3.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf3.setDbFieldSize(10);
 		dbf3.setSort_order(250);
-		dbf3.setIsNull(false);
+		dbf3.setIsNull(true);
 		dbf3.setLabel_code("identity_data.document_series");
 		dbf3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
