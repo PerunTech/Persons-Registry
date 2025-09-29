@@ -876,24 +876,24 @@ public class DbInit implements IDbInit {
 		dbf5.setLabel_code("identity_data.valid_before");
 		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
-		DbDataField dbf7 = new DbDataField();
-		dbf7.setDbFieldName("DOCUMENT_TYPE");
-		dbf7.setDbFieldType(DbFieldType.NVARCHAR);
-		dbf7.setDbFieldSize(60);
-		dbf7.setSort_order(600);
-		dbf7.setIsNull(false);
-		dbf7.setLabel_code("identity_data.document_type");
-		dbf7.setCode_list_user_code("IDENTITY_TYPE");
-		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+//		DbDataField dbf7 = new DbDataField();
+//		dbf7.setDbFieldName("DOCUMENT_TYPE");
+//		dbf7.setDbFieldType(DbFieldType.NVARCHAR);
+//		dbf7.setDbFieldSize(60);
+//		dbf7.setSort_order(600);
+//		dbf7.setIsNull(false);
+//		dbf7.setLabel_code("identity_data.document_type");
+//		dbf7.setCode_list_user_code("IDENTITY_TYPE");
+//		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
-		DbDataField[] dbTableFields = new DbDataField[6];
+		DbDataField[] dbTableFields = new DbDataField[5];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
 		//dbTableFields[2] = dbf3;
 		dbTableFields[2] = dbf4;
 		dbTableFields[3] = dbf6;		
 		dbTableFields[4] = dbf5;
-		dbTableFields[5] = dbf7;
+//		dbTableFields[5] = dbf7;
 
 		dbf.setDbTableFields(dbTableFields);
 		return dbf;
