@@ -1,42 +1,18 @@
 import {
   React,
   ComponentManager,
-  connect, GenericForm, axios, PropTypes
+  connect, GenericForm, axios, PropTypes, utils
 } from "perun-core";
-import { setInputFilter } from '../../utils/utils'
-import { labelsManager } from '../../utils/LabelsExport'
 const { useState, useEffect } = React
-
-const PersonIdNoFieldFormWrapper = (props, context) => {
-  const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
+const { labelsManager } = utils
+const PersonWrapper = (props, context) => {
 
   const [isAddForm, setisAddForm] = useState(undefined)
 
-  useEffect(() => {
-    // Get the form classNames
-    const formClassNames = ComponentManager.getStateForComponent(props.formid, 'className')
-    // Append a dot to each of them, so we can use them to get the needed input
-    const finalFormClassNames = formClassNames?.split(' ')?.map(value => `.${value}`)?.join('') || ''
-    // Get the needed input
-    const input = document.querySelectorAll(`${finalFormClassNames} #root_ID_NO`)
-    if (input) {
-      const personalIdNumberInput = input[0]
-      if (personalIdNumberInput) {
-        setPersonalIdNumberInputField(personalIdNumberInput)
-      }
-    }
-  }, [])
 
   useEffect(() => {
-    if (personalIdNumberInputField) {
-      // Allow only a maximum amount of 13 characters
-      setInputFilter(personalIdNumberInputField, function (value) {
-        return /^.{0,13}$/.test(value)
-      })
-    }
-  }, [personalIdNumberInputField])
+    console.log('test');
 
-  useEffect(() => {
     const isAddForm = ComponentManager.getStateForComponent(
       props.formid,
       "isAddForm"
@@ -91,7 +67,7 @@ const PersonIdNoFieldFormWrapper = (props, context) => {
           uiSchemaConfigMethod={`/ReactElements/getTableUISchema/${props.svSession}/ADDRESS`}
           tableFormDataMethod={`/ReactElements/getTableFormData/${props.svSession}/0/ADDRESS`}
           addSaveFunction={(e) => saveMultipleForms(e.formData)}
-          customSaveButtonName={labelsManager.importLabel('save', 'persons_registry', context)}
+          customSaveButtonName={labelsManager('save', context, 'persons_registry')}
           hideBtns={'closeAndDelete'}
           customSave={true}
         />}
@@ -104,8 +80,8 @@ const mapStateToProps = (state) => ({
   svSession: state.security.svSession,
 });
 
-PersonIdNoFieldFormWrapper.contextTypes = {
+PersonWrapper.contextTypes = {
   intl: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(PersonIdNoFieldFormWrapper);
+export default connect(mapStateToProps)(PersonWrapper);
