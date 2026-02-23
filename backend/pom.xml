@@ -4,7 +4,7 @@
 
 	<groupId>org.peruntech</groupId>
 	<artifactId>persons-registry</artifactId>
-	<version>4.0.0</version>
+	<version>4.0.2</version>
 	<packaging>bundle</packaging>
 
 	<name>persons-registry</name>

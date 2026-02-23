@@ -838,15 +838,15 @@ public class DbInit implements IDbInit {
 		dbf2.setLabel_code("identity_data.identity_code");
 		dbf2.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
-		DbDataField dbf3 = new DbDataField();
+		/*DbDataField dbf3 = new DbDataField();
 		dbf3.setDbFieldName("DOCUMENT_SERIES");
 		dbf3.setDbFieldType(DbFieldType.NVARCHAR);
 		dbf3.setDbFieldSize(10);
 		dbf3.setSort_order(250);
-		dbf3.setIsNull(false);
+		dbf3.setIsNull(true);
 		dbf3.setLabel_code("identity_data.document_series");
 		dbf3.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
-
+*/
 		DbDataField dbf4 = new DbDataField();
 		dbf4.setDbFieldName("ISSUED_BY");
 		dbf4.setDbFieldType(DbFieldType.NVARCHAR);
@@ -876,24 +876,24 @@ public class DbInit implements IDbInit {
 		dbf5.setLabel_code("identity_data.valid_before");
 		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 		
-		DbDataField dbf7 = new DbDataField();
-		dbf7.setDbFieldName("DOCUMENT_TYPE");
-		dbf7.setDbFieldType(DbFieldType.NVARCHAR);
-		dbf7.setDbFieldSize(60);
-		dbf7.setSort_order(600);
-		dbf7.setIsNull(false);
-		dbf7.setLabel_code("identity_data.document_type");
-		dbf7.setCode_list_user_code("IDENTITY_TYPE");
-		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+//		DbDataField dbf7 = new DbDataField();
+//		dbf7.setDbFieldName("DOCUMENT_TYPE");
+//		dbf7.setDbFieldType(DbFieldType.NVARCHAR);
+//		dbf7.setDbFieldSize(60);
+//		dbf7.setSort_order(600);
+//		dbf7.setIsNull(false);
+//		dbf7.setLabel_code("identity_data.document_type");
+//		dbf7.setCode_list_user_code("IDENTITY_TYPE");
+//		dbf7.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
 
-		DbDataField[] dbTableFields = new DbDataField[7];
+		DbDataField[] dbTableFields = new DbDataField[5];
 		dbTableFields[0] = dbf1;
 		dbTableFields[1] = dbf2;
-		dbTableFields[2] = dbf3;
-		dbTableFields[3] = dbf4;
-		dbTableFields[4] = dbf6;		
-		dbTableFields[5] = dbf5;
-		dbTableFields[6] = dbf7;
+		//dbTableFields[2] = dbf3;
+		dbTableFields[2] = dbf4;
+		dbTableFields[3] = dbf6;		
+		dbTableFields[4] = dbf5;
+//		dbTableFields[5] = dbf7;
 
 		dbf.setDbTableFields(dbTableFields);
 		return dbf;
