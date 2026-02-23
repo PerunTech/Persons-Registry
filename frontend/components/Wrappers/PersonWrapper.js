@@ -11,8 +11,6 @@ const PersonWrapper = (props, context) => {
 
 
   useEffect(() => {
-    console.log('test');
-
     const isAddForm = ComponentManager.getStateForComponent(
       props.formid,
       "isAddForm"

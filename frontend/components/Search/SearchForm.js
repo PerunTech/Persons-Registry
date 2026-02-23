@@ -100,8 +100,6 @@ const SearchForm = (props, context) => {
           if (result.value?.response?.type?.toLowerCase() === 'error') {
             alertUserResponse({ response: result.value.response })
           } else {
-            console.log(result);
-
             if (result.value?.name === 'jsonSchema') {
               Object.assign(jsonSchema, result.value.response)
             }

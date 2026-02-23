@@ -90,13 +90,16 @@ const Form = (props) => {
       if (res?.data) {
         const resType = res.data?.type?.toLowerCase() || 'info'
         if (resType === 'success') {
+          const objid = res?.data?.data['OBJECT_ID']
+          if (objid) {
+            const href = `/main/persons-registry/PERSON/${objid}/summary`
+            hashHistory.push(href);
+          }
+
           props.setShowFormModal(false)
           if (showGrid) {
             GridManager.reloadGridData(gridId)
           } else if (searchResult) {
-            console.log(searchResult)
-            const href = `/main/persons-registry/${objectId}/summary-item`
-            hashHistory.push(href);
 
             store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-reload-search-grid', value: true } })
           }
