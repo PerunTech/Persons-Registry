@@ -1,40 +1,18 @@
 import {
   React,
-  ComponentManager, utils,
-  connect, GenericForm, axios, PropTypes
+  ComponentManager,
+  connect, GenericForm, axios, PropTypes, utils
 } from "perun-core";
-const { labelsManager, setInputFilter } = utils
 const { useState, useEffect } = React
+const { labelsManager } = utils
+const PersonWrapper = (props, context) => {
 
-const PersonIdNoFieldFormWrapper = (props, context) => {
-  const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
   const [isAddForm, setisAddForm] = useState(undefined)
 
-  useEffect(() => {
-    // Get the form classNames
-    const formClassNames = ComponentManager.getStateForComponent(props.formid, 'className')
-    // Append a dot to each of them, so we can use them to get the needed input
-    const finalFormClassNames = formClassNames?.split(' ')?.map(value => `.${value}`)?.join('') || ''
-    // Get the needed input
-    const input = document.querySelectorAll(`${finalFormClassNames} #root_ID_NO`)
-    if (input) {
-      const personalIdNumberInput = input[0]
-      if (personalIdNumberInput) {
-        setPersonalIdNumberInputField(personalIdNumberInput)
-      }
-    }
-  }, [])
 
   useEffect(() => {
-    if (personalIdNumberInputField) {
-      // Allow only a maximum amount of 13 characters
-      setInputFilter(personalIdNumberInputField, function (value) {
-        return /^.{0,13}$/.test(value)
-      })
-    }
-  }, [personalIdNumberInputField])
+    console.log('test');
 
-  useEffect(() => {
     const isAddForm = ComponentManager.getStateForComponent(
       props.formid,
       "isAddForm"
@@ -102,8 +80,8 @@ const mapStateToProps = (state) => ({
   svSession: state.security.svSession,
 });
 
-PersonIdNoFieldFormWrapper.contextTypes = {
+PersonWrapper.contextTypes = {
   intl: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(PersonIdNoFieldFormWrapper);
+export default connect(mapStateToProps)(PersonWrapper);
