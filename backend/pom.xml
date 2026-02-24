@@ -82,7 +82,8 @@
 							com.prtech.persons_registry.Activator
 						</Bundle-Activator>
 						<Export-Package>
-							com.prtech.persons_registry
+							com.prtech.persons_registry,
+							com.prtech.persons_registry.models
 						</Export-Package>
 						<Private-Package>
 							com.prtech.persons_registry
