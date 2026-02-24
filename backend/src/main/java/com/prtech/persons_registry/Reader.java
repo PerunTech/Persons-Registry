@@ -3,6 +3,8 @@ package com.prtech.persons_registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import com.google.gson.JsonObject;
 import com.prtech.svarog.CodeList;
 import com.prtech.svarog.SvCore;
@@ -12,6 +14,7 @@ import com.prtech.svarog.SvReader;
 import com.prtech.svarog.svCONST;
 import com.prtech.svarog_common.DbDataArray;
 import com.prtech.svarog_common.DbDataObject;
+import com.prtech.svarog_common.DbQueryObject;
 import com.prtech.svarog_common.DbSearchCriterion;
 import com.prtech.svarog_common.DbSearchExpression;
 import com.prtech.svarog_common.DbSearch.DbLogicOperand;
@@ -210,4 +213,55 @@ public class Reader {
 			exists = true;
 		return exists;
 	}
+	
+	public static DbDataArray getFilteredRecords(MultivaluedMap<String, String> formVals, String tableName,
+			SvReader svr) throws SvException {
+		DbDataArray result = new DbDataArray();
+		DbSearchExpression dbse = new DbSearchExpression();
+		Boolean hasCrit = false;
+
+		for (String field : formVals.keySet()) {
+			if ("ROW_LIMIT".equals(field))
+				continue;
+			hasCrit = addSearchCriterion(formVals, field, tableName, DbCompareOperand.ILIKE, dbse, true) || hasCrit;
+		}
+		if (hasCrit) {
+			Integer rowLimit = null;
+			Integer offset = null;
+			try {
+				if (formVals.getFirst("ROW_LIMIT") != null)
+					rowLimit = Integer.valueOf(formVals.getFirst("ROW_LIMIT"));
+			} catch (NumberFormatException e) {
+			}
+			if (rowLimit == null)
+				rowLimit = 100;
+
+			DbQueryObject query = new DbQueryObject(SvReader.getDbtByName(tableName), dbse, null, null);
+			ArrayList<String> orderBy = new ArrayList<String>();
+			orderBy.add("PKID" + " " + "DESC");
+			query.setOrderByFields(orderBy);
+			result = svr.getObjects(query, rowLimit, offset);
+		}
+		return result;
+	}
+
+	public static Boolean addSearchCriterion(MultivaluedMap<String, String> formVals, String fieldName, String tableName,
+			DbCompareOperand operand, DbSearchExpression dbse, Boolean includePercent) throws SvException {
+		DbDataObject field = SvCore.getFieldByName(tableName, fieldName);
+		String value = formVals.getFirst(fieldName);
+		if (field != null && value != null && !value.trim().equals("null")) {
+			if ("NUMERIC".equals(field.getVal("FIELD_TYPE").toString()))
+				fieldName = fieldName + "::text";
+			if (field.getVal("CODE_LIST_ID")!=null)
+				operand = DbCompareOperand.EQUAL;
+			if (includePercent && operand!=DbCompareOperand.EQUAL)
+				value = "%" + value + "%";
+			DbSearchCriterion dbc = new DbSearchCriterion(fieldName, operand, value);
+			dbse.addDbSearchItem(dbc);
+			return true;
+		}
+		return false;
+	}
+	
+	
 }
