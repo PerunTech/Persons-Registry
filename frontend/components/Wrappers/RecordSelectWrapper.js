@@ -1,7 +1,7 @@
 import { React, PropTypes, ComponentManager, ExportableGrid, elements, utils } from 'perun-core'
 import WrapperSearchForm from './WrapperSearchForm'
 const { useEffect, useRef, useState } = React
-const { getDynamicKey, usePrevious } = utils
+const { getDynamicKey } = utils
 const { ReactBootstrap } = elements
 const { Modal } = ReactBootstrap
 
@@ -13,7 +13,6 @@ const RecordSelectWrapper = (props, context) => {
   const [showArrayGridModal, setShowArrayGridModal] = useState(false)
   const [singleInputConfig, setSingleInputConfig] = useState(undefined)
   const [arrayInputsConfig, setArrayInputsConfig] = useState(undefined)
-  const prevGridId = usePrevious(gridId)
 
   useEffect(() => {
     checkConfig()
@@ -28,12 +27,6 @@ const RecordSelectWrapper = (props, context) => {
   })
 
   useEffect(() => {
-    return () => {
-      ComponentManager.cleanComponentReducerState(prevGridId)
-    }
-  }, [prevGridId])
-
-  useEffect(() => {
     if (searchResult) {
       setGridId(getDynamicKey())
     }
@@ -41,7 +34,6 @@ const RecordSelectWrapper = (props, context) => {
 
   const closeArrayGridModal = () => {
     setShowArrayGridModal(false)
-    ComponentManager.cleanComponentReducerState('RECORD_SELECTION_GRID_MODAL')
   }
 
   const onArrayInputClick = () => {
@@ -73,7 +65,6 @@ const RecordSelectWrapper = (props, context) => {
 
   const closeGridModal = () => {
     setShowGridModal(false)
-    ComponentManager.cleanComponentReducerState('RECORD_SELECTION_GRID_MODAL')
   }
 
   const onInputClick = (clickedInput) => {

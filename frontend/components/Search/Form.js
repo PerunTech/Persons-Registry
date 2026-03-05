@@ -78,7 +78,7 @@ const Form = (props) => {
 
   const onSubmit = () => {
     const formId = 'PERSON_REGISTRY_REGISTRATION_FORM'
-    const { formConfig, showGrid, gridId, searchResult } = props
+    const { formConfig, showGrid, searchResult } = props
     const saveConfig = formConfig.save
     const formData = ComponentManager.getStateForComponent(formId, 'formTableData')
     const data = Object.assign({}, formData)
@@ -98,7 +98,7 @@ const Form = (props) => {
 
           props.setShowFormModal(false)
           if (showGrid) {
-            GridManager.reloadGridData(gridId)
+            GridManager.reloadAllGrids()
           } else if (searchResult) {
 
             store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-reload-search-grid', value: true } })

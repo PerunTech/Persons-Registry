@@ -3,7 +3,7 @@ import Form from './Form'
 import SearchForm from './SearchForm'
 import { ActionForm } from '../Utils'
 const { useEffect, useState } = React
-const { getDynamicKey, updateIdScreen, usePrevious, labelsManager } = utils
+const { getDynamicKey, updateIdScreen, labelsManager } = utils
 const { alertUserResponse, alertUserV2, ReactBootstrap, Icon } = elements
 const { Modal } = ReactBootstrap
 const { store, updateSelectedRows } = redux
@@ -26,7 +26,6 @@ const Search = (props, context) => {
   const [showFormModal, setShowFormModal] = useState(false)
   const [actionFormConfig, setActionFormConfig] = useState(undefined)
   const [showActionFormModal, setShowActionFormModal] = useState(false)
-  const prevGridId = usePrevious(gridId)
 
   useEffect(() => {
     updateIdScreen('persons_registry', context)
@@ -36,12 +35,6 @@ const Search = (props, context) => {
     const initialRoute = { route: `#/main/persons-registry`, label: 'person-registry' }
     store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-previous-routes', value: [initialRoute] } })
   }, [])
-
-  useEffect(() => {
-    return () => {
-      ComponentManager.cleanComponentReducerState(prevGridId)
-    }
-  }, [prevGridId])
 
   useEffect(() => {
     if (searchResult) {

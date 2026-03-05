@@ -28,7 +28,7 @@ const TopButtons = (props, context) => {
 
   const reloadGrid = () => {
     const gridId = props.activeComponent + props.objectId
-    GridManager.reloadGridData(gridId)
+    GridManager.reloadAllGrids()
     store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], gridId] })
     ComponentManager.setStateForComponent(gridId, 'selectedIndexes', [])
     ComponentManager.setStateForComponent(gridId, 'selectedIndexesBeforeFilters', [])
@@ -41,7 +41,7 @@ const TopButtons = (props, context) => {
   }
 
   const getRowData = () => {
-    const { session, objectId, tableName, activeComponent, selectedRow } = props
+    const { session, objectId, tableName, selectedRow } = props
     const url = `${window.server}/ReactElements/getRowDataByObjectId/${session}/${objectId}/${tableName}`
     setLoading(true)
     axios.get(url).then(res => {
@@ -50,7 +50,7 @@ const TopButtons = (props, context) => {
         const rowData = Object.assign({}, selectedRow)
         const mergedRowData = { ...rowData, ...res.data[0] }
         store.dispatch({ type: 'SAVE', payload: { key: `person-registry-module-row-${tableName}`, value: mergedRowData } })
-        GridManager.reloadGridData(activeComponent + objectId)
+        GridManager.reloadAllGrids()
       }
     }).catch(err => {
       console.error(err)
@@ -125,7 +125,7 @@ const TopButtons = (props, context) => {
         const resType = res.data?.type?.toLowerCase() || 'info'
         alertUserResponse({ response: res })
         if (resType === 'success') {
-          GridManager.reloadGridData(props.activeComponent + props.objectId)
+          GridManager.reloadAllGrids()
           getRowData()
         }
       }
@@ -316,7 +316,6 @@ const TopButtons = (props, context) => {
 
   const closeGridModal = () => {
     setShowGridModal(false)
-    ComponentManager.cleanComponentReducerState(gridConfig?.ID)
   }
 
   const onActionGridRowClick = (_id, _idx, row) => {
@@ -332,7 +331,7 @@ const TopButtons = (props, context) => {
           const resType = res.data?.type?.toLowerCase() || 'info'
           alertUserResponse({ response: res })
           if (resType === 'success') {
-            GridManager.reloadGridData(props.activeComponent + props.objectId)
+            GridManager.reloadAllGrids()
             closeGridModal()
           }
         }

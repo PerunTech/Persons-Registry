@@ -24,7 +24,6 @@ const CustomButtons = (props, context) => {
     const [actionToggle, setActionToggle] = useState(undefined)
     useEffect(() => {
         return () => {
-            ComponentManager.cleanComponentReducerState(props.tableName + props.appObjId);
             store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], props.tableName + props.appObjId] })
             ComponentManager.setStateForComponent(props.tableName + props.appObjId, 'selectedIndexes', [])
             ComponentManager.setStateForComponent(props.tableName + props.appObjId, 'selectedIndexesBeforeFilters', [])
@@ -265,7 +264,7 @@ const CustomButtons = (props, context) => {
         store.dispatch(updateSelectedRows(selectedRows, gridId));
     };
     const reloadGrid = (gridId, multiSelect) => {
-        GridManager.reloadGridData(gridId)
+        GridManager.reloadAllGrids()
         if (multiSelect) {
             store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], gridId] })
             ComponentManager.setStateForComponent(gridId, 'selectedIndexes', [])
@@ -420,7 +419,7 @@ const CustomButtons = (props, context) => {
                         setRender(false)
                         alertUserResponse({ response: res.data, onConfirm: resetFormSaveState })
                         if (isModal) {
-                            GridManager.reloadGridData(props.tableName + props.appObjId)
+                            GridManager.reloadAllGrids()
                             closeFormModal()
                         }
                         if (refreshSummary) store.dispatch({ type: 'SAVE', payload: { key: 'refreshSummary', value: true } })
@@ -446,7 +445,7 @@ const CustomButtons = (props, context) => {
                 alertUserResponse({ response: res.data, onConfirm: resetFormDeleteState })
                 if (resType === 'success') {
                     closeFormModal()
-                    GridManager.reloadGridData(props.tableName + props.appObjId);
+                    GridManager.reloadAllGrids();
                     if (refreshSummary) store.dispatch({ type: 'SAVE', payload: { key: 'refreshSummary', value: true } })
                 }
             }

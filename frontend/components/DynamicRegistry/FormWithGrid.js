@@ -14,7 +14,6 @@ const FormWithGrid = (props, context) => {
 
   useEffect(() => {
     return () => {
-      ComponentManager.cleanComponentReducerState(props.tableName + props.farmObjId)
       store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], props.tableName + props.farmObjId] })
       ComponentManager.setStateForComponent(props.tableName + props.farmObjId, 'selectedIndexes', [])
       ComponentManager.setStateForComponent(props.tableName + props.farmObjId, 'selectedIndexesBeforeFilters', [])
@@ -66,7 +65,7 @@ const FormWithGrid = (props, context) => {
           } else {
             alertUserResponse({ response: res.data, onConfirm: resetFormSaveState })
             if (isModal) {
-              GridManager.reloadGridData(props.tableName + props.farmObjId)
+              GridManager.reloadAllGrids()
               closeFormModal()
             } else {
               setRender(false)
@@ -96,7 +95,7 @@ const FormWithGrid = (props, context) => {
         if (resType === 'success') {
           if (isModal) {
             closeFormModal()
-            GridManager.reloadGridData(props.tableName + props.farmObjId);
+            GridManager.reloadAllGrids();
           }
           if (refreshSummary) store.dispatch({ type: 'SAVE', payload: { key: 'refreshSummary', value: true } })
         }

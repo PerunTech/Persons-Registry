@@ -1,18 +1,11 @@
 import { React, PropTypes, ExportableGrid, connect, elements, axios, GenericForm, ComponentManager, GridManager, redux, utils } from 'perun-core'
-const { useState, useEffect } = React
+const { useState } = React
 const { labelsManager, getDynamicKey, replaceFunc } = utils
 const { ReactBootstrap, alertUserResponse } = elements;
 const { Modal } = ReactBootstrap;
 const { store } = redux
 let prev
 const ParentChildGrids = (props, context) => {
-    useEffect(() => {
-        return () => {
-            ComponentManager.cleanComponentReducerState(props.grids[0].ID + '_' + props.farmObjId)
-            ComponentManager.cleanComponentReducerState(prev)
-        }
-    }, [])
-
     const [stateGrid, setStateGrid] = useState(undefined)
     const [rowChild, setRowChild] = useState(0)
     const [rowParent, setRowParent] = useState(0)
@@ -102,7 +95,7 @@ const ParentChildGrids = (props, context) => {
                 const onConfirm = () => {
                     if (resType === 'success') {
                         setShow(false)
-                        GridManager.reloadGridData(prev)
+                        GridManager.reloadAllGrids()
                     } else {
                         ComponentManager.setStateForComponent(props.grids[1] + '_FORM', null, { saveExecuted: false })
                     }
@@ -135,7 +128,7 @@ const ParentChildGrids = (props, context) => {
                 })
                 if (resType === 'success') {
                     setShow(false)
-                    GridManager.reloadGridData(prev);
+                    GridManager.reloadAllGrids();
                 }
             }
         }).catch(err => {
@@ -149,7 +142,6 @@ const ParentChildGrids = (props, context) => {
 
     const handleCustomRowClick = (_id, _rowIdx, row, gridId, grid) => {
         setRowParent(row[`${gridId}.OBJECT_ID`] || 0)
-        ComponentManager.cleanComponentReducerState(gridId + prev)
         generateGrid(row[`${gridId}.OBJECT_ID`], grid)
     }
     const handleRowClick = (_id, _rowIdx, row, gridId, _gridAndDynamic) => {
