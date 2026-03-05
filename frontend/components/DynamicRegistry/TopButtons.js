@@ -424,7 +424,7 @@ const TopButtons = (props, context) => {
                 id={el.ID}
                 onClick={() => onClick(el, el.data?.length > 0)}
                 className={`btn top-btn top-btn-parent ${el.ID.toLowerCase()}-aims-btn`}
-                data-tooltip-id={el.data?.length > 0 ? 'top-buttons-tooltip' : 'top-buttons-simple-tooltip'}
+                data-tooltip-id={el.data?.length > 0 ? `top-buttons-tooltip_${el.ID}` : `top-buttons-simple-tooltip_${el.ID}`}
                 data-tooltip-content={el.data?.length > 0 ? JSON.stringify(el.data) : el.label}
                 data-tooltip-place='bottom'
               >
@@ -435,7 +435,7 @@ const TopButtons = (props, context) => {
                 )}
                 <span className='top-button-label'>{el.label}</span>
               </button>
-              <Tooltip id='top-buttons-tooltip' place='bottom' clickable className='aims-tooltip'
+              <Tooltip id={`top-buttons-tooltip_${el.ID}`} place='bottom' clickable className='aims-tooltip'
                 render={({ content }) => {
                   const submenu = JSON.parse(content || '[]')
                   if (!submenu.length) return null
@@ -460,7 +460,7 @@ const TopButtons = (props, context) => {
                   )
                 }}
               />
-              <Tooltip className='aims-tooltip' id='top-buttons-simple-tooltip' place='bottom' />
+              <Tooltip className='aims-tooltip' id={`top-buttons-simple-tooltip_${el.ID}`} place='bottom' />
             </div>
           )
         })}
