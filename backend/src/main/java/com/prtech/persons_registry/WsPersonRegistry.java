@@ -966,6 +966,50 @@ public class WsPersonRegistry {
 		}
 		return Response.status(200).entity(jResult.toString()).build();
 	}
+	
+	@Path("/getPersonsByCriteria/{sessionId}/{tableName}")
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getObjectByCriteria(@PathParam("sessionId") String sessionId, @PathParam("tableName") String tableName,
+			MultivaluedMap<String, String> formVals, @Context HttpServletRequest httpRequest) {
+		ResponseHandler jrh = new ResponseHandler();
+		
+		try (SvReader svr = new SvReader(sessionId)) {
+			JsonArray result = new JsonArray();
+			DbDataArray filteredArray = null;
+			String[] tablesUsedArray = new String[1];
+			Boolean[] tableShowArray = new Boolean[1];
+			int tablesusedCount = 1;
+			
+			if (formVals == null || formVals.isEmpty())
+				return (new WsReactElements()).getTableSampleData(sessionId, tableName, 50, true, httpRequest);
+		
+			filteredArray = Reader.getFilteredRecords(formVals, tableName, svr);
+			
+			// Handle empty results
+	        if (filteredArray == null || filteredArray.getItems().isEmpty()) {
+	            jrh.create(MessageType.WARNING, 
+	                       I18n.getText("warning.no_data_found"), 
+	                       I18n.getText("warning.no_data_found_label"), 
+	                       new JsonArray());
+	            return Response.status(200).entity(jrh.getAll().toString()).build();
+	        }
+	        
+	        tablesUsedArray[0] = PRC.PERSON;
+			tableShowArray[0] = true;
+			result = WsReactElements.prapareTableQueryData(filteredArray, tablesUsedArray, tableShowArray,
+					tablesusedCount, true, svr, false, new HashMap<String, String>());
+			
+			jrh.create(MessageType.SUCCESS, I18n.getText("data.read"), I18n.getText("data.read"),
+					new Gson().fromJson(result, JsonArray.class));
+		} catch (SvException e) {
+			log4j.error(e.getFormattedMessage(), e);
+			return handleException(e, new ResponseHandler(), "Error during getObjectByCriteria");
+		}
+		
+		return Response.status(200).entity(jrh.getAll().toString()).build();
+	}
 
 	private Response handleException(Exception e, ResponseHandler jrh, String message) {
 		if (e instanceof SvException) {
