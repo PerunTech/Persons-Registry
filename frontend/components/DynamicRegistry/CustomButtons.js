@@ -291,7 +291,7 @@ const CustomButtons = (props, context) => {
         let uiSchemaConfig = props.configuration.objectConfiguration?.uischema?.onSubmit
         let formDataWs = props.configuration.objectConfiguration?.data?.onSubmit
         let onSubmitWs = props.configuration.objectConfiguration?.save?.onSave
-        let contentType = props.configuration.objectConfiguration?.save?.contentType || 'application/x-www-form-urlencoded'
+        let contentType = props.configuration.objectConfiguration?.save?.contentType
         let params = props.configuration.objectConfiguration?.save?.params
         let wrapperConfig = props.configuration.objectConfiguration?.wrapper
         // If we're rendering a modal, the configuration services are a bit nested
@@ -305,7 +305,7 @@ const CustomButtons = (props, context) => {
             // If the form data WS contains something like {TABLE_NAME.OBJECT_ID} find it and replace it with the clicked object's ID
             formDataWs = replaceFunc(formDataWs, props.tableName, clickedRowObjectId, props.configuration.objectConfiguration?.isSvarogForm)
             onSubmitWs = props.configuration.objectConfiguration?.form?.save?.onSave
-            contentType = props.configuration.objectConfiguration?.form?.save?.contentType || 'application/x-www-form-urlencoded'
+            contentType = props.configuration.objectConfiguration?.form?.save?.contentType
             params = props.configuration.objectConfiguration?.form?.save?.params
             wrapperConfig = props.configuration.objectConfiguration?.form?.wrapper
         }
@@ -407,9 +407,9 @@ const CustomButtons = (props, context) => {
             const url = `${window.server}${wsPath}`
             axios({
                 method: "post",
-                data: formData,
+                data: !contentType ? encodeURIComponent(JSON.stringify(formData)) : formData,
                 url,
-                headers: { "Content-Type": contentType },
+                headers: { "Content-Type": contentType || 'application/x-www-form-urlencoded' },
             }).then(res => {
                 if (res?.data) {
                     const resType = res.data?.type?.toLowerCase() || 'info'

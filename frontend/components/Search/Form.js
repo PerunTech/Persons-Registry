@@ -76,17 +76,18 @@ const Form = (props) => {
     ComponentManager.setStateForComponent('PERSON_REGISTRY_REGISTRATION_FORM', null, { saveExecuted: false })
   }
 
-  const onSubmit = () => {
+  const onSubmit = async (e) => {
     const formId = 'PERSON_REGISTRY_REGISTRATION_FORM'
     const { formConfig, showGrid, searchResult } = props
     const saveConfig = formConfig.save
-    const formData = ComponentManager.getStateForComponent(formId, 'formTableData')
+    const formData = e?.formData || ComponentManager.getStateForComponent(formId, 'formTableData')
     const data = Object.assign({}, formData)
     if (saveConfig.params) {
       Object.assign(data, { ...saveConfig.params })
     }
     const reqConfig = { method: saveConfig.type, url: `${window.server}${saveConfig.onSave}`, headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, data: encodeURIComponent(JSON.stringify(data)), }
-    axios(reqConfig).then(res => {
+    try {
+      const res = await axios(reqConfig)
       if (res?.data) {
         const resType = res.data?.type?.toLowerCase() || 'info'
         if (resType === 'success') {
@@ -103,13 +104,17 @@ const Form = (props) => {
 
             store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-reload-search-grid', value: true } })
           }
+          alertUserResponse({ response: res, onConfirm: resetFormSaveState })
+          return objid || null
         }
         alertUserResponse({ response: res, onConfirm: resetFormSaveState })
       }
-    }).catch(err => {
+      return null
+    } catch (err) {
       console.error(err)
       alertUserResponse({ response: err, onConfirm: resetFormSaveState })
-    })
+      return null
+    }
   };
 
   const generateForm = () => {
