@@ -502,6 +502,10 @@ public class WsPersonRegistry {
 				case "MDA":
 					listRequired.add(PRC.ID_NO);
 					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("FIRST_NAME");
+					listRequired.add("LAST_NAME");
+					listRequired.add("GENDER");
+					listRequired.add("NATIONALITY");
 					break;
 				case "CYP":
 					listRequired.add(PRC.ID_NO);
@@ -528,6 +532,7 @@ public class WsPersonRegistry {
 					listRequired.add(PRC.ID_NO);
 					listRequired.add("NAME");
 					listRequired.add("DT_BIRTH_REG");
+					listRequired.add("SHORT_NAME");
 					break;
 				case "CYP":
 					listRequired.add(PRC.ID_NO);
