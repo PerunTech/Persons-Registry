@@ -37,7 +37,7 @@ const SideMenu = (props) => {
         const { svSession, tableName, objectId } = props
         props.setTopButtons(undefined)
         setLoading(true)
-        const url = `${window.server}/Menu/getMenu/${svSession}/${objectId}/${tableName}`
+        const url = `${window.server}/Menu/getMenu/${svSession}/${objectId}/${tableName}/-`
         const reqConfig = { method: 'get', url }
         axios(reqConfig).then(res => {
             setLoading(false)

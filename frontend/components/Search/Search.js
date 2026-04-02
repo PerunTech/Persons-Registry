@@ -61,8 +61,8 @@ const Search = (props, context) => {
   const getConfiguration = () => {
     setLoading(true)
     const { svSession } = props
-    const url = `${window.server}/Menu/getMenu/${svSession}/person_registry-person-search-main`
-    const reqConfig = { method: 'post', url, data: {} }
+    const url = `${window.server}/Menu/getMenu/${svSession}/0/0/person_registry-person-search-main`
+    const reqConfig = { method: 'get', url }
     axios(reqConfig).then(res => {
       setLoading(false)
       if (res?.data) {
