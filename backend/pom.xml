@@ -124,6 +124,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.peruntech</groupId>
+			<artifactId>svarog</artifactId>
+			<version>[4.0.0-SNAPSHOT,5.0.0)</version>
+			<scope>provided</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.peruntech</groupId>
 			<artifactId>perun-core-services</artifactId>
 			<version>[4.0.0-SNAPSHOT,5.0.0)</version>
 			<scope>provided</scope>
