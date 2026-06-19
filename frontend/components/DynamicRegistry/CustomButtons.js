@@ -6,7 +6,7 @@ import SearchDynamic from './SearchDynamic';
 import ParentChildGrids from './ParentChildGrids'
 import Documents from './Documents'
 import FormWithGrid from './FormWithGrid';
-import { RecordSelectWrapper } from '../Wrappers';
+import * as Wrappers from '../Wrappers';
 const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements;
 const { Modal } = ReactBootstrap;
 const { useState, useEffect } = React
@@ -291,9 +291,9 @@ const CustomButtons = (props, context) => {
         let uiSchemaConfig = props.configuration.objectConfiguration?.uischema?.onSubmit
         let formDataWs = props.configuration.objectConfiguration?.data?.onSubmit
         let onSubmitWs = props.configuration.objectConfiguration?.save?.onSave
-        let contentType = props.configuration.objectConfiguration?.save?.contentType
+        let contentType = props.configuration.objectConfiguration?.save?.contentType || 'application/x-www-form-urlencoded'
         let params = props.configuration.objectConfiguration?.save?.params
-        let wrapperConfig = props.configuration.objectConfiguration?.wrapper
+        let wrapper = props.configuration.objectConfiguration?.wrapper
         // If we're rendering a modal, the configuration services are a bit nested
         let refreshSummary = props.configuration.objectConfiguration?.refreshSummary
         if (isModal) {
@@ -305,16 +305,21 @@ const CustomButtons = (props, context) => {
             // If the form data WS contains something like {TABLE_NAME.OBJECT_ID} find it and replace it with the clicked object's ID
             formDataWs = replaceFunc(formDataWs, props.tableName, clickedRowObjectId, props.configuration.objectConfiguration?.isSvarogForm)
             onSubmitWs = props.configuration.objectConfiguration?.form?.save?.onSave
-            contentType = props.configuration.objectConfiguration?.form?.save?.contentType
+            contentType = props.configuration.objectConfiguration?.form?.save?.contentType || 'application/x-www-form-urlencoded'
             params = props.configuration.objectConfiguration?.form?.save?.params
-            wrapperConfig = props.configuration.objectConfiguration?.form?.wrapper
+            if (!wrapper) {
+                wrapper = props.configuration.objectConfiguration?.form?.wrapper
+            }
+
         }
         let hideBtns = 'close'
 
         let Wrapper = undefined
         // Check if there is a wrapper
-        if (wrapperConfig && Object.keys(wrapperConfig).length > 0 && wrapperConfig.enabled) {
-            Wrapper = RecordSelectWrapper
+        if (wrapper && Object.keys(wrapper).length > 0 && wrapper.enabled) {
+            Wrapper = Wrappers.RecordSelectWrapper
+        } else if (typeof wrapper === 'string' && Wrappers[wrapper]) {
+            Wrapper = Wrappers[wrapper]
         }
 
         let readOnlyConfig
@@ -355,7 +360,7 @@ const CustomButtons = (props, context) => {
                 addDeleteFunction={(_id, _action, _session, formData) => deleteFunc(_id, _action, _session, formData, refreshSummary)}
                 hideBtns={hideBtns}
                 inputWrapper={Wrapper}
-                wrapperConfig={wrapperConfig}
+                wrapperConfig={wrapper}
                 closeModalFunc={() => setShowModal(false)}
                 objId={props.appObjId}
                 appObjId={props.appObjId}
@@ -407,9 +412,9 @@ const CustomButtons = (props, context) => {
             const url = `${window.server}${wsPath}`
             axios({
                 method: "post",
-                data: !contentType ? encodeURIComponent(JSON.stringify(formData)) : formData,
+                data: formData,
                 url,
-                headers: { "Content-Type": contentType || 'application/x-www-form-urlencoded' },
+                headers: { "Content-Type": contentType },
             }).then(res => {
                 if (res?.data) {
                     const resType = res.data?.type?.toLowerCase() || 'info'
