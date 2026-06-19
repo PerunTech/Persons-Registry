@@ -515,7 +515,6 @@ public class WsPersonRegistry {
 					listRequired.add("GENDER");
 					listRequired.add("NATIONALITY");
 					listRequired.add("RESIDENCY_STATUS");
-					listRequired.add("EU_CITIZENSHIP");
 					break;
 				default:
 					listRequired.add(PRC.ID_NO);
