@@ -53,6 +53,9 @@ public class DbInit implements IDbInit {
 		dbe2.setDbFieldSize(100);
 		dbe2.setIsNull(false);
 		dbe2.setLabel_code("physical_entity.first_name");
+		dbe2.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.first_name.help\"}}}");
+
 
 		DbDataField dbe3 = new DbDataField();
 		dbe3.setDbFieldName("LAST_NAME");
@@ -60,6 +63,9 @@ public class DbInit implements IDbInit {
 		dbe3.setDbFieldSize(100);
 		dbe3.setIsNull(false);
 		dbe3.setLabel_code("physical_entity.last_name");
+		dbe3.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.last_name.help\"}}}");
+
 
 		// DbDataField dbe4 = new DbDataField();
 		// dbe4.setDbFieldName(PRC.ID_NO);
@@ -76,6 +82,9 @@ public class DbInit implements IDbInit {
 		dbe5.setIsNull(false);
 		dbe5.setCode_list_user_code("GENDER");
 		dbe5.setLabel_code("physical_entity.gender");
+		dbe5.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.gender.help\"}}}");
+
 
 		// DbDataField dbe6 = new DbDataField();
 		// dbe6.setDbFieldName("DT_BIRTH");
@@ -248,7 +257,7 @@ public class DbInit implements IDbInit {
 		dbf2.setIndexName("PERSON_ID_NO_IDX");
 		dbf2.setLabel_code("person.id_no");
 		dbf2.setGui_metadata(
-				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"minLength\":13,\"maxLength\":13,\"searchForm\":{\"minLength\":5}}}");
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"minLength\":13,\"maxLength\":13,\"searchForm\":{\"minLength\":5},\"uischema\":{\"ui:helpCode\":\"perun.person.form.id_no.help\"}}}");
 		dbf2.setSort_order(1005);
 		
 		DbDataField dbf3 = new DbDataField();
@@ -261,7 +270,7 @@ public class DbInit implements IDbInit {
 		dbf3.setIndexName("PERSON_TAX_NO_IDX");
 		dbf3.setLabel_code("person.tax_no");
 		dbf3.setGui_metadata(
-				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"searchForm\":{\"minLength\":5}}}");
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"searchForm\":{\"minLength\":5},\"uischema\":{\"ui:helpCode\":\"perun.person.form.tax_no.help\"}}}");
 		dbf3.setSort_order(1010);
 
 		DbDataField dbf4 = new DbDataField();
@@ -272,7 +281,7 @@ public class DbInit implements IDbInit {
 		dbf4.setIndexName("PERSON_NAME_NO_IDX");
 		dbf4.setLabel_code("person.name");
 		dbf4.setGui_metadata(
-				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"searchForm\":{\"minLength\":3}}}");
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"searchForm\":{\"minLength\":3},\"uischema\":{\"ui:helpCode\":\"perun.person.form.name.help\"}}}");
 		dbf4.setSort_order(1015);
 		
 		DbDataField dbf5 = new DbDataField();
@@ -284,6 +293,8 @@ public class DbInit implements IDbInit {
 		//dbf5.setGui_metadata(
 		//		"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"uischema\":{\"ui:widget\":\"DependencyDropdown\",\"parentCodeValue\":\"COUNTRY_CODE\"},\"editable\":true}}");
 		dbf5.setLabel_code("person.country_code");
+		dbf5.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.country_code.help\"}}}");
 		dbf5.setSort_order(1020);
 		
 		DbDataField dbf6 = new DbDataField();
@@ -295,6 +306,8 @@ public class DbInit implements IDbInit {
 		//dbf6.setGui_metadata(
 		//		"{\"react\":{\"filterable\":true,\"visible\":true,\"sortable\":true,\"resizable\":true,\"uischema\":{\"ui:widget\":\"hidden\",\"dependentOn\":\"COUNTRY_CODE\",\"parentCodeValue\":\"MUNICIPALITY\"},\"editable\":true}}");
 		dbf6.setLabel_code("person.municipality");
+		dbf6.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.municipality.help\"}}}");
 		dbf6.setSort_order(1030);
 		
 		DbDataField dbf7 = new DbDataField();
@@ -306,6 +319,8 @@ public class DbInit implements IDbInit {
 		//dbf7.setGui_metadata(
 		//		"{\"react\":{\"filterable\":true,\"visible\":true,\"sortable\":true,\"resizable\":true,\"uischema\":{\"ui:widget\":\"hidden\",\"dependentOn\":\"MUNICIPALITY\",\"parentCodeValue\":\"POPULATED_AREAS\"},\"editable\":true}}");
 		dbf7.setLabel_code("person.city_village");
+		dbf7.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.city_village.help\"}}}");
 		dbf7.setSort_order(1035);
 		
 		DbDataField dbf8 = new DbDataField();
@@ -314,6 +329,8 @@ public class DbInit implements IDbInit {
 		dbf8.setDbFieldSize(200);
 		dbf8.setIsNull(true);
 		dbf8.setLabel_code("person.address");
+		dbf8.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.address.help\"}}}");
 		dbf8.setSort_order(1040);
 
 		DbDataField dbf9 = new DbDataField();
@@ -322,6 +339,8 @@ public class DbInit implements IDbInit {
 		dbf9.setDbFieldSize(3);
 		dbf9.setIsNull(true);
 		dbf9.setLabel_code("person.dt_birth_reg");
+		dbf9.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.dt_birth_reg.help\"}}}");
 		dbf9.setSort_order(1045);
 
 		DbDataField dbf10 = new DbDataField();
@@ -339,6 +358,8 @@ public class DbInit implements IDbInit {
 		dbf11.setDbFieldSize(100);
 		dbf11.setIsNull(true);
 		dbf11.setLabel_code("person.city");
+		dbf11.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.city.help\"}}}");
 		dbf11.setSort_order(1025);
 		
 		
@@ -348,6 +369,8 @@ public class DbInit implements IDbInit {
 		dbf12.setDbFieldSize(75);
 		dbf12.setIsNull(true);
 		dbf12.setLabel_code("person.phone_number");
+		dbf12.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.phone_number.help\"}}}");
 		dbf12.setSort_order(1050);
 		
 		
@@ -357,6 +380,8 @@ public class DbInit implements IDbInit {
 		dbf13.setDbFieldSize(150);
 		dbf13.setIsNull(true);
 		dbf13.setLabel_code("person.email");
+		dbf13.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.person.form.email.help\"}}}");
 		dbf13.setSort_order(1060);
 		
 		
