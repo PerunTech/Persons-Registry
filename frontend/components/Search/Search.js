@@ -425,7 +425,7 @@ const Search = (props, context) => {
             {configuration && generateSideMenuButtons()}
           </div>
         </div>
-        <div className='farm-registry-search-grid-container phc-search-grid-container person-registry-search-grid-container'>
+        <div className='farm-registry-search-grid-container person-registry-search-grid-container'>
           {showSearchForm && searchFormConfig && <SearchForm key={searchFormId} id={searchFormId} formConfig={searchFormConfig} setSearchResult={setSearchResult} />}
           {searchResult && gridConfig && generateGrid()}
           {showGrid && gridConfig && generateGrid()}

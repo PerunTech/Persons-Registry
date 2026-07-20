@@ -371,6 +371,7 @@ const CustomButtons = (props, context) => {
                 config={props.configuration.objectConfiguration}
                 formName={props.tableName}
                 heightRatio={0.8}
+                resetClickedRowObjectId={() => setClickedRowObjectId(0)}
             />
         )
     }
