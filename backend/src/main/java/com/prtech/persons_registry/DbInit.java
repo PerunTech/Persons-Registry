@@ -603,7 +603,7 @@ public class DbInit implements IDbInit {
 		dbe8.setLabel_code("address.postal_code");
 		dbe8.setGui_metadata(
 				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.postal_code.help\"}}}");
-		tbl.addDbDataField(dbe8);
+		
 		
 		DbDataField dbe9 = new DbDataField();
 		dbe9.setDbFieldName("PHONE");
@@ -623,7 +623,7 @@ public class DbInit implements IDbInit {
 		dbe10.setLabel_code("address.fax");
 		dbe10.setGui_metadata(
 				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.fax.help\"}}}");
-		tbl.addDbDataField(dbe10);
+		
 		
 		
 		DbDataField dbe12 = new DbDataField();
@@ -635,7 +635,7 @@ public class DbInit implements IDbInit {
 		dbe12.setLabel_code("address.phone_mobile");
 		dbe12.setGui_metadata(
 				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.phone_mobile.help\"}}}");
-		tbl.addDbDataField(dbe12);
+		
 		
 		DbDataField dbe11 = new DbDataField();
 		dbe11.setDbFieldName("EMAIL");
