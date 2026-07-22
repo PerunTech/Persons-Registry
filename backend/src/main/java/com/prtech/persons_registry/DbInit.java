@@ -601,7 +601,9 @@ public class DbInit implements IDbInit {
 		dbe8.setIsNull(true);
 		dbe8.setSort_order(800);
 		dbe8.setLabel_code("address.postal_code");
-		dbe8.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbe8.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.postal_code.help\"}}}");
+		tbl.addDbDataField(dbe8);
 		
 		DbDataField dbe9 = new DbDataField();
 		dbe9.setDbFieldName("PHONE");
@@ -611,7 +613,7 @@ public class DbInit implements IDbInit {
 		dbe9.setSort_order(900);
 		dbe9.setLabel_code("address.phone");
 		dbe9.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
-		
+
 		DbDataField dbe10 = new DbDataField();
 		dbe10.setDbFieldName("FAX");
 		dbe10.setDbFieldType(DbFieldType.NVARCHAR);
@@ -619,7 +621,9 @@ public class DbInit implements IDbInit {
 		dbe10.setIsNull(true);
 		dbe10.setSort_order(1000);
 		dbe10.setLabel_code("address.fax");
-		dbe10.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbe10.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.fax.help\"}}}");
+		tbl.addDbDataField(dbe10);
 		
 		
 		DbDataField dbe12 = new DbDataField();
@@ -629,7 +633,9 @@ public class DbInit implements IDbInit {
 		dbe12.setIsNull(true);
 		dbe12.setSort_order(1100);
 		dbe12.setLabel_code("address.phone_mobile");
-		dbe12.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbe12.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.address.form.phone_mobile.help\"}}}");
+		tbl.addDbDataField(dbe12);
 		
 		DbDataField dbe11 = new DbDataField();
 		dbe11.setDbFieldName("EMAIL");
