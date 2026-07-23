@@ -156,11 +156,16 @@ public class DbInit implements IDbInit {
 //		dbe2.setIsNull(false);
 //		dbe2.setLabel_code("legal_entity.full_name");
 
-		 DbDataField dbe3 = new DbDataField();
-		 dbe3.setDbFieldName("SHORT_NAME");
-		 dbe3.setDbFieldType(DbFieldType.NVARCHAR);
-		 dbe3.setDbFieldSize(100);
-		 dbe3.setLabel_code("legal_entity.short_name");
+		DbDataField dbe3 = new DbDataField();
+		dbe3.setDbFieldName("SHORT_NAME");
+		dbe3.setDbFieldType(DbFieldType.NVARCHAR);
+		dbe3.setDbFieldSize(100);
+		dbe3.setIsNull(false);
+		dbe3.setLabel_code("legal_entity.short_name");
+		dbe3.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.short_name.help\"}}}");
+		dbe3.setSort_order(200);
+		
 		//
 		// DbDataField dbe4 = new DbDataField();
 		// dbe4.setDbFieldName(PRC.ID_NO);
@@ -190,6 +195,8 @@ public class DbInit implements IDbInit {
 		dbe7.setDbFieldSize(20);
 		dbe7.setCode_list_user_code("BUSINESS_STATUS");
 		dbe7.setLabel_code("legal_entity.business_status");
+		dbe7.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.business_status.help\"}}}");
 
 		DbDataField dbe8 = new DbDataField();
 		dbe8.setDbFieldName("OWNERSHIP_TYPE");
@@ -197,6 +204,8 @@ public class DbInit implements IDbInit {
 		dbe8.setDbFieldSize(10);
 		dbe8.setCode_list_user_code("OWNERSHIP_TYPE");
 		dbe8.setLabel_code("legal_entity.ownership_type");
+		dbe8.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.ownership_type.help\"}}}");
 
 		DbDataField dbe9 = new DbDataField();
 		dbe9.setDbFieldName("SUBJECT_SIZE");
@@ -204,6 +213,8 @@ public class DbInit implements IDbInit {
 		dbe9.setDbFieldSize(10);
 		dbe9.setCode_list_user_code("SUBJECT_SIZE");
 		dbe9.setLabel_code("legal_entity.subject_size");
+		dbe9.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.subject_size.help\"}}}");
 
 		DbDataField dbe10 = new DbDataField();
 		dbe10.setDbFieldName("ORGANIZATIONAL_TYPE");
@@ -211,6 +222,8 @@ public class DbInit implements IDbInit {
 		dbe10.setDbFieldSize(10);
 		dbe10.setCode_list_user_code("ORGANIZATIONAL_TYPE");
 		dbe10.setLabel_code("legal_entity.organizational_type");
+		dbe10.setGui_metadata(
+				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.organizational_type.help\"}}}");
 
 		DbDataField[] dbTableFields = new DbDataField[6];
 		dbTableFields[0] = dbe1;
