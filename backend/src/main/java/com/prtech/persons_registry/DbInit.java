@@ -165,7 +165,7 @@ public class DbInit implements IDbInit {
 		dbe3.setGui_metadata(
 				"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.legal_entity.form.short_name.help\"}}}");
 		dbe3.setSort_order(200);
-		tbl.addDbDataField(dbe3);
+		testExt.addDbDataField(dbe3);
 		//
 		// DbDataField dbe4 = new DbDataField();
 		// dbe4.setDbFieldName(PRC.ID_NO);
