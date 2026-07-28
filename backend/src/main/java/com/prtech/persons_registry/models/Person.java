@@ -291,7 +291,12 @@ public class Person extends BaseObjectModel {
 		summary.put(labelElement, valueElement);
 
 		labelElement = I18n.getText(localeId, this.fieldsLabels.get(PRC.PERSON_TYPE));
-		valueElement = this.personType != null ? this.personType : PRC.NOT_AVAILABLE_NA;
+		if (this.personType != null) {
+			String value = Reader.getLabelCodeByCodelist("PERSON_TYPE", this.personType, svr);
+			valueElement = I18n.getText(localeId, value);
+		} else {
+			valueElement = PRC.NOT_AVAILABLE_NA;
+		}
 		summary.put(labelElement, valueElement);
 
 		return summary;
