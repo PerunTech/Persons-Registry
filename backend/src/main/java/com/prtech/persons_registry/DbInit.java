@@ -880,7 +880,8 @@ public class DbInit implements IDbInit {
 		dbf2.setSort_order(200);
 		dbf2.setIsNull(false);
 		dbf2.setLabel_code("identity_data.identity_code");
-		dbf2.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbf2.setGui_metadata(
+		"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.identity_data.form.identity_code.help\"}}}");
 		
 		/*DbDataField dbf3 = new DbDataField();
 		dbf3.setDbFieldName("DOCUMENT_SERIES");
@@ -899,7 +900,8 @@ public class DbInit implements IDbInit {
 		dbf4.setIsNull(true);
 		dbf4.setLabel_code("identity_data.issued_by");
 		//dbf4.setCode_list_user_code("DOCUMENT_AUTHORITY");
-		dbf4.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbf4.setGui_metadata(
+		"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.identity_data.form.issued_by.help\"}}}");
 		
 		DbDataField dbf6 = new DbDataField();
 		dbf6.setDbFieldName("ISSUED_ON");
@@ -908,7 +910,8 @@ public class DbInit implements IDbInit {
 		dbf6.setSort_order(400);
 		dbf6.setIsNull(true);
 		dbf6.setLabel_code("identity_data.issued_on");
-		dbf6.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbf6.setGui_metadata(
+		"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.identity_data.form.issued_on.help\"}}}");
 		
 		
 		DbDataField dbf5 = new DbDataField();
@@ -918,7 +921,8 @@ public class DbInit implements IDbInit {
 		dbf5.setSort_order(500);
 		dbf5.setIsNull(true);
 		dbf5.setLabel_code("identity_data.valid_before");
-		dbf5.setGui_metadata(CONST_GUI_FIL_VIS_RES_RW);
+		dbf5.setGui_metadata(
+		"{\"react\":{\"filterable\":true,\"visible\":true,\"resizable\":true,\"editable\":true,\"uischema\":{\"ui:helpCode\":\"perun.identity_data.form.valid_before.help\"}}}");
 		
 //		DbDataField dbf7 = new DbDataField();
 //		dbf7.setDbFieldName("DOCUMENT_TYPE");
