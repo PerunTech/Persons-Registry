@@ -39,6 +39,16 @@ public class PRC {
 	public static final String LEGAL_ENTITY = "LEGAL_ENTITY";
 	public static final String FIELD_VALUE = "FIELD_VALUE";
 	public static final String DEPENDENT_PARENT_CODE_VALUE = "DEPENDENT_PARENT_CODE_VALUE";
+	public static final String NAME = "NAME";
+	public static final String MUNICIPALITY = "MUNICIPALITY";
+	public static final String CITY_VILLAGE = "CITY_VILLAGE";
+	public static final String ADDRESS = "ADDRESS";
+	public static final String DT_BIRTH_REG = "DT_BIRTH_REG";
+	public static final String PERSON_TYPE = "PERSON_TYPE";
+	public static final String CITY = "CITY";
+	public static final String PHONE_NUMBER = "PHONE_NUMBER";
+	public static final String EMAIL = "EMAIL";
+	public static final String PILOT_FORM_ID = "PILOT_FORM_ID";
 
 	// CODES
 	public static final String COUNTRY_CODE = "COUNTRY_CODE";
@@ -56,5 +66,6 @@ public class PRC {
 	public static final String PERUN_ERROR_SAVE = "perrun.error.save";
 	public static final String ERROR_PERUN_CHANGED_STATUS = "error.perun.changedStatus";
 	public static final String ERROR_USER_NOT_AUTHORIZED = "error_user_not_authorized";
+	public static final String NOT_AVAILABLE_NA = "N/A";
 
 }

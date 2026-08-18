@@ -1,38 +1,14 @@
 import {
   React,
-  ComponentManager, utils,
-  connect, GenericForm, axios, PropTypes
+  ComponentManager,
+  connect, GenericForm, axios, PropTypes, utils
 } from "perun-core";
-const { labelsManager, setInputFilter } = utils
 const { useState, useEffect } = React
+const { labelsManager } = utils
+const PersonWrapper = (props, context) => {
 
-const PersonIdNoFieldFormWrapper = (props, context) => {
-  const [personalIdNumberInputField, setPersonalIdNumberInputField] = useState(undefined)
   const [isAddForm, setisAddForm] = useState(undefined)
 
-  useEffect(() => {
-    // Get the form classNames
-    const formClassNames = ComponentManager.getStateForComponent(props.formid, 'className')
-    // Append a dot to each of them, so we can use them to get the needed input
-    const finalFormClassNames = formClassNames?.split(' ')?.map(value => `.${value}`)?.join('') || ''
-    // Get the needed input
-    const input = document.querySelectorAll(`${finalFormClassNames} #root_ID_NO`)
-    if (input) {
-      const personalIdNumberInput = input[0]
-      if (personalIdNumberInput) {
-        setPersonalIdNumberInputField(personalIdNumberInput)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (personalIdNumberInputField) {
-      // Allow only a maximum amount of 13 characters
-      setInputFilter(personalIdNumberInputField, function (value) {
-        return /^.{0,13}$/.test(value)
-      })
-    }
-  }, [personalIdNumberInputField])
 
   useEffect(() => {
     const isAddForm = ComponentManager.getStateForComponent(
@@ -66,7 +42,7 @@ const PersonIdNoFieldFormWrapper = (props, context) => {
     }
     const url = `/ReactElements/createTableRecordFormData/${props.svSession}/ADDRESS/${resultId}`
     const contentType = 'application/x-www-form-urlencoded'
-    const reqConfig = { method: 'post', url: `${window.server}${url}`, data: JSON.stringify(addressData), headers: { 'Content-Type': contentType } }
+    const reqConfig = { method: 'post', url: `${window.server}${url}`, data: encodeURIComponent(JSON.stringify(addressData)), headers: { 'Content-Type': contentType } }
 
     axios(reqConfig).then(res => {
       if (res?.data) {
@@ -102,8 +78,8 @@ const mapStateToProps = (state) => ({
   svSession: state.security.svSession,
 });
 
-PersonIdNoFieldFormWrapper.contextTypes = {
+PersonWrapper.contextTypes = {
   intl: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(PersonIdNoFieldFormWrapper);
+export default connect(mapStateToProps)(PersonWrapper);

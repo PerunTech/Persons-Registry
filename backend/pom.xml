@@ -4,7 +4,7 @@
 
 	<groupId>org.peruntech</groupId>
 	<artifactId>persons-registry</artifactId>
-	<version>4.0.2</version>
+	<version>4.0.3</version>
 	<packaging>bundle</packaging>
 
 	<name>persons-registry</name>
@@ -82,7 +82,8 @@
 							com.prtech.persons_registry.Activator
 						</Bundle-Activator>
 						<Export-Package>
-							com.prtech.persons_registry
+							com.prtech.persons_registry,
+							com.prtech.persons_registry.models
 						</Export-Package>
 						<Private-Package>
 							com.prtech.persons_registry
@@ -122,11 +123,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>svarog</groupId>
+			<groupId>org.peruntech</groupId>
 			<artifactId>svarog</artifactId>
 			<version>[4.0.0-SNAPSHOT,5.0.0)</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.peruntech</groupId>
 			<artifactId>perun-core-services</artifactId>

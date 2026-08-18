@@ -3,7 +3,10 @@ package com.prtech.persons_registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import com.google.gson.JsonObject;
+import com.prtech.perun.services.ws.DbReader;
 import com.prtech.svarog.CodeList;
 import com.prtech.svarog.SvCore;
 import com.prtech.svarog.SvException;
@@ -12,10 +15,11 @@ import com.prtech.svarog.SvReader;
 import com.prtech.svarog.svCONST;
 import com.prtech.svarog_common.DbDataArray;
 import com.prtech.svarog_common.DbDataObject;
-import com.prtech.svarog_common.DbSearchCriterion;
-import com.prtech.svarog_common.DbSearchExpression;
+import com.prtech.svarog_common.DbQueryObject;
 import com.prtech.svarog_common.DbSearch.DbLogicOperand;
+import com.prtech.svarog_common.DbSearchCriterion;
 import com.prtech.svarog_common.DbSearchCriterion.DbCompareOperand;
+import com.prtech.svarog_common.DbSearchExpression;
 
 public class Reader {
 	public DbDataObject getCodeListByCodeValue(String codeValue, SvReader svr) throws SvException {
@@ -40,7 +44,7 @@ public class Reader {
 		}
 		return dboField;
 	}
-	
+
 	public JsonObject getDependentElements(JsonObject jFormData, String tableName, SvReader svr) throws SvException {
 		JsonObject jResult = new JsonObject();
 		HashMap<String, String> hmDistinctDependentValues = new HashMap<>();
@@ -60,7 +64,7 @@ public class Reader {
 			if (dboConfigField == null) {
 				throw new SvException("error.perun_core.missing_config_field", svr.getInstanceUser());
 			}
-			
+
 			if (fieldValue.equals("MKD")) {
 				ArrayList<String> regions = new ArrayList<>();
 				regions.add("VAR");
@@ -78,7 +82,7 @@ public class Reader {
 				dbaDependencyConfigurationTable = searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL,
 						SvCore.getTypeIdByName(tableName), dboConfigField.getVal(PRC.FIELD_NAME).toString(), fieldValue,
 						svr);
-			
+
 			if (!jFormData.has(PRC.DEPENDENT_PARENT_CODE_VALUE)) {
 				throw new SvException("error.perun_core.missing_dep_code_value", svr.getInstanceUser());
 			}
@@ -96,7 +100,8 @@ public class Reader {
 				if (hmDistinctDependentValues
 						.get(dbo.getVal(dboConfigField.getVal(PRC.FIELD_NAME).toString())) != null) {
 					jResult.addProperty(dbo.getVal(dboConfigField.getVal(PRC.FIELD_NAME).toString()).toString(),
-							hmDistinctDependentValues.get(dbo.getVal(dboConfigField.getVal(PRC.FIELD_NAME).toString())));
+							hmDistinctDependentValues
+									.get(dbo.getVal(dboConfigField.getVal(PRC.FIELD_NAME).toString())));
 				}
 			}
 		}
@@ -119,7 +124,7 @@ public class Reader {
 		}
 		return dboMatchedField;
 	}
-	
+
 	public DbDataObject getDboCodebyParentCodeValue(String parentCodeValue, SvReader svr) {
 		DbDataObject dbo = null;
 		DbDataArray dbaParentCodes = searchDbObjectsBySingleFilter(DbCompareOperand.EQUAL, svCONST.OBJECT_TYPE_CODE,
@@ -132,7 +137,7 @@ public class Reader {
 		}
 		return dbo;
 	}
-	
+
 	public DbDataArray searchDbObjectsBySingleFilter(DbCompareOperand operand, Long objectType, String columnName,
 			Object value, SvReader svr) {
 		DbDataArray dbArr = new DbDataArray();
@@ -144,7 +149,7 @@ public class Reader {
 		}
 		return dbArr;
 	}
-	
+
 	public DbDataArray searchDbObjectsByMultipleFilter(DbCompareOperand operand, Long objectType, String columnName,
 			ArrayList<String> vals, SvReader svr) {
 		DbDataArray dbArr = new DbDataArray();
@@ -161,8 +166,10 @@ public class Reader {
 		}
 		return dbArr;
 	}
-	
-	/** method to check if link between objects exist so we don't have to blow exceptions
+
+	/**
+	 * method to check if link between objects exist so we don't have to blow
+	 * exceptions
 	 * 
 	 * @param svr
 	 * @param obejct1
@@ -174,10 +181,12 @@ public class Reader {
 	public Boolean linkExists(DbDataObject obejct1, DbDataObject object2, String linkType, SvReader svr)
 			throws SvException {
 		DbDataObject dbl = SvLink.getLinkType(linkType, obejct1.getObjectType(), object2.getObjectType());
-		return linkExists( obejct1, object2, dbl, svr);
+		return linkExists(obejct1, object2, dbl, svr);
 	}
-	
-	/** method to check if link between objects exist so we don't have to blow exceptions
+
+	/**
+	 * method to check if link between objects exist so we don't have to blow
+	 * exceptions
 	 * 
 	 * @param svr
 	 * @param obejct1
@@ -209,5 +218,75 @@ public class Reader {
 		if (areLinked != null && !areLinked.getItems().isEmpty())
 			exists = true;
 		return exists;
+	}
+	
+	public static DbDataArray getFilteredRecords(MultivaluedMap<String, String> formVals, String tableName,
+			SvReader svr) throws SvException {
+		DbDataArray result = new DbDataArray();
+		DbSearchExpression dbse = new DbSearchExpression();
+		Boolean hasCrit = false;
+
+		for (String field : formVals.keySet()) {
+			if ("ROW_LIMIT".equals(field))
+				continue;
+			hasCrit = addSearchCriterion(formVals, field, tableName, DbCompareOperand.ILIKE, dbse, true) || hasCrit;
+		}
+		if (hasCrit) {
+			Integer rowLimit = null;
+			Integer offset = null;
+			try {
+				if (formVals.getFirst("ROW_LIMIT") != null)
+					rowLimit = Integer.valueOf(formVals.getFirst("ROW_LIMIT"));
+			} catch (NumberFormatException e) {
+			}
+			if (rowLimit == null)
+				rowLimit = 100;
+
+			DbQueryObject query = new DbQueryObject(SvReader.getDbtByName(tableName), dbse, null, null);
+			ArrayList<String> orderBy = new ArrayList<String>();
+			orderBy.add("PKID" + " " + "DESC");
+			query.setOrderByFields(orderBy);
+			result = svr.getObjects(query, rowLimit, offset);
+		}
+		return result;
+	}
+
+	public static Boolean addSearchCriterion(MultivaluedMap<String, String> formVals, String fieldName, String tableName,
+			DbCompareOperand operand, DbSearchExpression dbse, Boolean includePercent) throws SvException {
+		DbDataObject field = SvCore.getFieldByName(tableName, fieldName);
+		String value = formVals.getFirst(fieldName);
+		if (field != null && value != null && !value.trim().equals("null")) {
+			if ("NUMERIC".equals(field.getVal("FIELD_TYPE").toString()))
+				fieldName = fieldName + "::text";
+			if (field.getVal("CODE_LIST_ID")!=null)
+				operand = DbCompareOperand.EQUAL;
+			if (includePercent && operand!=DbCompareOperand.EQUAL)
+				value = "%" + value + "%";
+			DbSearchCriterion dbc = new DbSearchCriterion(fieldName, operand, value);
+			dbse.addDbSearchItem(dbc);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public static String getLabelCodeByCodelist(String codeList, String codeValue, SvReader svr) throws SvException {
+		DbDataObject dboLabel = null;
+		DbReader dbr = new DbReader();
+		DbDataArray dataEntry = dbr.searchObjectsBySingleFilter(DbCompareOperand.EQUAL, svCONST.OBJECT_TYPE_CODE,
+				PRC.PARENT_CODE_VALUE, codeList, svr);
+		if (!dataEntry.isEmpty()) {
+			for (int i = 0; i < dataEntry.size(); ++i) {
+				DbDataObject entry = dataEntry.get(i);
+				if (entry.getVal(PRC.CODE_VALUE).toString().equals(codeValue)) {
+					dboLabel = entry;
+					break;
+				}
+			}
+		}
+		if (dboLabel != null) {
+			return dboLabel.getVal(PRC.LABEL_CODE).toString();
+		}
+		return null;
 	}
 }

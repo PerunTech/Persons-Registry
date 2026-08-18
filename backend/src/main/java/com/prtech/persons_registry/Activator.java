@@ -26,6 +26,8 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.prtech.models.ModelFactory;
+import com.prtech.persons_registry.models.PersonsModelFactory;
 import com.prtech.svarog.SvConf;
 import com.prtech.svarog.SvCore;
 import com.prtech.svarog.SvException;
@@ -167,9 +169,15 @@ public class Activator implements BundleActivator {
 				this.registration.add(svc);
 		}
 
+		log4j.info("Registering ModelFactory class: " + PersonsModelFactory.class.getName());
+		ModelFactory factory = new PersonsModelFactory();
+		ServiceRegistration factoryReg = context.registerService(ModelFactory.class.getName(), factory, null);
+		registration.add(factoryReg);
+
 		IPerunPlugin plg = new PerunPluginInfo();
 		log4j.info("Registering perunPlugin service class: {}", plg.getClass().getName());
-		context.registerService(IPerunPlugin.class.getName(), plg, null);
+		svc = context.registerService(IPerunPlugin.class.getName(), plg, null);
+		registration.add(svc);
 
 		httpTracker = new ServiceTracker<Object, Object>(context, HttpService.class.getName(), null) {
 			@Override
