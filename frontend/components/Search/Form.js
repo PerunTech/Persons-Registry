@@ -1,5 +1,4 @@
 import { React, Loading, GenericForm, ComponentManager, GridManager, axios, elements, redux, createHashHistory } from 'perun-core'
-import { RecordSelectWrapper } from '../Wrappers'
 import PersonWrapper from '../Wrappers/PersonWrapper'
 const { useEffect, useState } = React
 const { alertUserResponse } = elements
@@ -118,15 +117,6 @@ const Form = (props) => {
   };
 
   const generateForm = () => {
-    const { formConfig } = props
-    let wrapperConfig = undefined
-    let Wrapper = undefined
-    // Check if there is a wrapper
-    if (formConfig.wrapper && Object.keys(formConfig.wrapper).length > 0 && formConfig.wrapper.enabled) {
-      wrapperConfig = formConfig.wrapper
-      Wrapper = RecordSelectWrapper
-    }
-
     return (
       <GenericForm
         className='form-test person-registry-forms person-registration-form-initial aims-forms'

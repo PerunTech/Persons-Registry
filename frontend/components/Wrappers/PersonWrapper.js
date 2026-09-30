@@ -44,10 +44,7 @@ const PersonWrapper = (props, context) => {
     const contentType = 'application/x-www-form-urlencoded'
     const reqConfig = { method: 'post', url: `${window.server}${url}`, data: encodeURIComponent(JSON.stringify(addressData)), headers: { 'Content-Type': contentType } }
 
-    axios(reqConfig).then(res => {
-      if (res?.data) {
-      }
-    }).catch(err => {
+    axios(reqConfig).catch(err => {
       console.error(err)
     })
 
