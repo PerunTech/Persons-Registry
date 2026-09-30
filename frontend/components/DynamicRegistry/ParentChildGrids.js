@@ -4,7 +4,6 @@ const { labelsManager, getDynamicKey, replaceFunc } = utils
 const { ReactBootstrap, alertUserResponse } = elements;
 const { Modal } = ReactBootstrap;
 const { store } = redux
-let prev
 const ParentChildGrids = (props, context) => {
     const [stateGrid, setStateGrid] = useState(undefined)
     const [rowChild, setRowChild] = useState(0)
@@ -36,7 +35,6 @@ const ParentChildGrids = (props, context) => {
     }
     const generateGrid = (objectId, grid) => {
         let gridId = grid.ID + objectId + getDynamicKey()
-        prev = gridId
         if (objectId) {
             const configWs = grid.objectConfiguration.configuration.onSubmit
             let dataWs = grid.objectConfiguration.data.onSubmit
