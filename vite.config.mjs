@@ -47,6 +47,20 @@ const jsxInJs = () => ({
   },
 });
 
+/**
+ * Source paths in the map, relative to the repository rather than to the map.
+ *
+ * DevTools resolves each source against the map's URL, which on a server is
+ * `/<context>/<file>.js.map`. Relative to the map's own folder the sources are
+ * `../../frontend/...`, which climbs out of the context path to the server's
+ * root -- where every plugin built this way puts its `frontend/`, so DevTools
+ * mixes up files that two plugins name the same, such as `frontend/index.js`.
+ * As `frontend/...` they stay under `/<context>/`. The map carries the sources'
+ * text, so nothing is fetched from those URLs.
+ */
+const sourcePath = (source, map) =>
+  path.relative(import.meta.dirname, path.resolve(path.dirname(map), source)).split(path.sep).join('/');
+
 const externals = ['perun-core'];
 
 export default defineConfig(({ mode }) => {
@@ -76,7 +90,10 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         external: externals,
-        output: { globals: Object.fromEntries(externals.map(name => [name, name])) },
+        output: {
+          globals: Object.fromEntries(externals.map(name => [name, name])),
+          sourcemapPathTransform: sourcePath,
+        },
       },
     },
   };
