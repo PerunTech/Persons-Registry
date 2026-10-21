@@ -52,6 +52,7 @@ const SideMenu = (props) => {
                         const component = props.routeParams?.component
                         const isChild = component.includes('SUB-')
                         const tableName = component.replace(/^SUB-/, '')
+                        let opened = false
                         res.data?.data?.buttonArray?.map(item => {
                             if (item.position === 'top') {
                                 topButtons.push(item)
@@ -60,17 +61,24 @@ const SideMenu = (props) => {
                                 if (item.data && isChild) {
                                     item.data.map(child => {
                                         if (child?.ID?.includes(tableName)) {
+                                            opened = true
                                             onButtonClick(child, true)
                                             setActive(item)
                                         }
                                     })
                                 } else {
                                     if (item?.ID?.includes(tableName)) {
+                                        opened = true
                                         onButtonClick(item)
                                     }
                                 }
                             }
                         })
+                        // Nothing in the route to open (e.g. entering from the search): a page is the item's main screen, so open it
+                        if (!opened) {
+                            const page = buttonArray.find(item => item?.objectConfiguration?.type === 'page')
+                            if (page) onButtonClick(page)
+                        }
                         setConfiguration(buttonArray)
                         props.setTopButtons(topButtons)
                     }

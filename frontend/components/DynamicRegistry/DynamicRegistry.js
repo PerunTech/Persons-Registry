@@ -24,6 +24,8 @@ const DynamicRegistry = (props, context) => {
             setToggledMenu(!toggledMenu)
         }
     }
+    // A page shows the screen's top buttons in its own header instead of the bar above it
+    const isPage = dynamicComponent?.props?.configuration?.objectConfiguration?.type === 'page'
     return (
         <div className="farm-registry-main-container">
             <SideMenu
@@ -36,7 +38,7 @@ const DynamicRegistry = (props, context) => {
                 routeParams={props.match.params}
             />
             <div className={`farm-registry-content person-registry-content ${toggledMenu && 'aims-registry-content-toggled'}`}>
-                {topButtons && Array.isArray(topButtons) && topButtons.length > 0 && (
+                {!isPage && topButtons && Array.isArray(topButtons) && topButtons.length > 0 && (
                     <div className='top-buttons-container'>
                         <TopButtons
                             configuration={topButtons}
@@ -47,7 +49,7 @@ const DynamicRegistry = (props, context) => {
                     </div>
                 )}
                 <div className='dynamic-component-container'>
-                    {dynamicComponent}
+                    {isPage ? React.cloneElement(dynamicComponent, { headerTopButtons: topButtons }) : dynamicComponent}
                 </div>
             </div>
         </div>
