@@ -4,7 +4,8 @@ const { replaceFunc, getDynamicKey, flattenObject, labelsManager } = utils
 import DoubleGrid from './DoubleGrid';
 import SearchDynamic from './SearchDynamic';
 import ParentChildGrids from './ParentChildGrids'
-import Documents from './Documents'
+import AttachmentsTable from './AttachmentsTable'
+import PageLayout from './PageLayout'
 import FormWithGrid from './FormWithGrid';
 import * as Wrappers from '../Wrappers';
 const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements;
@@ -229,12 +230,15 @@ const CustomButtons = (props, context) => {
     const generateGrid = () => {
         const configWs = props.configuration.objectConfiguration.configuration.onSubmit
         const dataWs = props.configuration.objectConfiguration.data.onSubmit
-        const multiSelect = props.configuration.objectConfiguration.multiSelect || false
+        // The grid only enables selection for a real boolean, but menus often configure it as "true"
+        const multiSelect = [true, 'true'].includes(props.configuration.objectConfiguration.multiSelect)
         const btnArray = props.configuration.objectConfiguration.additionalBtns
         const outerBtnArray = props.configuration.objectConfiguration.outerBtnArray
         const _maxLength = props.configuration.objectConfiguration.maxLength || 9999
         const additionalTopBtns = props.configuration.objectConfiguration.additionalTopButtons
-        if (additionalTopBtns && Array.isArray(additionalTopBtns) && additionalTopBtns.length > 0) {
+        const hasAdditionalTopBtns = Array.isArray(additionalTopBtns) && additionalTopBtns.length > 0
+        // Inside a page the buttons belong to this section and PageLayout shows them in its header
+        if (hasAdditionalTopBtns && !props.inPage) {
             store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-additional-top-buttons', value: additionalTopBtns } })
         }
         const grid = <div className={`${`custom-grid-container-${props.tableName.toLowerCase()}`} ${props.configuration.objectConfiguration.readOnly && 'read-only-grid'}`}>
@@ -253,7 +257,7 @@ const CustomButtons = (props, context) => {
                 enableMultiSelect={multiSelect}
                 onSelectChangeFunct={customRowSelection}
                 buttonsArray={btnArray ? btnArrCreate(btnArray, multiSelect) : undefined}
-                heightRatio={outerBtnArray ? 0.5 : 0.7}
+                heightRatio={props.configuration.objectConfiguration.heightRatio || (outerBtnArray ? 0.5 : 0.7)}
             />
         </div>
         return grid
@@ -276,7 +280,7 @@ const CustomButtons = (props, context) => {
         if (props.configuration.objectConfiguration?.isSvarogForm) {
             setClickedRowObjectId(row[`SVAROG_FORM.OBJECT_ID`] || 0)
         } else {
-            setClickedRowObjectId(row[`${props.tableName}.OBJECT_ID`] || 0)
+            setClickedRowObjectId(row[`${props.configuration?.tableName || props.tableName}.OBJECT_ID`] || 0)
             setRowClicked(row)
         }
         setShowModal(true)
@@ -303,7 +307,8 @@ const CustomButtons = (props, context) => {
             uiSchemaConfig = props.configuration.objectConfiguration?.form?.uischema?.onSubmit
             formDataWs = props.configuration.objectConfiguration?.form?.data?.onSubmit
             // If the form data WS contains something like {TABLE_NAME.OBJECT_ID} find it and replace it with the clicked object's ID
-            formDataWs = replaceFunc(formDataWs, props.tableName, clickedRowObjectId, props.configuration.objectConfiguration?.isSvarogForm)
+            // The placeholder names the row's table, which can differ from the menu's id (e.g. a page section)
+            formDataWs = replaceFunc(formDataWs, props.configuration?.tableName || props.tableName, clickedRowObjectId, props.configuration.objectConfiguration?.isSvarogForm)
             onSubmitWs = props.configuration.objectConfiguration?.form?.save?.onSave
             contentType = props.configuration.objectConfiguration?.form?.save?.contentType || 'application/x-www-form-urlencoded'
             params = props.configuration.objectConfiguration?.form?.save?.params
@@ -349,7 +354,7 @@ const CustomButtons = (props, context) => {
         }
         return (
             <GenericForm
-                className={`form-test aims-forms custom-farm-registry-form ${isModal && 'hide-initial-form-legend'} ${props.tableName.toLowerCase()}-form ${props.configuration.objectConfiguration?.readOnly && 'read-only-form'} `}
+                className={`form-test aims-forms custom-farm-registry-form ${(isModal || props.inPage) && 'hide-initial-form-legend'} ${props.tableName.toLowerCase()}-form ${props.configuration.objectConfiguration?.readOnly && 'read-only-form'} `}
                 params={'READ_URL'}
                 key={dynamicFormId}
                 id={dynamicFormId}
@@ -470,9 +475,13 @@ const CustomButtons = (props, context) => {
                 {/* GRID */}
                 {props.configuration?.objectConfiguration?.type === 'grid' && generateGrid()}
                 {/* ATTACHMENTS */}
-                {props.configuration?.objectConfiguration?.type === 'attachment' && <Documents getUploadedFiles={props.configuration?.objectConfiguration?.data.onSubmit}
-                    uploadFileUrl={props.configuration?.objectConfiguration?.attach.onSubmit}
+                {props.configuration?.objectConfiguration?.type === 'attachment' && <AttachmentsTable
+                    configuration={props.configuration.objectConfiguration}
+                    standalone={!props.inPage}
+                    onCount={props.onSectionCount}
                 />}
+                {/* PAGE: several items (forms, grids) laid out together */}
+                {props.configuration?.objectConfiguration?.type === 'page' && <PageLayout configuration={props.configuration} objectId={props.objectId} appObjId={props.appObjId} routeParams={props.routeParams} headerTopButtons={props.headerTopButtons} getConfiguration={props.getConfiguration} />}
                 {/* SEARCH-GRID*/}
                 {props.configuration?.objectConfiguration?.type === 'search-grid' && <SearchDynamic tableName={props.tableName} configuration={props.configuration.objectConfiguration} />}
                 {/* PARENT-CHILD-GRID */}

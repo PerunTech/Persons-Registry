@@ -20,13 +20,18 @@ const TopButtons = (props, context) => {
       topButtons.push(...props.additionalTopBtns)
     }
     setButtons(topButtons)
-  }, [props.additionalTopBtns])
+  }, [props.additionalTopBtns, props.configuration])
 
   useEffect(() => {
     resetState()
   }, [props.activeComponent])
 
   const reloadGrid = () => {
+    // A page section's buttons reload that section's grid, whose ID differs from the active component's
+    if (props.refreshResults) {
+      props.refreshResults()
+      return
+    }
     const gridId = props.activeComponent + props.objectId
     GridManager.reloadAllGrids()
     store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], gridId] })
