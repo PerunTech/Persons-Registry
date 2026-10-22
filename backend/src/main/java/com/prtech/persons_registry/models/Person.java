@@ -269,9 +269,11 @@ public class Person extends BaseObjectModel {
 		valueElement = this.idNo != null ? this.idNo : PRC.NOT_AVAILABLE_NA;
 		details.put(labelElement, valueElement);
 
-		labelElement = I18n.getText(localeId, this.fieldsLabels.get(PRC.TAX_NO));
-		valueElement = this.taxNo != null ? this.taxNo : PRC.NOT_AVAILABLE_NA;
-		details.put(labelElement, valueElement);
+		if (this.personType != null && this.personType.equals("G")) {
+			labelElement = I18n.getText(localeId, this.fieldsLabels.get(PRC.TAX_NO));
+			valueElement = this.taxNo != null ? this.taxNo : PRC.NOT_AVAILABLE_NA;
+			details.put(labelElement, valueElement);
+		}
 
 		return details;
 	}
