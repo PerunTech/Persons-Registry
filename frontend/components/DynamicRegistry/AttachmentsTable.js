@@ -1,4 +1,4 @@
-import { React, connect, elements, PropTypes, axios, Loading } from 'perun-core'
+import { React, useIntl, connect, elements, axios, Loading } from 'perun-core'
 const { useState, useEffect, useRef } = React
 const { alertUserResponse, alertUserV2 } = elements
 
@@ -43,8 +43,9 @@ const UploadIcon = () => (
     </svg>
 )
 
-const AttachmentsTable = (props, context) => {
-    const t = (id, defaultMessage, values) => context.intl.formatMessage({ id, defaultMessage }, values)
+const AttachmentsTable = (props) => {
+    const intl = useIntl()
+    const t = (id, defaultMessage, values) => intl.formatMessage({ id, defaultMessage }, values)
     const config = props.configuration || {}
     // Any file type unless the item restricts it, e.g. ".pdf,.png"; the size limit always applies
     const accept = config.accept || ''
@@ -233,10 +234,6 @@ const AttachmentsTable = (props, context) => {
             )}
         </div>
     )
-}
-
-AttachmentsTable.contextTypes = {
-    intl: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => ({

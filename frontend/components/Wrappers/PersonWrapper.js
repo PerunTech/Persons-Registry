@@ -1,11 +1,13 @@
 import {
   React,
+  useIntl,
   ComponentManager,
-  connect, GenericForm, axios, PropTypes, utils
+  connect, GenericForm, axios, utils
 } from "perun-core";
 const { useState, useEffect } = React
 const { labelsManager } = utils
-const PersonWrapper = (props, context) => {
+const PersonWrapper = (props) => {
+  const intl = useIntl()
 
   const [isAddForm, setisAddForm] = useState(undefined)
 
@@ -62,7 +64,7 @@ const PersonWrapper = (props, context) => {
           uiSchemaConfigMethod={`/ReactElements/getTableUISchema/${props.svSession}/ADDRESS`}
           tableFormDataMethod={`/ReactElements/getTableFormData/${props.svSession}/0/ADDRESS`}
           addSaveFunction={(e) => saveMultipleForms(e.formData)}
-          customSaveButtonName={labelsManager('save', context, 'persons_registry')}
+          customSaveButtonName={labelsManager('save', intl, 'persons_registry')}
           hideBtns={'closeAndDelete'}
           customSave={true}
         />}
@@ -74,9 +76,5 @@ const PersonWrapper = (props, context) => {
 const mapStateToProps = (state) => ({
   svSession: state.security.svSession,
 });
-
-PersonWrapper.contextTypes = {
-  intl: PropTypes.object.isRequired
-}
 
 export default connect(mapStateToProps)(PersonWrapper);

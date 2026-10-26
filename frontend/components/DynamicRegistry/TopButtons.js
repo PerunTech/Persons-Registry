@@ -1,4 +1,4 @@
-import { React, ReactDOM, PropTypes, Tooltip, Swal, Loading, ExportableGrid, ComponentManager, GridManager, axios, connect, elements, redux, utils } from 'perun-core'
+import { React, useIntl, ReactDOM, createRoot, Tooltip, Swal, Loading, ExportableGrid, ComponentManager, GridManager, axios, connect, elements, redux, utils } from 'perun-core'
 import { ActionForm } from '../Utils'
 const { useEffect, useState } = React
 const { alertUserResponse, alertUserV2, ReactBootstrap, Icon } = elements
@@ -6,7 +6,8 @@ const { Modal } = ReactBootstrap
 const { store } = redux
 const { labelsManager } = utils
 
-const TopButtons = (props, context) => {
+const TopButtons = (props) => {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [buttons, setButtons] = useState(undefined)
   const [formConfig, setFormConfig] = useState(undefined)
@@ -167,12 +168,12 @@ const TopButtons = (props, context) => {
         if (el.eSignature && el.eSignature.enabled === true) {
           alertUserV2({
             type: 'question',
-            title: labelsManager('e_sign_report_prompt', context, 'person-registry'),
+            title: labelsManager('e_sign_report_prompt', intl, 'person-registry'),
             showCancel: true,
             showDeny: true,
-            confirmButtonText: labelsManager('yes', context, 'person-registry'),
-            cancelButtonText: labelsManager('cancel', context, 'person-registry'),
-            denyButtonText: labelsManager('no', context, 'person-registry'),
+            confirmButtonText: labelsManager('yes', intl, 'person-registry'),
+            cancelButtonText: labelsManager('cancel', intl, 'person-registry'),
+            denyButtonText: labelsManager('no', intl, 'person-registry'),
             denyButtonColor: '#87adbd',
             onConfirm: () => printReport(true, 'true'),
             onCancel: () => Swal.close(),
@@ -187,12 +188,12 @@ const TopButtons = (props, context) => {
         if (!hasChildren) {
           alertUserV2({
             type: 'question',
-            title: labelsManager('transition_to_selected_status', context, 'person-registry'),
-            confirmButtonText: labelsManager('yes', context, 'person-registry'),
+            title: labelsManager('transition_to_selected_status', intl, 'person-registry'),
+            confirmButtonText: labelsManager('yes', intl, 'person-registry'),
             confirmButtonColor: '#87adbd',
             onConfirm: () => handleAction(el),
             showCancel: true,
-            cancelButtonText: labelsManager('no', context, 'person-registry'),
+            cancelButtonText: labelsManager('no', intl, 'person-registry'),
           })
         }
         break;
@@ -249,10 +250,10 @@ const TopButtons = (props, context) => {
                     title: res.data?.title || '',
                     message: res.data?.message || '',
                     ...res.data?.message && { html: res.data?.message?.replace(/\n/g, '<br>') },
-                    confirmButtonText: labelsManager('proceed', context, 'person-registry'),
+                    confirmButtonText: labelsManager('proceed', intl, 'person-registry'),
                     onConfirm: executeAction,
                     showCancel: true,
-                    cancelButtonText: labelsManager('cancel', context, 'person-registry')
+                    cancelButtonText: labelsManager('cancel', intl, 'person-registry')
                   })
                 }
               }).catch(err => {
@@ -263,7 +264,7 @@ const TopButtons = (props, context) => {
             }
           }
         } else {
-          alertUserV2({ type: 'info', title: labelsManager('no_rows_selected', context, 'person-registry') })
+          alertUserV2({ type: 'info', title: labelsManager('no_rows_selected', intl, 'person-registry') })
         }
         break;
       }
@@ -296,16 +297,17 @@ const TopButtons = (props, context) => {
                     })}
                   </>
                 )
-                ReactDOM.render(customInputs, customInputsContainer)
+                // flushSync: SweetAlert takes the element as it is, so it has to be rendered before it is handed over
+                ReactDOM.flushSync(() => createRoot(customInputsContainer).render(customInputs))
               }
               alertUserV2({
                 type: 'info',
                 title: el?.promptTitle || '',
                 message: el?.promptMessage || '',
-                confirmButtonText: labelsManager('yes', context, 'person-registry'),
+                confirmButtonText: labelsManager('yes', intl, 'person-registry'),
                 onConfirm: () => executeGeneralAction(el),
                 showCancel: true,
-                cancelButtonText: labelsManager('no', context, 'person-registry'),
+                cancelButtonText: labelsManager('no', intl, 'person-registry'),
                 onCancel: () => store.dispatch({ type: 'SAVE', payload: { key: 'person-registry-module-custom-inputs-data', value: {} } }),
                 ...customInputs && { html: customInputsContainer }
               })
@@ -410,10 +412,10 @@ const TopButtons = (props, context) => {
       type: 'info',
       title: promptTitle || '',
       message: promptMessage || '',
-      confirmButtonText: labelsManager('yes', context, 'person-registry'),
+      confirmButtonText: labelsManager('yes', intl, 'person-registry'),
       onConfirm: executeAction,
       showCancel: true,
-      cancelButtonText: labelsManager('no', context, 'person-registry'),
+      cancelButtonText: labelsManager('no', intl, 'person-registry'),
       onCancel: resetFormSaveState
     })
   }
@@ -492,10 +494,6 @@ const TopButtons = (props, context) => {
       )}
     </>
   )
-}
-
-TopButtons.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state, ownProps) => ({

@@ -1,11 +1,12 @@
-import { React, PropTypes, ComponentManager, GridManager, GenericForm, ExportableGrid, elements, axios, connect, redux, utils } from 'perun-core'
+import { React, useIntl, ComponentManager, GridManager, GenericForm, ExportableGrid, elements, axios, connect, redux, utils } from 'perun-core'
 const { flattenObject, getDynamicKey, replaceFunc, labelsManager } = utils
 const { useEffect, useState } = React
 const { store } = redux
 const { ReactBootstrap, alertUserResponse, alertUserV2 } = elements
 const { Modal } = ReactBootstrap
 
-const FormWithGrid = (props, context) => {
+const FormWithGrid = (props) => {
+  const intl = useIntl()
   const [showModal, setShowModal] = useState(false)
   const [dynamicFormId, _setDynamicFormId] = useState(getDynamicKey())
   const [dynamicModalFormId, _setDynamicModalFormId] = useState(getDynamicKey())
@@ -48,7 +49,7 @@ const FormWithGrid = (props, context) => {
     // Check if the filtered form data object has only four keys and they are only system fields
     const onlyHasSystemFields = Object.keys(nonNullishFormData).length === 4 && Object.keys(nonNullishFormData).every(k => k === 'OBJECT_ID' || k === 'OBJECT_TYPE' || k === 'PKID' || k === 'PARENT_ID')
     if (isEmpty || onlyHasSystemFields) {
-      const label = labelsManager('enter_some_values', context, 'person-registry')
+      const label = labelsManager('enter_some_values', intl, 'person-registry')
       alertUserV2({ type: 'info', title: label, onConfirm: resetFormSaveState })
     } else {
       const url = `${window.server}${wsPath}`
@@ -187,7 +188,7 @@ const FormWithGrid = (props, context) => {
           dataTableName={dataWs}
           toggleCustomButton={!readOnly}
           customButton={() => setShowModal(true)}
-          customButtonLabel={labelsManager('add', context, 'farm_registry')}
+          customButtonLabel={labelsManager('add', intl, 'farm_registry')}
           onRowClickFunct={(id, idx, row) => handleRowClick(id, idx, row, tableName)}
           heightRatio={0.4}
         />
@@ -214,10 +215,6 @@ const FormWithGrid = (props, context) => {
       )}
     </>
   )
-}
-
-FormWithGrid.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => ({

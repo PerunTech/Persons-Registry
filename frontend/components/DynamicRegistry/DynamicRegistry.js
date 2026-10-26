@@ -1,15 +1,16 @@
-import { React, PropTypes, GridManager, connect, utils } from 'perun-core'
+import { React, useIntl, GridManager, connect, utils } from 'perun-core'
 import SideMenu from './SideMenu'
 import TopButtons from './TopButtons'
 const { updateIdScreen } = utils
 const { useState, useEffect } = React
 
-const DynamicRegistry = (props, context) => {
+const DynamicRegistry = (props) => {
+    const intl = useIntl()
     const [dynamicComponent, setDynamicComponent] = useState(undefined)
     const [topButtons, setTopButtons] = useState(undefined)
     const [toggledMenu, setToggledMenu] = useState(false)
     useEffect(() => {
-        updateIdScreen('persons_registry', context)
+        updateIdScreen('persons_registry', intl)
     }, [])
     useEffect(() => {
         GridManager.reloadAllGrids();
@@ -59,9 +60,5 @@ const DynamicRegistry = (props, context) => {
 const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 });
-
-DynamicRegistry.contextTypes = {
-    intl: PropTypes.object.isRequired,
-};
 
 export default connect(mapStateToProps)(DynamicRegistry);

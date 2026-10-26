@@ -1,11 +1,12 @@
-import { React, connect, PropTypes, Tooltip, Loading, axios, elements, createHashHistory, redux, ReactDOM, utils } from "perun-core";
+import { React, useIntl, connect, Tooltip, Loading, axios, elements, createHashHistory, redux, ReactDOM, createRoot, utils } from "perun-core";
 const { labelsManager } = utils
 const { useEffect, useRef, useState } = React;
 const { ReactBootstrap, alertUserResponse, alertUserV2, Icon } = elements;
 const { Modal } = ReactBootstrap;
 const { store } = redux
 const hashHistory = createHashHistory();
-const ObjectSummary = (props, context) => {
+const ObjectSummary = (props) => {
+    const intl = useIntl()
     const mounted = useRef()
     const [loading, setLoading] = useState(false);
     const [show, setShow] = useState(false);
@@ -155,12 +156,12 @@ const ObjectSummary = (props, context) => {
         }
         alertUserV2({
             type: 'info',
-            title: labelsManager('confirm_update_action', context, 'person-registry'),
-            message: labelsManager('confirm_update_action_msg', context, 'person-registry'),
-            confirmButtonText: labelsManager('yes', context, 'person-registry'),
+            title: labelsManager('confirm_update_action', intl, 'person-registry'),
+            message: labelsManager('confirm_update_action_msg', intl, 'person-registry'),
+            confirmButtonText: labelsManager('yes', intl, 'person-registry'),
             onConfirm,
             showCancel: true,
-            cancelButtonText: labelsManager('no', context)
+            cancelButtonText: labelsManager('no', intl)
         })
     }
 
@@ -178,9 +179,10 @@ const ObjectSummary = (props, context) => {
 
     const generateCheckList = (data) => {
         const customElement = document.createElement('div');
-        ReactDOM.render(
+        // flushSync: SweetAlert takes the element as it is, so it has to be rendered before it is handed over
+        ReactDOM.flushSync(() => createRoot(customElement).render(
             <div className='farm-registry-alert'>
-                <div className='farm-registry-alert-title'><p>{labelsManager('alert-title', context, 'person-registry')}</p></div>
+                <div className='farm-registry-alert-title'><p>{labelsManager('alert-title', intl, 'person-registry')}</p></div>
                 <div className='farm-registry-alert-fields'>
                     {data['FIELDS'].map((el, index) => (
                         <div className='farm-registry-alert-field' key={index}>
@@ -189,9 +191,8 @@ const ObjectSummary = (props, context) => {
                         </div>
                     ))}
                 </div>
-            </div>,
-            customElement
-        );
+            </div>
+        ));
         alertUserV2({
             html: customElement,
             allowOutsideClick: true,
@@ -235,7 +236,7 @@ const ObjectSummary = (props, context) => {
                         data-tooltip-content={JSON.stringify(props?.businessLogicReducer?.['person-registry-module-previous-routes'])}
                     >
                         <Icon name='IconChevronLeft' />
-                        <span className='back-btn-text'>{labelsManager('back', context, 'persons_registry')}</span>
+                        <span className='back-btn-text'>{labelsManager('back', intl, 'persons_registry')}</span>
                     </button>
                     <Tooltip
                         id='epi-back-button-tooltip'
@@ -256,7 +257,7 @@ const ObjectSummary = (props, context) => {
                                                     <Icon name='IconChevronLeft' />
                                                 )}
                                                 <button key={index} className='aims-back-route' onClick={() => onRouteClick(index)}>
-                                                    {labelsManager(route.label, context, 'person-registry')}
+                                                    {labelsManager(route.label, intl, 'person-registry')}
                                                 </button>
                                             </>
                                         )
@@ -266,7 +267,7 @@ const ObjectSummary = (props, context) => {
                         }}
                     />
                     <button
-                        title={labelsManager(props.toggledMenu ? 'expand' : 'collapse', context, 'general')}
+                        title={labelsManager(props.toggledMenu ? 'expand' : 'collapse', intl, 'general')}
                         className='farm-registry-summary-back-btn aims-registry-collapse'
                         onClick={() => props.toggleSideMenu()}
                     >
@@ -286,10 +287,10 @@ const ObjectSummary = (props, context) => {
                                     className="farm-registry-object-summary-show-more"
                                     onClick={() => setShow(true)}
                                 >
-                                    {labelsManager('show_more', context, 'person-registry')}
+                                    {labelsManager('show_more', intl, 'person-registry')}
                                 </button>
                             )}
-                            {importUrl && <button className={`update-farm-btn`} onClick={() => updateData()}><span className={`update-farm-btn-container`}>{labelsManager("update_data_btn", context, 'person-registry')} <span className={`update-farm-btn-icon`}><Icon name="IconReload" /></span></span></button>}
+                            {importUrl && <button className={`update-farm-btn`} onClick={() => updateData()}><span className={`update-farm-btn-container`}>{labelsManager("update_data_btn", intl, 'person-registry')} <span className={`update-farm-btn-icon`}><Icon name="IconReload" /></span></span></button>}
                             {actions && generateSummaryActions()}
                         </div>
                     </>
@@ -317,9 +318,5 @@ const mapStateToProps = (state) => ({
     businessLogicReducer: state.businessLogicReducer,
     refreshSummary: state.businessLogicReducer?.refreshSummary
 });
-
-ObjectSummary.contextTypes = {
-    intl: PropTypes.object.isRequired,
-};
 
 export default connect(mapStateToProps)(ObjectSummary);

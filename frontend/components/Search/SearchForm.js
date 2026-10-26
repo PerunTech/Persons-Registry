@@ -1,10 +1,11 @@
-import { React, PropTypes, ComponentManager, Loading, GenericForm, axios, connect, elements, redux, utils } from 'perun-core'
+import { React, useIntl, ComponentManager, Loading, GenericForm, axios, connect, elements, redux, utils } from 'perun-core'
 const { useEffect, useState } = React
 const { alertUserResponse } = elements
 const { store } = redux
 const { labelsManager } = utils
 
-const SearchForm = (props, context) => {
+const SearchForm = (props) => {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(undefined)
 
@@ -132,7 +133,7 @@ const SearchForm = (props, context) => {
         tableFormDataMethod={data.formData}
         addSaveFunction={onSubmit}
         hideBtns='closeAndDelete'
-        customSaveButtonName={labelsManager('search', context, 'farm_registry')}
+        customSaveButtonName={labelsManager('search', intl, 'farm_registry')}
         customSave
       />
     )
@@ -144,10 +145,6 @@ const SearchForm = (props, context) => {
       {data && generateForm()}
     </>
   )
-}
-
-SearchForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => ({
