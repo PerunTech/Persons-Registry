@@ -1,9 +1,10 @@
-import { React, PropTypes, Loading, GenericForm, axios, elements, utils } from 'perun-core'
+import { React, useIntl, Loading, GenericForm, axios, elements, utils } from 'perun-core'
 const { useEffect, useState } = React
 const { alertUserResponse } = elements
 const { flattenObject, labelsManager } = utils
 
-const WrapperSearchForm = (props, context) => {
+const WrapperSearchForm = (props) => {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(undefined)
 
@@ -128,7 +129,7 @@ const WrapperSearchForm = (props, context) => {
         tableFormDataMethod={data.formData}
         addSaveFunction={(e) => onSubmit(e)}
         hideBtns='closeAndDelete'
-        customSaveButtonName={labelsManager('search', context, 'farm_registry')}
+        customSaveButtonName={labelsManager('search', intl, 'farm_registry')}
         customSave
       />
     )
@@ -140,10 +141,6 @@ const WrapperSearchForm = (props, context) => {
       {data && generateForm()}
     </>
   )
-}
-
-WrapperSearchForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 export default WrapperSearchForm

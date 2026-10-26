@@ -1,11 +1,12 @@
-import { React, PropTypes, ExportableGrid, connect, redux, elements, axios, GenericForm, ComponentManager, GridManager, Loading, createHashHistory, utils } from 'perun-core'
+import { React, useIntl, ExportableGrid, connect, redux, elements, axios, GenericForm, ComponentManager, GridManager, Loading, createHashHistory, utils } from 'perun-core'
 const { labelsManager, flattenObject } = utils
 const { alertUserResponse } = elements
 const { store, dataToRedux, removeAsyncReducer } = redux
 const { useState, useEffect } = React
 const hashHistory = createHashHistory()
 
-const SearchDynamic = (props, context) => {
+const SearchDynamic = (props) => {
+    const intl = useIntl()
     const tableName = props.tableName?.toUpperCase() || ''
     const gridId = `${props.tableName}_SEARCH`
     const [loading, setLoading] = useState(false)
@@ -30,7 +31,7 @@ const SearchDynamic = (props, context) => {
                 addSaveFunction={(e) => {
                     performSearch(e.formData, true)
                 }}
-                customSaveButtonName={labelsManager('search', context, 'farm_registry')}
+                customSaveButtonName={labelsManager('search', intl, 'farm_registry')}
             />
         )
     }
@@ -119,9 +120,5 @@ const SearchDynamic = (props, context) => {
 const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 })
-
-SearchDynamic.contextTypes = {
-    intl: PropTypes.object.isRequired,
-}
 
 export default connect(mapStateToProps)(SearchDynamic)

@@ -1,4 +1,4 @@
-import { React, connect, PropTypes, Loading, axios, createHashHistory, elements, redux, Tooltip } from "perun-core";
+import { React, connect, Loading, axios, createHashHistory, elements, redux, Tooltip } from "perun-core";
 const { useEffect, useState, useRef } = React
 const { alertUserResponse, Icon } = elements
 const { store } = redux;
@@ -290,9 +290,5 @@ const mapStateToProps = (state, ownProps) => ({
     selectedRow: state.businessLogicReducer?.[`person-registry-module-row-${ownProps?.routeParams?.tableName}`],
     menuName: state.businessLogicReducer?.[`person-registry-module-menu-name-${ownProps?.routeParams?.tableName}`],
 });
-
-SideMenu.contextTypes = {
-    intl: PropTypes.object.isRequired,
-};
 
 export default connect(mapStateToProps)(SideMenu);

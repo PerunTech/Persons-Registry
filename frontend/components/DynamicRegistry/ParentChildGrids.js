@@ -1,10 +1,11 @@
-import { React, PropTypes, ExportableGrid, connect, elements, axios, GenericForm, ComponentManager, GridManager, redux, utils } from 'perun-core'
+import { React, useIntl, ExportableGrid, connect, elements, axios, GenericForm, ComponentManager, GridManager, redux, utils } from 'perun-core'
 const { useState } = React
 const { labelsManager, getDynamicKey, replaceFunc } = utils
 const { ReactBootstrap, alertUserResponse } = elements;
 const { Modal } = ReactBootstrap;
 const { store } = redux
-const ParentChildGrids = (props, context) => {
+const ParentChildGrids = (props) => {
+    const intl = useIntl()
     const [stateGrid, setStateGrid] = useState(undefined)
     const [rowChild, setRowChild] = useState(0)
     const [rowParent, setRowParent] = useState(0)
@@ -55,7 +56,7 @@ const ParentChildGrids = (props, context) => {
                     customButton={() => {
                         setShow(true)
                     }}
-                    customButtonLabel={labelsManager('add', context, 'farm_registry')}
+                    customButtonLabel={labelsManager('add', intl, 'farm_registry')}
                 />
 
             </div>
@@ -77,7 +78,7 @@ const ParentChildGrids = (props, context) => {
                 uiSchemaConfigMethod={form.uischema?.onSubmit}
                 tableFormDataMethod={formData}
                 addSaveFunction={(e) => onSubmit(e)}
-                customSaveButtonName={labelsManager('save', context, 'person-registry')}
+                customSaveButtonName={labelsManager('save', intl, 'person-registry')}
                 addDeleteFunction={(_id, _action, _session, formData) => deleteFunc(_id, _action, _session, formData)}
                 hideBtns={rowChild === 0 ? 'closeAndDelete' : 'close'}
             />
@@ -169,7 +170,4 @@ const mapStateToProps = (state) => ({
     farmObjId: state['farm_registry.mapData']?.farmData?.objectId
 });
 
-ParentChildGrids.contextTypes = {
-    intl: PropTypes.object.isRequired,
-};
 export default connect(mapStateToProps)(ParentChildGrids);

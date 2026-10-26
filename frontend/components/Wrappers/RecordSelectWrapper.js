@@ -1,11 +1,12 @@
-import { React, PropTypes, ComponentManager, ExportableGrid, elements, utils } from 'perun-core'
+import { React, useIntl, ComponentManager, ExportableGrid, elements, utils } from 'perun-core'
 import WrapperSearchForm from './WrapperSearchForm'
 const { useEffect, useRef, useState } = React
 const { getDynamicKey } = utils
 const { ReactBootstrap } = elements
 const { Modal } = ReactBootstrap
 
-const RecordSelectWrapper = (props, context) => {
+const RecordSelectWrapper = (props) => {
+  const intl = useIntl()
   const mounted = useRef()
   const [gridId, setGridId] = useState('')
   const [showGridModal, setShowGridModal] = useState(false)
@@ -45,7 +46,7 @@ const RecordSelectWrapper = (props, context) => {
     input.style.cursor = 'pointer'
     input.setAttribute('readonly', 'readonly')
     input.addEventListener('keydown', e => e.preventDefault())
-    input.placeholder = context.intl.formatMessage({
+    input.placeholder = intl.formatMessage({
       id: placeholderLabelCode || 'Missing label',
       defaultMessage: placeholderLabelCode || 'Missing label'
     })
@@ -259,10 +260,6 @@ const RecordSelectWrapper = (props, context) => {
       )}
     </>
   )
-}
-
-RecordSelectWrapper.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 export default RecordSelectWrapper

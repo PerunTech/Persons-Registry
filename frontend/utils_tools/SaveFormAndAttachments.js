@@ -1,9 +1,9 @@
 
 import {
     React,
+    useIntl,
     connect,
     elements,
-    PropTypes,
     axios,
     Loading,
     ComponentManager,
@@ -13,7 +13,8 @@ const { useState, useEffect } = React;
 const { alertUserV2, alertUserResponse, Icon } = elements;
 const { labelsManager, formatDateAndTime } = utils
 
-const Attachments = (props, context) => {
+const Attachments = (props) => {
+    const intl = useIntl()
     const [fileItems, setFileItems] = useState(undefined)
     const [loading, setLoading] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState(undefined)
@@ -111,14 +112,14 @@ const Attachments = (props, context) => {
             nameString = erroArrNames.join(',')
             alertUserV2({
                 type: 'warning',
-                title: `${labelsManager('desc_error_upload', context, 'farm_registry')} :`,
+                title: `${labelsManager('desc_error_upload', intl, 'farm_registry')} :`,
                 message: ` ${nameString}`,
                 onConfirm
             })
         } else {
             alertUserV2({
                 type: 'success',
-                title: labelsManager('desc_success_upload_title', context, 'farm_registry'),
+                title: labelsManager('desc_success_upload_title', intl, 'farm_registry'),
                 onConfirm
             })
         }
@@ -157,11 +158,11 @@ const Attachments = (props, context) => {
     const deletePrompt = (el, e) => {
         alertUserV2({
             type: 'warning',
-            title: labelsManager('delete_uploaded_file', context, 'farm_registry'),
-            confirmButtonText: labelsManager('yes', context, 'farm_registry'),
+            title: labelsManager('delete_uploaded_file', intl, 'farm_registry'),
+            confirmButtonText: labelsManager('yes', intl, 'farm_registry'),
             onConfirm: () => deleteDownload(el, e),
             showCancel: true,
-            cancelButtonText: labelsManager('no', context, 'farm_registry')
+            cancelButtonText: labelsManager('no', intl, 'farm_registry')
         })
     }
 
@@ -296,8 +297,8 @@ const Attachments = (props, context) => {
                 {/* attachl left-live */}
                 {!readOnly && <div className={'applications-attachments-selected applications-attachments-container'}>
                     <div className={'applications-upload'}>
-                        <p>{labelsManager('attachment_title-temp', context, 'farm_registry')}</p>
-                        <label title={labelsManager('upload_file_btn', context, 'farm_registry')} htmlFor={'upload-file'} className={'upload-file-btn'} id='uploadBtn'><Icon name="IconPlus" size="35" /></label>
+                        <p>{labelsManager('attachment_title-temp', intl, 'farm_registry')}</p>
+                        <label title={labelsManager('upload_file_btn', intl, 'farm_registry')} htmlFor={'upload-file'} className={'upload-file-btn'} id='uploadBtn'><Icon name="IconPlus" size="35" /></label>
                         <input className={'applications-upload-input'} type="file" id='upload-file' onChange={handleUploadedFiles} multiple={true} />
                     </div>
                     <div className={'applications-files'}>
@@ -307,7 +308,7 @@ const Attachments = (props, context) => {
                 {/* attach right offline */}
                 <div className={'applications-attachments-uploaded applications-attachments-container'}>
                     <div className={'applications-upload'}>
-                        <p>{labelsManager('attachment_title', context, 'farm_registry')}</p>
+                        <p>{labelsManager('attachment_title', intl, 'farm_registry')}</p>
                     </div>
                     <div className={'applications-files'}>
                         {fileItems}
@@ -317,8 +318,8 @@ const Attachments = (props, context) => {
 
             {/* save and delete section */}
             {<div id="btnSeparator" className={"attachment-btns"}>
-                {showSave && <button onClick={() => { handleSubmit() }} type="submit" id="save_form_btn" className={'wrapper-btn-save btn-success btn_save_form'}>{labelsManager('save', context, 'farm_registry')}</button>}
-                {(props.objId !== 0 && props.objId) && showDelete && <button onClick={() => { deleteFunc() }} type="button" id="save_form_btn" className={'wrapper-btn-save btn-danger btn_delete_form'}>{labelsManager('delete', context, 'farm_registry')}</button>}
+                {showSave && <button onClick={() => { handleSubmit() }} type="submit" id="save_form_btn" className={'wrapper-btn-save btn-success btn_save_form'}>{labelsManager('save', intl, 'farm_registry')}</button>}
+                {(props.objId !== 0 && props.objId) && showDelete && <button onClick={() => { deleteFunc() }} type="button" id="save_form_btn" className={'wrapper-btn-save btn-danger btn_delete_form'}>{labelsManager('delete', intl, 'farm_registry')}</button>}
             </div>}
         </>
     );
@@ -328,7 +329,4 @@ const mapStateToProps = (state) => ({
     svSession: state.security.svSession,
 });
 
-Attachments.contextTypes = {
-    intl: PropTypes.object.isRequired,
-};
 export default connect(mapStateToProps)(Attachments);

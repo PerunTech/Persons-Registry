@@ -1,4 +1,4 @@
-import { React, ReactDOM, PropTypes, Loading, ComponentManager, redux, ExportableGrid, axios, connect, createHashHistory, elements, utils } from 'perun-core'
+import { React, useIntl, ReactDOM, createRoot, Loading, ComponentManager, redux, ExportableGrid, axios, connect, createHashHistory, elements, utils } from 'perun-core'
 import Form from './Form'
 import SearchForm from './SearchForm'
 import { ActionForm } from '../Utils'
@@ -9,7 +9,8 @@ const { Modal } = ReactBootstrap
 const { store, updateSelectedRows } = redux
 const hashHistory = createHashHistory()
 
-const Search = (props, context) => {
+const Search = (props) => {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [configuration, setConfiguration] = useState(undefined)
   const [activeElement, setActiveElement] = useState('')
@@ -28,7 +29,7 @@ const Search = (props, context) => {
   const [showActionFormModal, setShowActionFormModal] = useState(false)
 
   useEffect(() => {
-    updateIdScreen('persons_registry', context)
+    updateIdScreen('persons_registry', intl)
     getConfiguration()
     store.dispatch({ type: 'SAVE', payload: { key: 'farm-registry-route', value: '' } })
     store.dispatch({ type: 'SAVE', payload: { key: 'farm-registry-object-id', value: '' } })
@@ -176,7 +177,8 @@ const Search = (props, context) => {
           })}
         </>
       )
-      ReactDOM.render(customInputs, customInputsContainer)
+      // flushSync: SweetAlert takes the element as it is, so it has to be rendered before it is handed over
+      ReactDOM.flushSync(() => createRoot(customInputsContainer).render(customInputs))
     }
 
     const onCancel = () => {
@@ -193,10 +195,10 @@ const Search = (props, context) => {
       type: 'info',
       title: config?.promptTitle || '',
       message: config?.promptMessage || '',
-      confirmButtonText: labelsManager('yes', context, 'person-registry'),
+      confirmButtonText: labelsManager('yes', intl, 'person-registry'),
       onConfirm: () => executeAction(actionConfig),
       showCancel: true,
-      cancelButtonText: labelsManager('no', context, 'person-registry'),
+      cancelButtonText: labelsManager('no', intl, 'person-registry'),
       onCancel,
       ...customInputs && { html: customInputsContainer }
     })
@@ -215,7 +217,7 @@ const Search = (props, context) => {
           break;
       }
     } else {
-      alertUserV2({ type: 'info', title: labelsManager('no_rows_selected', context, 'person-registry') })
+      alertUserV2({ type: 'info', title: labelsManager('no_rows_selected', intl, 'person-registry') })
     }
   }
 
@@ -418,7 +420,7 @@ const Search = (props, context) => {
           <div className='back-button-container'>
             <button className='btn back-btn epi-back-btn' onClick={() => hashHistory.push('/main')}>
               <Icon name='IconChevronLeft' />
-              <span className='back-btn-text'>{labelsManager('back', context, 'persons_registry')}</span>
+              <span className='back-btn-text'>{labelsManager('back', intl, 'persons_registry')}</span>
             </button>
           </div>
           <div className="farm-registry-sidemenu-buttons-container">
@@ -453,10 +455,6 @@ const Search = (props, context) => {
       </div>
     </>
   )
-}
-
-Search.contextTypes = {
-  intl: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => ({
