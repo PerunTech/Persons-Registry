@@ -22,7 +22,7 @@ const SearchForm = (props) => {
 
   const onSubmit = () => {
     store.dispatch({ type: 'UPDATE_SELECTED_GRID_ROWS', payload: [[], ''] })
-    const formData = ComponentManager.getStateForComponent(props.searchFormId, 'formTableData')
+    const formData = ComponentManager.getStateForComponent(props.id, 'formTableData')
     const { formConfig, setSearchResult } = props
     const searchConfig = formConfig?.searchForm
     const searchType = searchConfig?.save?.type || 'GET'
@@ -126,8 +126,8 @@ const SearchForm = (props) => {
       <GenericForm
         className='form-test person-registry-forms admin-console-search-from person-registry-search-form'
         params='FORM_DATA'
-        key={props.searchFormId}
-        id={props.searchFormId}
+        key={props.id}
+        id={props.id}
         method={data.jsonSchema}
         uiSchemaConfigMethod={data.uiSchema}
         tableFormDataMethod={data.formData}

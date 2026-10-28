@@ -1,12 +1,14 @@
 import { React, useIntl, Loading, GenericForm, axios, elements, utils } from 'perun-core'
 const { useEffect, useState } = React
 const { alertUserResponse } = elements
-const { flattenObject, labelsManager } = utils
+const { flattenObject, labelsManager, getDynamicKey } = utils
 
 const WrapperSearchForm = (props) => {
   const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(undefined)
+  // A fixed id could hand this form the slice, and so the search handler, of the one before it
+  const [searchFormId] = useState(() => getDynamicKey())
 
   useEffect(() => {
     getData()
@@ -122,8 +124,8 @@ const WrapperSearchForm = (props) => {
       <GenericForm
         className='form-test custom-farm-registry-form aims-forms hide-all-form-legends'
         params='FORM_DATA'
-        key='PERSON_REGISTRY_WRAPPER_SEARCH_FORM'
-        id='PERSON_REGISTRY_WRAPPER_SEARCH_FORM'
+        key={searchFormId}
+        id={searchFormId}
         method={data.jsonSchema}
         uiSchemaConfigMethod={data.uiSchema}
         tableFormDataMethod={data.formData}

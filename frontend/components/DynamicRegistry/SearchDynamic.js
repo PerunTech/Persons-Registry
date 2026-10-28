@@ -1,5 +1,5 @@
 import { React, useIntl, ExportableGrid, connect, redux, elements, axios, GenericForm, ComponentManager, GridManager, Loading, createHashHistory, utils } from 'perun-core'
-const { labelsManager, flattenObject } = utils
+const { labelsManager, flattenObject, getDynamicKey } = utils
 const { alertUserResponse } = elements
 const { store, dataToRedux, removeAsyncReducer } = redux
 const { useState, useEffect } = React
@@ -11,6 +11,8 @@ const SearchDynamic = (props) => {
     const gridId = `${props.tableName}_SEARCH`
     const [loading, setLoading] = useState(false)
     const [resultsData, setResultsData] = useState(undefined)
+    // A fixed id could hand this form the slice, and so the search handler, of the one before it
+    const [searchFormId] = useState(() => getDynamicKey())
     useEffect(() => {
         performSearch({}, false)
     }, [])
@@ -21,8 +23,8 @@ const SearchDynamic = (props) => {
             <GenericForm
                 className={`sectioned-search-form aims-forms hide-all-form-legends`}
                 params='FORM_DATA'
-                key={gridId + '_FORM'}
-                id={gridId + '_FORM'}
+                key={searchFormId}
+                id={searchFormId}
                 method={searchConfig?.configuration?.onSubmit}
                 uiSchemaConfigMethod={searchConfig?.uischema?.onSubmit}
                 tableFormDataMethod={searchConfig?.data?.onSubmit}
@@ -95,7 +97,7 @@ const SearchDynamic = (props) => {
                 alertUserResponse({ response: err })
                 // Handle form-specific error logic
                 if (isForm) {
-                    ComponentManager.setStateForComponent(`${gridId}_FORM`, null, {
+                    ComponentManager.setStateForComponent(searchFormId, null, {
                         saveExecuted: false,
                     });
                 }
