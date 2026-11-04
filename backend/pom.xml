@@ -8,7 +8,52 @@
 	<packaging>bundle</packaging>
 
 	<name>persons-registry</name>
-	<url>http://maven.apache.org</url>
+	<description>Persons Registry bundle for the Svarog Business Platform</description>
+	<url>https://github.com/PerunTech/persons-registry</url>
+	<organization>
+		<name>Perun Technologies</name>
+		<url>http://peruntech.org</url>
+	</organization>
+	<scm>
+		<connection>scm:git:git@github.com:PerunTech/persons-registry.git</connection>
+		<developerConnection>scm:git:git@github.com:PerunTech/persons-registry.git</developerConnection>
+		<url>https://github.com/PerunTech/persons-registry.git</url>
+	</scm>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>karikjtomi</id>
+			<name>Tomi Karikj</name>
+			<email>t.karikj@prtech.mk</email>
+			<url>http://www.perun.tech</url>
+			<organization>Perun Technologies</organization>
+			<organizationUrl>http://www.perun.tech</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Skopje</timezone>
+		</developer>
+		<developer>
+			<id>ristepejov</id>
+			<name>Riste Pejov</name>
+			<email>r.pejov@prtech.mk</email>
+			<url>http://www.perun.tech</url>
+			<organization>Perun Technologies</organization>
+			<organizationUrl>http://www.perun.tech</organizationUrl>
+			<roles>
+				<role>architect</role>
+			</roles>
+			<timezone>Europe/Skopje</timezone>
+		</developer>
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,6 +71,11 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.jreleaser</groupId>
+				<artifactId>jreleaser-maven-plugin</artifactId>
+				<version>1.19.0</version>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -147,6 +197,29 @@
 					<version>12.2.0.1.0</version>
 				</dependency>
 			</dependencies>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.4.1</version>
+						<configuration>
+							<doclint>none</doclint>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadoc</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 	
