@@ -8,6 +8,7 @@ const { Modal } = ReactBootstrap
 const RecordSelectWrapper = (props) => {
   const intl = useIntl()
   const mounted = useRef()
+  const arrayIndex = useRef()
   const [gridId, setGridId] = useState('')
   const [showGridModal, setShowGridModal] = useState(false)
   const [searchResult, setSearchResult] = useState(undefined)
@@ -37,12 +38,21 @@ const RecordSelectWrapper = (props) => {
     setShowArrayGridModal(false)
   }
 
-  const onArrayInputClick = () => {
+  const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  // Older configurations name the array and the item's section; newer ones give the input's id with {index} for the item
+  const arrayInputPattern = ({ inputId, firstSectionName, secondSectionName, displayFieldName }) => {
+    const id = firstSectionName ? ['root', firstSectionName, '{index}', secondSectionName, displayFieldName].filter(Boolean).join('_') : inputId
+    return new RegExp(`^${id.split('{index}').map(escapeRegExp).join('(\\d+)')}$`)
+  }
+
+  const onArrayInputClick = (input) => {
+    arrayIndex.current = Number(input.id.match(arrayInputPattern(arrayInputsConfig))?.[1])
     setShowArrayGridModal(true)
   }
 
   const handleInputTransformation = (input, placeholderLabelCode, isArrayInput) => {
-    input.onclick = () => isArrayInput ? onArrayInputClick() : onInputClick(input)
+    input.onclick = () => isArrayInput ? onArrayInputClick(input) : onInputClick(input)
     input.style.cursor = 'pointer'
     input.setAttribute('readonly', 'readonly')
     input.addEventListener('keydown', e => e.preventDefault())
@@ -55,12 +65,9 @@ const RecordSelectWrapper = (props) => {
 
   const transformArrayInputs = () => {
     if (arrayInputsConfig) {
-      const { firstSectionName, secondSectionName, displayFieldName, placeholderLabelCode } = arrayInputsConfig
-      const regex = new RegExp('^root_' + firstSectionName + '_\\d+_' + secondSectionName + `_${displayFieldName}` + '$')
-      const inputs = Array.from(document.querySelectorAll('input')).filter((input) => regex.test(input.id))
-      if (inputs && inputs.length > 0) {
-        inputs.forEach(input => handleInputTransformation(input, placeholderLabelCode, true))
-      }
+      const pattern = arrayInputPattern(arrayInputsConfig)
+      const inputs = Array.from(document.querySelectorAll('input')).filter((input) => pattern.test(input.id))
+      inputs.forEach(input => handleInputTransformation(input, arrayInputsConfig.placeholderLabelCode, true))
     }
   }
 
@@ -115,30 +122,22 @@ const RecordSelectWrapper = (props) => {
     const { formid } = props
     const formData = ComponentManager.getStateForComponent(formid, 'formTableData')
     if (isArrayInput) {
-      const { tableName, denormalizedField, denormalizedFieldName, displayFieldName, displayValue, firstSectionName, secondSectionName } = arrayInputsConfig
-      const denormalizedFieldValue = row[`${tableName}.${denormalizedField}`]
-      const valueToDisplay = row[`${tableName}.${displayValue}`]
-      if (formData) {
-        if (firstSectionName) {
-          if (!formData[firstSectionName]) {
-            formData[firstSectionName] = []
-          }
-          if (formData[firstSectionName] && Array.isArray(formData[firstSectionName])) {
-            formData[firstSectionName][formData[firstSectionName].length - 1] = {
-              [secondSectionName]: {
-                ...formData[firstSectionName][formData[firstSectionName].length - 1]?.[secondSectionName] && { ...formData[firstSectionName][formData[firstSectionName].length - 1]?.[secondSectionName] },
-                [denormalizedFieldName]: denormalizedFieldValue,
-                [displayFieldName]: valueToDisplay
-              }
-            }
-            // This will remove any empty objects from the array
-            formData[firstSectionName] = formData[firstSectionName].filter(item => Object.keys(item).length > 0)
-          }
-          ComponentManager.setStateForComponent(formid, 'formTableData', formData)
-          props.formInstance.setState({ formTableData: formData })
-          props.formInstance.onInputChange(formData)
-          closeArrayGridModal()
+      const { tableName, denormalizedField, denormalizedFieldName, displayFieldName, displayValue, firstSectionName, secondSectionName, sectionName } = arrayInputsConfig
+      const arrayName = firstSectionName || sectionName
+      const index = arrayIndex.current
+      if (formData && arrayName && Number.isInteger(index)) {
+        const items = Array.isArray(formData[arrayName]) ? [...formData[arrayName]] : []
+        const item = { ...items[index] }
+        const picked = {
+          [denormalizedFieldName]: row[`${tableName}.${denormalizedField}`],
+          [displayFieldName]: row[`${tableName}.${displayValue}`]
         }
+        items[index] = secondSectionName ? { ...item, [secondSectionName]: { ...item[secondSectionName], ...picked } } : { ...item, ...picked }
+        formData[arrayName] = items
+        ComponentManager.setStateForComponent(formid, 'formTableData', formData)
+        props.formInstance.setState({ formTableData: formData })
+        props.formInstance.onInputChange(formData)
+        closeArrayGridModal()
       }
     } else {
       const { tableName, denormalizedField, denormalizedFieldName, displayFieldName, displayValue, sectionName, additionalFieldsToMap } = singleInputConfig
