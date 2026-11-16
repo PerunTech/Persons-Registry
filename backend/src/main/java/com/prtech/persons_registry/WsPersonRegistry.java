@@ -182,8 +182,8 @@ public class WsPersonRegistry {
 						break;
 					case "CYP":
 						listRequired.add(PRC.ID_NO);
-						listRequired.add(PRC.TAX_NO);
-						listRequired.add("DT_BIRTH_REG");
+//						listRequired.add(PRC.TAX_NO);
+//						listRequired.add("DT_BIRTH_REG");
 						listRequired.add("NAME");
 						break;
 					default:
@@ -514,7 +514,7 @@ public class WsPersonRegistry {
 					listRequired.add("LAST_NAME");
 					listRequired.add("GENDER");
 					listRequired.add("NATIONALITY");
-					listRequired.add("RESIDENCY_STATUS");
+//					listRequired.add("RESIDENCY_STATUS");
 					break;
 				default:
 					listRequired.add(PRC.ID_NO);
