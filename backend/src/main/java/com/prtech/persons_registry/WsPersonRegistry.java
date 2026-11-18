@@ -19,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -1052,6 +1053,11 @@ public class WsPersonRegistry {
 		if (person.getVal("TAX_NO") != null)
 			responseJsonObject.addProperty("TAX_NO", (String) person.getVal("TAX_NO"));
 
+		for (String contactField : new String[] { "COUNTRY_CODE", "CITY", "MUNICIPALITY", "CITY_VILLAGE",
+				"ADDRESS", "PHONE_NUMBER", "EMAIL" }) {
+			responseJsonObject.addProperty(contactField, ObjectUtils.defaultIfNull(
+					vdataObject.getAsString(contactField), person.getAsString(contactField)));
+		}
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_ID, vdataObject.getObjectId());
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_TYPE, vdataObject.getObjectType());
 		responseJsonObject.addProperty(tableName + "." + Rc.PKID, vdataObject.getPkid());
