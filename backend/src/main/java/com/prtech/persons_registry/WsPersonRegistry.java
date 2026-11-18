@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +20,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -1055,7 +1055,7 @@ public class WsPersonRegistry {
 
 		for (String contactField : new String[] { "COUNTRY_CODE", "CITY", "MUNICIPALITY", "CITY_VILLAGE",
 				"ADDRESS", "PHONE_NUMBER", "EMAIL" }) {
-			responseJsonObject.addProperty(contactField, ObjectUtils.defaultIfNull(
+			responseJsonObject.addProperty(contactField, Objects.toString(
 					vdataObject.getAsString(contactField), person.getAsString(contactField)));
 		}
 		responseJsonObject.addProperty(tableName + "." + Rc.OBJECT_ID, vdataObject.getObjectId());
